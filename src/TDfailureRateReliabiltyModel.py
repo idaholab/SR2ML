@@ -90,6 +90,7 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
       @ Out, None
     """
     if container.type in {'customLambda','customPfailure'}:
+      pass
       # read file
       #self.dataFilename = os.path.join(self.workingDir,container.fileName)
 
@@ -100,6 +101,7 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
       @ In, container, object, self-like object where all the variables can be stored
       @ In, Inputs, dict, dictionary of inputs from RAVEN
     """
+    pass
     
 
 
