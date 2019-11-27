@@ -31,7 +31,7 @@ from PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 
-class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
+class TDFailureRateReliabilityModel(ExternalModelPluginBase):
   """
     This class is designed to create a time dependent failure rate reliability model
   """
@@ -89,7 +89,8 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
       @ In, inputFiles, list, list of input files (if any)
       @ Out, None
     """
-    # if container.type in {'customLambda','customPfailure'}:
+    if container.type in {'customLambda','customPfailure'}:
+      pass
       # read file
       #self.dataFilename = os.path.join(self.workingDir,container.fileName)
 
@@ -100,3 +101,4 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
       @ In, container, object, self-like object where all the variables can be stored
       @ In, Inputs, dict, dictionary of inputs from RAVEN
     """
+    pass
