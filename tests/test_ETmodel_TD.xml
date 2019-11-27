@@ -7,6 +7,9 @@
     <description>
        This test is aimed to check the fault tree external model
     </description>
+    <revisions>
+      <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
+    </revisions>
   </TestInfo>
 
   <RunInfo>
@@ -20,7 +23,7 @@
   </Files>
 
   <Models>
-    <ExternalModel name="ET" subType="ETModel">
+    <ExternalModel name="ET" subType="SR2ML.ETModel">
       <variables>statusACC,statusLPI,statusLPR,sequence</variables>
       <map var='statusACC'>ACC</map>
       <map var='statusLPI'>LPI</map>

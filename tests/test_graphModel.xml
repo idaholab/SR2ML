@@ -7,6 +7,9 @@
     <description>
        This test is aimed to check the Graph Model
     </description>
+    <revisions>
+      <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
+    </revisions>
   </TestInfo>
 
   <RunInfo>
@@ -42,7 +45,7 @@
   </Samplers>
 
   <Models>
-    <ExternalModel name="graph" subType="GraphModel">
+    <ExternalModel name="graph" subType="SR2ML.GraphModel">
       <variables>status2,status3,status4,status5,statusSG1,statusSG2,statusSG3</variables>
       <!-- xml portion for this plugin only -->
       <modelFile>graphTest</modelFile>

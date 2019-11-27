@@ -7,6 +7,9 @@
     <description>
        This test is aimed to check the time dependent graph model
     </description>
+    <revisions>
+      <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
+    </revisions>
   </TestInfo>
 
   <RunInfo>
@@ -46,7 +49,7 @@
   </Samplers>
 
   <Models>
-    <ExternalModel name="graph" subType="GraphModel">
+    <ExternalModel name="graph" subType="SR2ML.GraphModel">
       <variables>statusA,statusB,statusC,statusD,statusOUT</variables>
       <modelFile>graphTestTD</modelFile>
       <nodesIN>in</nodesIN>

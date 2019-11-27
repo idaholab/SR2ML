@@ -7,6 +7,9 @@
     <description>
        This test is aimed to check Markov model with 3 states with instant transition
     </description>
+    <revisions>
+      <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
+    </revisions>
   </TestInfo>
 
   <RunInfo>
@@ -35,7 +38,7 @@
   </Samplers>
 
   <Models>
-    <ExternalModel name="markov" subType="MarkovModel">
+    <ExternalModel name="markov" subType="SR2ML.MarkovModel">
       <variables>initialState,finalState</variables>
       <initState>initialState</initState>
       <finState>finalState</finState>

@@ -7,6 +7,9 @@
     <description>
        This test is aimed to check ensemble model with fault tree and exvent tree external model
     </description>
+    <revisions>
+      <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
+    </revisions>
   </TestInfo>
 
   <RunInfo>
@@ -80,7 +83,7 @@
   </Samplers>
 
   <Models>
-    <ExternalModel name="ET" subType="ETModel">
+    <ExternalModel name="ET" subType="SR2ML.ETModel">
       <variables>initEvent,statusACC,statusLPI,LPR,sequence</variables>
       <map var='initEvent' >IE</map>
       <map var='statusACC' >ACC</map>
@@ -89,21 +92,21 @@
       <sequenceID>sequence</sequenceID>
     </ExternalModel>
 
-    <ExternalModel name="FT1" subType="FTModel">
+    <ExternalModel name="FT1" subType="SR2ML.FTModel">
       <variables>A,B,LPR</variables>
       <topEvents>LPR</topEvents>
       <map var='A'>A</map>
       <map var='B'>B</map>
     </ExternalModel>
 
-    <ExternalModel name="FT2" subType="FTModel">
+    <ExternalModel name="FT2" subType="SR2ML.FTModel">
       <variables>A,C,alpha</variables>
       <topEvents>alpha</topEvents>
       <map var='A'>A</map>
       <map var='C'>C</map>
     </ExternalModel>
 
-    <ExternalModel name="graph" subType="GraphModel">
+    <ExternalModel name="graph" subType="SR2ML.GraphModel">
       <variables>alpha,beta,gamma,statusACC</variables>
       <modelFile>RBD</modelFile>
       <nodesIN>signal</nodesIN>
@@ -114,7 +117,7 @@
       <map var='statusACC' >ACC</map>
     </ExternalModel>
 
-    <ExternalModel name="markov" subType="MarkovModel">
+    <ExternalModel name="markov" subType="SR2ML.MarkovModel">
       <variables>initialState,statusLPI</variables>
       <initState>initialState</initState>
       <finState>statusLPI</finState>
