@@ -42,44 +42,34 @@
           <requirement id_code="SR2ML-PRA-1">
               <description>The SR2ML plug-in shall support importing Event Tree Boolean logic structure to construct RAVEN Event Tree ExternalModel</description>
           </requirement>
-      </requirement_set>
 
-      <requirement_set caption="Probabilistic Risk Assessment">
           <requirement id_code="SR2ML-PRA-2">
               <description>The SR2ML plug-in shall support importing Fault Tree Boolean logic structure to construct RAVEN Fault Tree ExternalModel</description>
           </requirement>
-      </requirement_set>
 
-      <requirement_set caption="Probabilistic Risk Assessment">
           <requirement id_code="SR2ML-PRA-3">
               <description>The SR2ML plug-in shall support importing a generic Markov chain to construct RAVEN Markov chain ExternalModel</description>
           </requirement>
-      </requirement_set>
 
-      <requirement_set caption="Probabilistic Risk Assessment">
           <requirement id_code="SR2ML-PRA-4">
               <description>The SR2ML plug-in shall support importing Reliability Block Diagram (RBD) Boolean logic structure to construct RAVEN RBD ExternalModel</description>
           </requirement>
-      </requirement_set>
 
-      <!-- <requirement_set caption="Probabilistic Risk Assessment">
+          <!--
           <requirement id_code="SR2ML-PRA-5">
               <description>The SR2ML plug-in shall support importing OpenPSA formated Event Tree as a PointSet in RAVEN</description>
           </requirement>
-      </requirement_set> -->
 
-      <!-- <requirement_set caption="Probabilistic Risk Assessment">
           <requirement id_code="SR2ML-PRA-6">
               <description>The SR2ML plug-in shall support importing OpenPSA formated Fault Tree as a PointSet in RAVEN</description>
           </requirement>
-      </requirement_set> -->
 
-      <!-- <requirement_set caption="Probabilistic Risk Assessment">
           <requirement id_code="SR2ML-PRA-7">
               <description>The SR2ML plug-in shall support classify the simulation PRA data using imported Event Tree/Fault Tee data</description>
           </requirement>
-      </requirement_set> -->
+          -->
 
+      </requirement_set>
     </requirement_group>
 
 
