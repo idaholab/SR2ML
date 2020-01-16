@@ -7,6 +7,7 @@
     <description>
        This test is aimed to check time dependent fault tree external model
     </description>
+    <requirements>SR2ML-PRA-2</requirements>
     <revisions>
       <revision author="wangc" date="2019-11-27">Added Plugin name extension</revision>
     </revisions>
