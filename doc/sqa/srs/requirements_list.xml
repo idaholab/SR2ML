@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<requirements_specification application="SR2ML">
+
+
+    <requirement_group id="Minimum Requirements">
+
+      <requirement_set caption="Minimum Requirements">
+          <requirement id_code="CF-M-1">
+              <description>Computer: Any POSIX (and POSIX-like) system</description>
+              <source>``RAVEN User Manual'', INL/EXT-15-34123; Continous Integration System</source>
+          </requirement>
+          <requirement id_code="CF-M-2">
+              <description>RAM: 2 GB per core execution (depending on the type of analysis and data genarated)</description>
+              <source>``RAVEN User Manual'', INL/EXT-15-34123; Continous Integration System</source>
+          </requirement>
+          <requirement id_code="CF-M-3">
+              <description>Language: Python 3.x</description>
+              <source>``RAVEN User Manual'', INL/EXT-15-34123; Continous Integration System</source>
+          </requirement>
+        </requirement_set>
+
+    </requirement_group>
+
+
+    <requirement_group id="Functional Requirements">
+
+      <requirement_set caption="Framework, I/O, Execution Control">
+          <requirement id_code="CF-F-1">
+              <description>The SR2ML plug-in shall allow support for user-defined instructions for controlling the execution stages of the probabilistic safety, risk and reliability analysis.</description>
+          </requirement>
+          <requirement id_code="CF-F-2">
+              <description>The SR2ML plug-in shall allow for user-defined output types for simulation data.</description>
+          </requirement>
+      </requirement_set>
+
+    </requirement_group>
+
+
+    <requirement_group id="Usability Requirements">
+
+      <requirement_set caption="Risk Analysis">
+          <requirement id_code="CF-RA-1">
+              <description>The SR2ML plug-in shall support the computation of risk probability.</description>
+          </requirement>
+      </requirement_set>
+
+    </requirement_group>
+
+
+    <requirement_group id="Performance Requirements">
+      <requirement_set caption="Infrastructure Support">
+          <requirement id_code="CF-IS-1">
+              <description>The SR2ML plug-in shall be able to be executed in parallel via RAVEN</description>
+          </requirement>
+      </requirement_set>
+
+    </requirement_group>
+
+
+    <requirement_group id="System Interfaces">
+      <requirement_set caption="Interface with external applications">
+          <requirement id_code="CF-SI-1">
+              <description>The SR2ML plug-in shall be able to be initialized via input files.</description>
+          </requirement>
+      </requirement_set>
+
+    </requirement_group>
+
+</requirements_specification>
