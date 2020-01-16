@@ -23,6 +23,8 @@ warnings.simplefilter('default', DeprecationWarning)
 
 #External Modules---------------------------------------------------------------
 import numpy as np
+import math as math
+from scipy.integrate import quad
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
@@ -52,7 +54,8 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
     """
     container.mapping    = {}
     container.InvMapping = {}
-    allowedTypesParams   = {'linear':{'alpha','integrationTimeStep'},
+    allowedTypesParams   = {'constant':{'lambda0'}
+                            'linear':{'lambda0','alpha','integrationTimeStep'},
                             'weibull':{'alpha','beta','integrationTimeStep'},
                             'customLambda':{'fileName','skipFirstRow','timeColumn','reliabilityDataColumn','integrationTimeStep'},
                             'customPfailure':{'fileName','skipFirstRow','timeColumn',
@@ -62,6 +65,8 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
     for child in xmlNode:
       if child.tag == 'type':
         container.type = child.text.strip()
+      if child.tag == 'lambda0':
+        container.lambda0 = child.text.strip()
       if child.tag == 'alpha':
         container.alpha = child.text.strip()
       if child.tag == 'beta':
@@ -96,10 +101,33 @@ class TDfailureRateReliabiltyModel(ExternalModelPluginBase):
 
   def run(self, container, Inputs):
     """
-      This method determines the status of the TopEvent of the FT provided the status of its Basic Events
+      This method determines []
       @ In, container, object, self-like object where all the variables can be stored
       @ In, Inputs, dict, dictionary of inputs from RAVEN
-    """
-    
+    """084211
+    if container.type == 'constant':
+      container['P'] = constantFailureRateReliability(container.lambda0,Inputs['tMin'],Inputs['tMax'])
+    if container.type == 'linear':
 
 
+
+def constantFailureRateReliability(failureRate,tMin,tMax):
+  pMin = 1.0 - math.exp(-failureRate*tMin)
+  pMax = 1.0 - math.exp(-failureRate*tMax)
+  return p=pMax-pMin
+
+def linearFailureRateReliability(failureRate0,alpha,t):
+  failureRate = failureRate0 + alpha * t
+  return failureRate
+
+def PDFlinear(t,Lambda0,alpha):
+  pdf = linearFailureRateReliability(t,Lambda0,alpha) * math.exp(-quad(linearFailureRateReliability, 0, t, args=(Lambda0,alpha))[0])
+  return pdf
+
+def CDFlinear(t,Lambda0,alpha):
+  CDF = quad(PDFlinear, 0, t, args=(Lambda0,alpha))[0]  
+  return CDF
+
+def linearFailureRateReliability(failureRate0,alpha,tMin,tMax):
+  pMin =
+  pMax =
