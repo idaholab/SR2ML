@@ -1,4 +1,4 @@
-<Simulation verbosity="silent">
+<Simulation verbosity="debug">
   <TestInfo>
     <name>plugins/SR2ML.TestReliability</name>
     <author>wangc</author>
@@ -19,7 +19,7 @@
   </RunInfo>
 
   <Models>
-    <ExternalModel name="simple_reliability" subType="SR2ML.Reliability">
+    <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
       <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="exponential">

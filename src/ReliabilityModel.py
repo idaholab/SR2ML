@@ -14,12 +14,13 @@ import os
 # import logging
 #External Modules End--------------------------------------------------------------------------------
 
-raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../raven/framework'
-sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
+# raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../raven/framework'
+# sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
 #Internal Modules------------------------------------------------------------------------------------
 from SR2ML.src import Reliabilities
 from utils import mathUtils as utils
-from utils import InputData, InputTypes
+from utils import InputData
+from utils import InputTypes
 from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
@@ -77,6 +78,16 @@ class ReliabilityModel(ExternalModelPluginBase):
     """
     return self._dynamicHandling
 
+  def initialize(self, container, runInfoDict, inputFiles):
+    """
+      Method to initialize the Event-Tree model
+      @ In, container, object, self-like object where all the variables can be stored
+      @ In, runInfoDict, dict, dictionary containing all the RunInfo parameters (XML node <RunInfo>)
+      @ In, inputFiles, list, list of input files (if any)
+      @ Out, None
+    """
+    pass
+
   def run(self, container, inputDict):
     """
       This is a simple example of the run method in a plugin.
@@ -96,4 +107,4 @@ class ReliabilityModel(ExternalModelPluginBase):
     outputDict['rdf_R'] = self._model.getRDF()
     outputDict['frf_h'] = self._model.getFRF()
     for key, val in outputDict.items():
-      setattr(contain, key, val)
+      setattr(container, key, val)

@@ -14,8 +14,8 @@ import os
 from scipy.stats import expon
 #External Modules End--------------------------------------------------------------------------------
 
-raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../../raven/framework'
-sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
+# raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../../raven/framework'
+# sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
@@ -66,7 +66,7 @@ class ExponentialModel(ReliabilityBase):
         self._lambda = self.setVariable(child.value)
         if utils.isAString(self._lambda):
           self._variableDict['_lambda'] = self._lambda
-      elif child.getName().lower() == 'Tm':
+      elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
         if utils.isAString(self._tm):
           self._variableDict['_tm'] = self._tm

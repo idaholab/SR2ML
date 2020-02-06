@@ -11,10 +11,11 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 import os
 import abc
 import sys
+import numpy as np
 #External Modules End--------------------------------------------------------------------------------
 
-raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../../raven/framework'
-sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
+# raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../../raven/framework'
+# sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
@@ -43,7 +44,6 @@ class ReliabilityBase:
       @ In, None
       @ Out, None
     """
-    ExternalModelPluginBase.__init__(self)
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
     # If True the metric needs to be able to handle dynamic data
@@ -64,7 +64,7 @@ class ReliabilityBase:
     """
     paramInput = self.getInputSpecification()()
     paramInput.parseNode(xmlNode)
-    self._localHandleInput(self, paramInput)
+    self._localHandleInput(paramInput)
 
   @abc.abstractmethod
   def _localHandleInput(self, paramInput):
@@ -162,13 +162,13 @@ class ReliabilityBase:
     """
     return self._rdf
 
-  def getFDF(self):
+  def getFRF(self):
     """
       get calculated cdf value
       @ In, None
       @ Out, self._cdf,
     """
-    return self._fdf
+    return self._frf
 
   @abc.abstractmethod
   def _probabilityFunction(self):

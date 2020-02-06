@@ -13,18 +13,16 @@ warnings.simplefilter('default',DeprecationWarning)
 
 ################################################################################
 try:
-  from SR2ML.src.Reliabilities.ExponentialModel import ExponentialModel
-  from SR2ML.src.Reliabilities.Factory import knownTypes, returnInstance, returnClass
-except ImportError:
   from .ExponentialModel import ExponentialModel
-  from .Factory import knownTypes, returnInstance, returnClass
+except ImportError:
+  from . import ExponentialModel
 
 """
  Interface Dictionary (factory) (private)
 """
 __base = 'ReliabilityBase'
 __interfaceDict = {}
-__interfaceDict['ExponentialModel'] = ExponentialModel
+__interfaceDict['exponential'] = ExponentialModel
 
 def knownTypes():
   """
