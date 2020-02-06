@@ -14,8 +14,6 @@ import os
 # import logging
 #External Modules End--------------------------------------------------------------------------------
 
-# raven_path= os.path.abspath(os.path.dirname(__file__)) + '/../../raven/framework'
-# sys.path.append(raven_path) #'~/projects/raven/framework') # TODO generic RAVEN location
 #Internal Modules------------------------------------------------------------------------------------
 from SR2ML.src import Reliabilities
 from utils import mathUtils as utils
