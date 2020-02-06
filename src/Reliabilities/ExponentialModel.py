@@ -30,7 +30,7 @@ class ExponentialModel(ReliabilityBase):
     """
       Collects input specifications for this class.
       @ In, None
-      @ Out, input_specs, InputData, specs
+      @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ExponentialModel, cls).getInputSpecification()
     inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
@@ -54,7 +54,7 @@ class ExponentialModel(ReliabilityBase):
 
   def _localHandleInput(self, paramInput):
     """
-      Function to read the portion of the xml input that belongs to this specialized class
+      Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
@@ -73,21 +73,33 @@ class ExponentialModel(ReliabilityBase):
 
   def _probabilityFunction(self):
     """
+      Function to calculate probability
+      @ In, None
+      @ Out, _probabilityFunction, float/numpy.array, the calculated pdf value(s)
     """
     return self._expon.pdf(self._tm)
 
   def _cumulativeFunction(self):
     """
+      Function to calculate probability
+      @ In, None
+      @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
     """
     return self._expon.cdf(self._tm)
 
   def _reliabilityFunction(self):
     """
+      Function to calculate probability
+      @ In, None
+      @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
     """
     return self._expon.sf(self._tm)
 
   def _failureRateFunction(self):
     """
+      Function to calculate probability
+      @ In, None
+      @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """
     ht = self._probabilityFunction()/self._reliabilityFunction()
     return ht

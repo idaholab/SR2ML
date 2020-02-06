@@ -45,7 +45,6 @@ class ReliabilityModel(ExternalModelPluginBase):
     ExternalModelPluginBase.__init__(self)
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
-    # If True the metric needs to be able to handle dynamic data
     self._dynamicHandling    = False
     self._model = None
     self._modelType = None
