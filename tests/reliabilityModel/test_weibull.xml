@@ -5,7 +5,7 @@
     <created>2020-02-04</created>
     <classesTested>Models.ExternalModel</classesTested>
     <description>
-      This input tests reliability external model within SR2ML plugin
+      This input tests reliability external model (i.e. Weibull function) within SR2ML plugin
     </description>
     <revisions>
       <revision author="wangc" date="2020-02-04">Add test</revision>
@@ -15,12 +15,12 @@
 
   <RunInfo>
     <WorkingDir>simpleReliability</WorkingDir>
-    <Sequence>MCRun,printToFile</Sequence>
+    <Sequence>weibullMCRun,printToFile</Sequence>
   </RunInfo>
 
   <Models>
     <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
-      <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b</variables>
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b, c</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="weibull">
         <!-- mean failure rate -->
@@ -28,7 +28,7 @@
         <!-- mission time -->
         <Tm>b</Tm>
         <!-- shape parameter -->
-        <alpha>2.5</alpha>
+        <alpha>c</alpha>
       </ReliabilityModel>
       <!--  alias can be used to represent any input/output variables -->
       <!-- <alias variable='' type='output'></alias> -->
@@ -37,36 +37,41 @@
 
   <Distributions>
     <Uniform name="uni_dist">
-        <lowerBound>0.0</lowerBound>
-        <upperBound>1.0</upperBound>
+        <lowerBound>0.5</lowerBound>
+        <upperBound>4.0</upperBound>
     </Uniform>
   </Distributions>
 
   <Samplers>
     <MonteCarlo name="test_MC">
       <samplerInit>
-        <limit>2</limit>
+        <limit>4</limit>
       </samplerInit>
       <variable name="a">
           <distribution>uni_dist</distribution>
       </variable>
-      <constant name="b">0.5</constant>
+      <variable name="b">
+          <distribution>uni_dist</distribution>
+      </variable>
+      <variable name="c">
+          <distribution>uni_dist</distribution>
+      </variable>
     </MonteCarlo>
   </Samplers>
 
   <DataObjects>
     <PointSet name="reliabilityInput">
-      <Input>a,b</Input>
+      <Input>a,b,c</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="reliabilityOutput">
-      <Input>a,b</Input>
+      <Input>a,b,c</Input>
       <Output>cdf_F, pdf_f, rdf_R, frf_h</Output>
     </PointSet>
   </DataObjects>
 
   <Steps>
-    <MultiRun name="MCRun">
+    <MultiRun name="weibullMCRun">
       <Input          class="DataObjects"   type="PointSet">reliabilityInput</Input>
       <Model          class="Models"        type="ExternalModel">simple_reliability</Model>
       <Sampler        class="Samplers"      type="MonteCarlo">test_MC</Sampler>
@@ -74,12 +79,12 @@
     </MultiRun>
     <IOStep name="printToFile">
      <Input          class="DataObjects"   type="PointSet">reliabilityOutput</Input>
-     <Output         class="OutStreams"    type="Print">dumpReliabilityOutput</Output>
+     <Output         class="OutStreams"    type="Print">weibullOutput</Output>
     </IOStep>
   </Steps>
 
   <OutStreams>
-    <Print name="dumpReliabilityOutput">
+    <Print name="weibullOutput">
       <type>csv</type>
       <source>reliabilityOutput</source>
       <what>input,output</what>

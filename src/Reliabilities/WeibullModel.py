@@ -89,7 +89,7 @@ class WeibullModel(ScipyStatsModelBase):
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """
     # Numerical Solution
-    fr1 = self._probabilityFunction()/self._reliabilityFunction()
+    # ht = self._probabilityFunction()/self._reliabilityFunction()
     # Analytic Solution
-    fr2 = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
-    return fr1-fr2
+    ht = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
+    return ht

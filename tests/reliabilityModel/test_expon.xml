@@ -5,7 +5,7 @@
     <created>2020-02-04</created>
     <classesTested>Models.ExternalModel</classesTested>
     <description>
-      This input tests reliability external model within SR2ML plugin
+      This input tests reliability external model (i.e. exponential function) within SR2ML plugin
     </description>
     <revisions>
       <revision author="wangc" date="2020-02-04">Add test</revision>
@@ -15,7 +15,7 @@
 
   <RunInfo>
     <WorkingDir>simpleReliability</WorkingDir>
-    <Sequence>MCRun,printToFile</Sequence>
+    <Sequence>exponMCRun,printToFile</Sequence>
   </RunInfo>
 
   <Models>
@@ -37,20 +37,22 @@
 
   <Distributions>
     <Uniform name="uni_dist">
-        <lowerBound>0.0</lowerBound>
-        <upperBound>1.0</upperBound>
+        <lowerBound>0.5</lowerBound>
+        <upperBound>4.0</upperBound>
     </Uniform>
   </Distributions>
 
   <Samplers>
     <MonteCarlo name="test_MC">
       <samplerInit>
-        <limit>2</limit>
+        <limit>4</limit>
       </samplerInit>
       <variable name="a">
           <distribution>uni_dist</distribution>
       </variable>
-      <constant name="b">0.5</constant>
+      <variable name="b">
+          <distribution>uni_dist</distribution>
+      </variable>
     </MonteCarlo>
   </Samplers>
 
@@ -66,7 +68,7 @@
   </DataObjects>
 
   <Steps>
-    <MultiRun name="MCRun">
+    <MultiRun name="exponMCRun">
       <Input          class="DataObjects"   type="PointSet">reliabilityInput</Input>
       <Model          class="Models"        type="ExternalModel">simple_reliability</Model>
       <Sampler        class="Samplers"      type="MonteCarlo">test_MC</Sampler>
@@ -74,12 +76,12 @@
     </MultiRun>
     <IOStep name="printToFile">
      <Input          class="DataObjects"   type="PointSet">reliabilityOutput</Input>
-     <Output         class="OutStreams"    type="Print">dumpReliabilityOutput</Output>
+     <Output         class="OutStreams"    type="Print">exponOutput</Output>
     </IOStep>
   </Steps>
 
   <OutStreams>
-    <Print name="dumpReliabilityOutput">
+    <Print name="exponOutput">
       <type>csv</type>
       <source>reliabilityOutput</source>
       <what>input,output</what>
