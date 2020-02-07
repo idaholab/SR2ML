@@ -44,13 +44,9 @@ class ExponentialModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.__init__(self)
-    self.type = self.__class__.__name__
-    self.name = self.__class__.__name__
-    # If True the metric needs to be able to handle dynamic data
-    self._dynamicHandling    = False
     self._lambda = None
     self._tm = None
-    self._expon = None
+    self._model = expon
 
   def _localHandleInput(self, paramInput):
     """
@@ -71,39 +67,6 @@ class ExponentialModel(ReliabilityBase):
       elif child.getName() == 'outputVariables':
         self._outputList = child.value
 
-  def _probabilityFunction(self):
-    """
-      Function to calculate probability
-      @ In, None
-      @ Out, _probabilityFunction, float/numpy.array, the calculated pdf value(s)
-    """
-    return self._expon.pdf(self._tm)
-
-  def _cumulativeFunction(self):
-    """
-      Function to calculate probability
-      @ In, None
-      @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
-    """
-    return self._expon.cdf(self._tm)
-
-  def _reliabilityFunction(self):
-    """
-      Function to calculate probability
-      @ In, None
-      @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
-    """
-    return self._expon.sf(self._tm)
-
-  def _failureRateFunction(self):
-    """
-      Function to calculate probability
-      @ In, None
-      @ Out, ht, float/numpy.array, the calculated failure rate value(s)
-    """
-    ht = self._probabilityFunction()/self._reliabilityFunction()
-    return ht
-
   def initialize(self):
     """
       Method to initialize this plugin
@@ -111,4 +74,38 @@ class ExponentialModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.initialize(self)
-    self._expon = expon(loc=0, scale=1./self._lambda)
+    if self._lambda <= 0:
+      raise IOError('lambda should be postive, provided value is {}'.format(self._lambda))
+    self._model = self._model(loc=self._loc, scale=1./self._lambda)
+
+  def _probabilityFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, _probabilityFunction, float/numpy.array, the calculated pdf value(s)
+    """
+    return self._model.pdf(self._tm)
+
+  def _cumulativeFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
+    """
+    return self._model.cdf(self._tm)
+
+  def _reliabilityFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
+    """
+    return self._model.sf(self._tm)
+
+  def _failureRateFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, ht, float/numpy.array, the calculated failure rate value(s)
+    """
+    return self._lambda

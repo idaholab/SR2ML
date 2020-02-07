@@ -47,6 +47,8 @@ class ReliabilityBase:
     self._dynamicHandling    = False
     self._outputList = []
     self._variableDict = {}
+    self._model = None
+    self._loc = 0
     self._cdf = None
     self._pdf = None
     self._rdf = None
@@ -70,6 +72,14 @@ class ReliabilityBase:
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
+
+  def initialize(self):
+    """
+      Method to initialize
+      @ In, None
+      @ Out, None
+    """
+    pass
 
   def isDynamic(self):
     """
@@ -197,14 +207,6 @@ class ReliabilityBase:
       @ In, None
       @ Out, _failureRateFunction, float/numpy.array, the calculated failure rate value(s)
     """
-
-  def initialize(self):
-    """
-      Method to initialize
-      @ In, None
-      @ Out, None
-    """
-    pass
 
   def run(self):
     """
