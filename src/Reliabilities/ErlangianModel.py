@@ -17,10 +17,10 @@ from scipy.stats import erlang
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
-from .ExponentialModel import ExponentialModel
+from .ScipyStatsModelBase import ScipyStatsModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
-class ErlangianModel(ExponentialModel):
+class ErlangianModel(ScipyStatsModelBase):
   """
     Erlangian reliability models
   """
@@ -33,6 +33,8 @@ class ErlangianModel(ExponentialModel):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ErlangianModel, cls).getInputSpecification()
+    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
     inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
@@ -42,8 +44,9 @@ class ErlangianModel(ExponentialModel):
       @ In, None
       @ Out, None
     """
-    ExponentialModel.__init__(self)
-    # If True the metric needs to be able to handle dynamic data
+    ScipyStatsModelBase.__init__(self)
+    self._lambda = None
+    self._tm = None
     self._k = 1
     self._modelClass = erlang
 
@@ -54,18 +57,28 @@ class ErlangianModel(ExponentialModel):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ExponentialModel._localHandleInput(self, paramInput)
-    nodeK = paramInput.findFirst('k')
-    if nodeK is not None:
-      self._k = self.setVariable(nodeK.value)
-      self._variableDict['_k'] = self._k
+    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    for child in paramInput.subparts:
+      if child.getName().lower() == 'lambda':
+        self._lambda = self.setVariable(child.value)
+        if utils.isAString(self._lambda):
+          self._variableDict['_lambda'] = self._lambda
+      elif child.getName().lower() == 'tm':
+        self._tm = self.setVariable(child.value)
+        if utils.isAString(self._tm):
+          self._variableDict['_tm'] = self._tm
+      elif child.getName() == 'k':
+        self._k = self.setVariable(child.value)
+        if utils.isAString(self._k):
+          self._variableDict['_k'] = self._k
 
-  def initialize(self):
+  def initialize(self, inputDict):
     """
       Method to initialize this plugin
-      @ In, None
+      @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
+    ScipyStatsModelBase.initialize(self, inputDict)
     if self._lambda <= 0:
       raise IOError('lambda should be postive, provided value is {}'.format(self._lambda))
     self._model = self._modelClass(self._k, loc=self._loc, scale=1./self._lambda)

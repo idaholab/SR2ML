@@ -74,10 +74,21 @@ class ReliabilityBase:
       @ Out, None
     """
 
-  def initialize(self):
+  def initialize(self, inputDict):
     """
       Method to initialize
-      @ In, None
+      @ In, inputDict, dict, dictionary of inputs
+      @ Out, None
+    """
+    needDict = self.getParams()
+    needDict = self.loadVariables(needDict, inputDict)
+    self.setParams(needDict)
+    self._checkInputParams(needDict)
+
+  def _checkInputParams(self, needDict):
+    """
+      Method to check input parameters
+      @ In, needDict, dict, dictionary of required parameters
       @ Out, None
     """
     pass

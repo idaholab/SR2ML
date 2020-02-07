@@ -72,12 +72,13 @@ class GammaModel(ScipyStatsModelBase):
         if utils.isAString(self._tm):
           self._variableDict['_tm'] = self._tm
 
-  def initialize(self):
+  def initialize(self, inputDict):
     """
       Method to initialize this plugin
-      @ In, None
+      @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
+    ScipyStatsModelBase.initialize(self, inputDict)
     if self._alpha <= 0:
       raise IOError('alpha should be postive, provided value is {}'.format(self._alpha))
     self._model = self._modelClass(self._alpha, loc=self._loc, scale=1./self._beta)

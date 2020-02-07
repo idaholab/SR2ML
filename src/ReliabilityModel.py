@@ -93,10 +93,7 @@ class ReliabilityModel(ExternalModelPluginBase):
       @ Out,
     """
     self._model.handleInput(self._modelXMLInput)
-    needDict = self._model.getParams()
-    needDict = self._model.loadVariables(needDict, inputDict)
-    self._model.setParams(needDict)
-    self._model.initialize()
+    self._model.initialize(inputDict)
     self._model.run()
     outputDict = {}
     outputDict['cdf_F'] = self._model.getCDF()
