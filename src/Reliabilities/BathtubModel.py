@@ -111,7 +111,7 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm
+    tm = self._tm - self._loc
     term1 = c * alpha * np.power(tm/beta, alpha - 1.)
     term2 = (1.-c) * rho * np.power(tm/theta, rho -1.) * np.exp(np.power(tm/theta, alpha))
     term3 = -c * beta * np.power(tm/beta, alpha)
@@ -130,7 +130,7 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm
+    tm = self._tm - self._loc
     term3 = -c * beta * np.power(tm/beta, alpha)
     term4 = -(1.-c) *(np.exp(np.power(tm/theta, rho)) - 1.)
     cdf = 1. - np.exp(term3+term4)
@@ -147,7 +147,7 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm
+    tm = self._tm - self._loc
     term3 = -c * beta * np.power(tm/beta, alpha)
     term4 = -(1.-c) *(np.exp(np.power(tm/theta, rho)) - 1.)
     rdf = np.exp(term3+term4)
@@ -164,7 +164,7 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm
+    tm = self._tm - self._loc
     term1 = c * alpha * np.power(tm/beta, alpha - 1.)
     term2 = (1.-c) * rho * np.power(tm/theta, rho -1.) * np.exp(np.power(tm/theta, alpha))
     frf = term1 + term2
