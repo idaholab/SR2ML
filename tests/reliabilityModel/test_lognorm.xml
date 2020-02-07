@@ -1,0 +1,88 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>plugins/SR2ML.TestReliability</name>
+    <author>wangc</author>
+    <created>2020-02-04</created>
+    <classesTested>Models.ExternalModel</classesTested>
+    <description>
+      This input tests reliability external model within SR2ML plugin
+    </description>
+    <revisions>
+      <revision author="wangc" date="2020-02-04">Add test</revision>
+    </revisions>
+    <requirements>R-SR2ML-2</requirements>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>simpleReliability</WorkingDir>
+    <Sequence>MCRun,printToFile</Sequence>
+  </RunInfo>
+
+  <Models>
+    <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="lognorm">
+        <!-- mean failure rate -->
+        <beta>a</beta>
+        <!-- mission time -->
+        <Tm>b</Tm>
+        <!-- shape parameter -->
+        <alpha>2.5</alpha>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <!-- <alias variable='' type='output'></alias> -->
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name="uni_dist">
+        <lowerBound>0.0</lowerBound>
+        <upperBound>1.0</upperBound>
+    </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="test_MC">
+      <samplerInit>
+        <limit>2</limit>
+      </samplerInit>
+      <variable name="a">
+          <distribution>uni_dist</distribution>
+      </variable>
+      <constant name="b">0.5</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <DataObjects>
+    <PointSet name="reliabilityInput">
+      <Input>a,b</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="reliabilityOutput">
+      <Input>a,b</Input>
+      <Output>cdf_F, pdf_f, rdf_R, frf_h</Output>
+    </PointSet>
+  </DataObjects>
+
+  <Steps>
+    <MultiRun name="MCRun">
+      <Input          class="DataObjects"   type="PointSet">reliabilityInput</Input>
+      <Model          class="Models"        type="ExternalModel">simple_reliability</Model>
+      <Sampler        class="Samplers"      type="MonteCarlo">test_MC</Sampler>
+      <Output         class="DataObjects"   type="PointSet">reliabilityOutput</Output>
+    </MultiRun>
+    <IOStep name="printToFile">
+     <Input          class="DataObjects"   type="PointSet">reliabilityOutput</Input>
+     <Output         class="OutStreams"    type="Print">dumpReliabilityOutput</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="dumpReliabilityOutput">
+      <type>csv</type>
+      <source>reliabilityOutput</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+</Simulation>

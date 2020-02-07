@@ -9,6 +9,7 @@ Created on Feb. 21, 2019
 from .ExponentialModel import ExponentialModel
 from .ErlangianModel import ErlangianModel
 from .GammaModel import GammaModel
+from .LognormalModel import LognormalModel
 
 """
  Interface Dictionary (factory) (private)
@@ -18,6 +19,7 @@ __interfaceDict = {}
 __interfaceDict['exponential'] = ExponentialModel
 __interfaceDict['erlangian'] = ErlangianModel
 __interfaceDict['gamma'] = GammaModel
+__interfaceDict['lognorm'] = LognormalModel
 
 def knownTypes():
   """
