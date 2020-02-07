@@ -1,0 +1,91 @@
+"""
+Created on Feb. 6, 2020
+
+@author: wangc, mandd
+"""
+#for future compatibility with Python 3--------------------------------------------------------------
+from __future__ import division, print_function, unicode_literals, absolute_import
+#End compatibility block for Python 3----------------------------------------------------------------
+
+#External Modules------------------------------------------------------------------------------------
+import abc
+import sys
+import os
+from scipy.stats import gamma
+#External Modules End--------------------------------------------------------------------------------
+
+#Internal Modules------------------------------------------------------------------------------------
+from utils import mathUtils as utils
+from utils import InputData, InputTypes
+from .ScipyStatsModelBase import ScipyStatsModelBase
+#Internal Modules End--------------------------------------------------------------------------------
+
+class GammaModel(ScipyStatsModelBase):
+  """
+    Gamma reliability models
+  """
+
+  @classmethod
+  def getInputSpecification(cls):
+    """
+      Collects input specifications for this class.
+      @ In, None
+      @ Out, inputSpecs, InputData, specs
+    """
+    inputSpecs = super(ScipyStatsModelBase, cls).getInputSpecification()
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    return inputSpecs
+
+  def __init__(self):
+    """
+      Constructor
+      @ In, None
+      @ Out, None
+    """
+    ScipyStatsModelBase.__init__(self)
+    # If True the metric needs to be able to handle dynamic data
+    self._alpha = None
+    self._beta = 1
+    self._modelClass = gamma
+
+  def _localHandleInput(self, paramInput):
+    """
+      Function to read the portion of the parsed xml input that belongs to this specialized class
+      and initialize some stuff based on the inputs got
+      @ In, paramInput, InputData.ParameterInput, the parsed xml input
+      @ Out, None
+    """
+    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    for child in paramInput.subparts:
+      if child.getName().lower() == 'alpha':
+        self._alpha = self.setVariable(child.value)
+        if utils.isAString(self._alpha):
+          self._variableDict['_alpha'] = self._alpha
+      elif child.getName().lower() == 'beta':
+        self._beta = self.setVariable(child.value)
+        if utils.isAString(self._beta):
+          self._variableDict['_beta'] = self._beta
+      elif child.getName().lower() == 'tm':
+        self._tm = self.setVariable(child.value)
+        if utils.isAString(self._tm):
+          self._variableDict['_tm'] = self._tm
+
+  def initialize(self):
+    """
+      Method to initialize this plugin
+      @ In, None
+      @ Out, None
+    """
+    if self._alpha <= 0:
+      raise IOError('alpha should be postive, provided value is {}'.format(self._alpha))
+    self._model = self._modelClass(self._alpha, loc=self._loc, scale=1./self._beta)
+
+  def _failureRateFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, ht, float/numpy.array, the calculated failure rate value(s)
+    """
+    return self._probabilityFunction()/self._reliabilityFunction()

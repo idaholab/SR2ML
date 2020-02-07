@@ -8,6 +8,7 @@ Created on Feb. 21, 2019
 
 from .ExponentialModel import ExponentialModel
 from .ErlangianModel import ErlangianModel
+from .GammaModel import GammaModel
 
 """
  Interface Dictionary (factory) (private)
@@ -16,6 +17,7 @@ __base = 'ReliabilityBase'
 __interfaceDict = {}
 __interfaceDict['exponential'] = ExponentialModel
 __interfaceDict['erlangian'] = ErlangianModel
+__interfaceDict['gamma'] = GammaModel
 
 def knownTypes():
   """
