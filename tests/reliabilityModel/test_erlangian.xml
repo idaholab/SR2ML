@@ -20,13 +20,13 @@
 
   <Models>
     <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
-      <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b, k</variables>
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, lambda, tm, k</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="erlangian">
         <!-- mean failure rate -->
-        <lambda>a</lambda>
+        <lambda>lambda</lambda>
         <!-- mission time -->
-        <Tm>b</Tm>
+        <Tm>tm</Tm>
         <!-- shape parameter -->
         <k>k</k>
       </ReliabilityModel>
@@ -53,13 +53,13 @@
       <samplerInit>
         <limit>4</limit>
       </samplerInit>
-      <variable name="a">
+      <variable name="lambda">
           <distribution>uni_dist</distribution>
       </variable>
       <variable name="k">
           <distribution>c_dist</distribution>
       </variable>
-      <variable name="b">
+      <variable name="tm">
           <distribution>uni_dist</distribution>
       </variable>
     </MonteCarlo>
@@ -67,11 +67,11 @@
 
   <DataObjects>
     <PointSet name="reliabilityInput">
-      <Input>a,b,k</Input>
+      <Input>lambda,tm,k</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="reliabilityOutput">
-      <Input>a,b,k</Input>
+      <Input>lambda,tm,k</Input>
       <Output>cdf_F, pdf_f, rdf_R, frf_h</Output>
     </PointSet>
   </DataObjects>

@@ -20,15 +20,15 @@
 
   <Models>
     <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
-      <variables>cdf_F, pdf_f, rdf_R, frf_h, a, b, c</variables>
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, alpha, beta, tm</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="gamma">
         <!-- mean failure rate -->
-        <beta>a</beta>
+        <beta>beta</beta>
         <!-- mission time -->
-        <Tm>b</Tm>
+        <Tm>tm</Tm>
         <!-- shape parameter -->
-        <alpha>c</alpha>
+        <alpha>alpha</alpha>
       </ReliabilityModel>
       <!--  alias can be used to represent any input/output variables -->
       <!-- <alias variable='' type='output'></alias> -->
@@ -47,13 +47,13 @@
       <samplerInit>
         <limit>4</limit>
       </samplerInit>
-      <variable name="a">
+      <variable name="alpha">
           <distribution>uni_dist</distribution>
       </variable>
-      <variable name="b">
+      <variable name="beta">
           <distribution>uni_dist</distribution>
       </variable>
-      <variable name="c">
+      <variable name="tm">
           <distribution>uni_dist</distribution>
       </variable>
     </MonteCarlo>
@@ -61,11 +61,11 @@
 
   <DataObjects>
     <PointSet name="reliabilityInput">
-      <Input>a,b,c</Input>
+      <Input>alpha,beta,tm</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="reliabilityOutput">
-      <Input>a,b,c</Input>
+      <Input>alpha,beta,tm</Input>
       <Output>cdf_F, pdf_f, rdf_R, frf_h</Output>
     </PointSet>
   </DataObjects>
