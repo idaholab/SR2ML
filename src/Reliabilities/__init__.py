@@ -14,12 +14,14 @@ from .ErlangianModel import ErlangianModel
 from .GammaModel import GammaModel
 from .LognormalModel import LognormalModel
 from .WeibullModel import WeibullModel
+from .BathtubModel import BathtubModel
 from .Factory import knownTypes
 from .Factory import returnInstance
 from .Factory import returnClass
 
 __all__ = ['ExponentialModel',
-          'ErlangianModel',
-          'GammaModel',
-          'LognormalModel',
-          'WeibullModel']
+           'ErlangianModel',
+           'GammaModel',
+           'LognormalModel',
+           'WeibullModel',
+           'BathtubModel']
