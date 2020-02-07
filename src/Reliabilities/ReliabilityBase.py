@@ -48,6 +48,7 @@ class ReliabilityBase:
     self._outputList = []
     self._variableDict = {}
     self._model = None
+    self._modelClass = None
     self._loc = 0
     self._cdf = None
     self._pdf = None

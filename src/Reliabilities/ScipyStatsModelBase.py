@@ -11,16 +11,15 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 import abc
 import sys
 import os
-from scipy.stats import expon
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
-from .ScipyStatsModelBase import ScipyStatsModelBase
+from .ReliabilityBase import ReliabilityBase
 #Internal Modules End--------------------------------------------------------------------------------
 
-class ExponentialModel(ScipyStatsModelBase):
+class ScipyStatsModelBase(ReliabilityBase):
   """
     Exponential reliability models
   """
@@ -32,9 +31,7 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = super(ExponentialModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs = super(ScipyStatsModelBase, cls).getInputSpecification()
     return inputSpecs
 
   def __init__(self):
@@ -43,10 +40,8 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
-    self._lambda = None
-    self._tm = None
-    self._modelClass = expon
+    ReliabilityBase.__init__(self)
+    self._model = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -55,29 +50,31 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
-    for child in paramInput.subparts:
-      if child.getName().lower() == 'lambda':
-        self._lambda = self.setVariable(child.value)
-        if utils.isAString(self._lambda):
-          self._variableDict['_lambda'] = self._lambda
-      elif child.getName().lower() == 'tm':
-        self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
-      elif child.getName() == 'outputVariables':
-        self._outputList = child.value
+    pass
 
-  def initialize(self):
+  def _probabilityFunction(self):
     """
-      Method to initialize this plugin
+      Function to calculate probability
       @ In, None
-      @ Out, None
+      @ Out, _probabilityFunction, float/numpy.array, the calculated pdf value(s)
     """
-    ScipyStatsModelBase.initialize(self)
-    if self._lambda <= 0:
-      raise IOError('lambda should be postive, provided value is {}'.format(self._lambda))
-    self._model = self._modelClass(loc=self._loc, scale=1./self._lambda)
+    return self._model.pdf(self._tm)
+
+  def _cumulativeFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
+    """
+    return self._model.cdf(self._tm)
+
+  def _reliabilityFunction(self):
+    """
+      Function to calculate probability
+      @ In, None
+      @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
+    """
+    return self._model.sf(self._tm)
 
   def _failureRateFunction(self):
     """
@@ -85,4 +82,4 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """
-    return self._lambda
+    return self._probabilityFunction()/self._reliabilityFunction()

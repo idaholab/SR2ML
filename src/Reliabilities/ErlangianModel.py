@@ -1,5 +1,5 @@
 """
-Created on Jan. 30 2020
+Created on Feb. 6, 2020
 
 @author: wangc, mandd
 """
@@ -11,18 +11,18 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 import abc
 import sys
 import os
-from scipy.stats import expon
+from scipy.stats import erlang
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
-from .ScipyStatsModelBase import ScipyStatsModelBase
+from .ExponentialModel import ExponentialModel
 #Internal Modules End--------------------------------------------------------------------------------
 
-class ExponentialModel(ScipyStatsModelBase):
+class ErlangianModel(ExponentialModel):
   """
-    Exponential reliability models
+    Erlangian reliability models
   """
 
   @classmethod
@@ -32,9 +32,8 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = super(ExponentialModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs = super(ErlangianModel, cls).getInputSpecification()
+    inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -43,10 +42,10 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
-    self._lambda = None
-    self._tm = None
-    self._modelClass = expon
+    ExponentialModel.__init__(self)
+    # If True the metric needs to be able to handle dynamic data
+    self._k = 1
+    self._modelClass = erlang
 
   def _localHandleInput(self, paramInput):
     """
@@ -55,18 +54,11 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
-    for child in paramInput.subparts:
-      if child.getName().lower() == 'lambda':
-        self._lambda = self.setVariable(child.value)
-        if utils.isAString(self._lambda):
-          self._variableDict['_lambda'] = self._lambda
-      elif child.getName().lower() == 'tm':
-        self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
-      elif child.getName() == 'outputVariables':
-        self._outputList = child.value
+    ExponentialModel._localHandleInput(self, paramInput)
+    nodeK = paramInput.findFirst('k')
+    if nodeK is not None:
+      self._k = self.setVariable(nodeK.value)
+      self._variableDict['_k'] = self._k
 
   def initialize(self):
     """
@@ -74,10 +66,9 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self)
     if self._lambda <= 0:
       raise IOError('lambda should be postive, provided value is {}'.format(self._lambda))
-    self._model = self._modelClass(loc=self._loc, scale=1./self._lambda)
+    self._model = self._modelClass(self._k, loc=self._loc, scale=1./self._lambda)
 
   def _failureRateFunction(self):
     """
@@ -85,4 +76,4 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """
-    return self._lambda
+    return self._probabilityFunction()/self._reliabilityFunction()

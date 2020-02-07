@@ -7,6 +7,7 @@ Created on Feb. 21, 2019
 """
 
 from .ExponentialModel import ExponentialModel
+from .ErlangianModel import ErlangianModel
 
 """
  Interface Dictionary (factory) (private)
@@ -14,6 +15,7 @@ from .ExponentialModel import ExponentialModel
 __base = 'ReliabilityBase'
 __interfaceDict = {}
 __interfaceDict['exponential'] = ExponentialModel
+__interfaceDict['erlangian'] = ErlangianModel
 
 def knownTypes():
   """
