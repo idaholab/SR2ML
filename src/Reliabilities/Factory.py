@@ -10,6 +10,7 @@ from .ExponentialModel import ExponentialModel
 from .ErlangianModel import ErlangianModel
 from .GammaModel import GammaModel
 from .LognormalModel import LognormalModel
+from .WeibullModel import WeibullModel
 
 """
  Interface Dictionary (factory) (private)
@@ -20,6 +21,7 @@ __interfaceDict['exponential'] = ExponentialModel
 __interfaceDict['erlangian'] = ErlangianModel
 __interfaceDict['gamma'] = GammaModel
 __interfaceDict['lognorm'] = LognormalModel
+__interfaceDict['weibull'] = WeibullModel
 
 def knownTypes():
   """
