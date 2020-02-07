@@ -32,6 +32,7 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ScipyStatsModelBase, cls).getInputSpecification()
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -42,6 +43,7 @@ class ScipyStatsModelBase(ReliabilityBase):
     """
     ReliabilityBase.__init__(self)
     self._model = None
+    self._tm = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -50,7 +52,21 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    pass
+    ReliabilityBase._localHandleInput(self, paramInput)
+
+  def _checkInputParams(self, needDict):
+    """
+      Method to check input parameters
+      @ In, needDict, dict, dictionary of required parameters
+      @ Out, None
+    """
+    ReliabilityBase._checkInputParams(self, needDict)
+    for key, val in needDict.items():
+      if key == '_tm':
+        if val < 0:
+          raise IOError('Variable "Tm" should be nonnegative, but provided value is "{}"!'.format(val))
+      elif val <=0:
+        raise IOError('Variable "{}" should be nonnegative, but provided value is "{}"!'.format(key,val))
 
   def _probabilityFunction(self):
     """

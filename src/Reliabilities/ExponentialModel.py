@@ -34,7 +34,6 @@ class ExponentialModel(ScipyStatsModelBase):
     """
     inputSpecs = super(ExponentialModel, cls).getInputSpecification()
     inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -45,7 +44,6 @@ class ExponentialModel(ScipyStatsModelBase):
     """
     ScipyStatsModelBase.__init__(self)
     self._lambda = None
-    self._tm = None
     self._modelClass = expon
 
   def _localHandleInput(self, paramInput):

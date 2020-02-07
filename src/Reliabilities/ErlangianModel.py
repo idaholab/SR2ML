@@ -34,7 +34,6 @@ class ErlangianModel(ScipyStatsModelBase):
     """
     inputSpecs = super(ErlangianModel, cls).getInputSpecification()
     inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
     inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
@@ -46,7 +45,6 @@ class ErlangianModel(ScipyStatsModelBase):
     """
     ScipyStatsModelBase.__init__(self)
     self._lambda = None
-    self._tm = None
     self._k = 1
     self._modelClass = erlang
 

@@ -32,10 +32,9 @@ class GammaModel(ScipyStatsModelBase):
       @ In, None
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = super(ScipyStatsModelBase, cls).getInputSpecification()
+    inputSpecs = super(GammaModel, cls).getInputSpecification()
     inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
     inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -45,7 +44,6 @@ class GammaModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
-    # If True the metric needs to be able to handle dynamic data
     self._alpha = None
     self._beta = 1
     self._modelClass = gamma
