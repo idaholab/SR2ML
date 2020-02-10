@@ -95,7 +95,15 @@ class ReliabilityBase:
       @ In, needDict, dict, dictionary of required parameters
       @ Out, None
     """
-    pass
+    for key, val in needDict.items():
+      if key == '_tm' or key == '_loc':
+        if np.any(val<0.):
+          raise IOError('Variable "Tm" should be nonnegative, but provided value is "{}"!'.format(val))
+      elif key != '_c' and np.any(val<=0.):
+        raise IOError('Variable "{}" should be postive, but provided value is "{}"!'.format(key,val))
+    # if '_tm' in needDict and '_loc' in needDict:
+    #   if needDict['_tm'] < needDict['_loc']:
+    #     raise IOError('Variable "{}" with value "{}" is less than variable "{}" with value "{}", this is not allowed!'.format('_tm',needDict['_tm'],'_loc',needDict['_loc']))
 
   def isDynamic(self):
     """

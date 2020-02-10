@@ -91,8 +91,17 @@ class BathtubModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.initialize(self, inputDict)
-    if self._alpha <= 0:
-      raise IOError('alpha should be postive, provided value is {}'.format(self._alpha))
+
+  def _checkInputParams(self, needDict):
+    """
+      Method to check input parameters
+      @ In, needDict, dict, dictionary of required parameters
+      @ Out, None
+    """
+    ReliabilityBase._checkInputParams(self, needDict)
+    if '_c' in needDict:
+      if np.any(needDict['_c']<0) or np.any(needDict['_c']>1):
+        raise IOError('Variable "{}" should be between [0,1], but "{}" is provided!'.format('_c',needDict['_c']))
 
   def _probabilityFunction(self):
     """

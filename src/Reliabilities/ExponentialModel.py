@@ -69,8 +69,6 @@ class ExponentialModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.initialize(self, inputDict)
-    if self._lambda <= 0:
-      raise IOError('lambda should be postive, provided value is {}'.format(self._lambda))
     self._model = self._modelClass(loc=self._loc, scale=1./self._lambda)
 
   def _failureRateFunction(self):

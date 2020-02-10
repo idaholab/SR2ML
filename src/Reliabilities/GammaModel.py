@@ -74,8 +74,6 @@ class GammaModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.initialize(self, inputDict)
-    if self._alpha <= 0:
-      raise IOError('alpha should be postive, provided value is {}'.format(self._alpha))
     self._model = self._modelClass(self._alpha, loc=self._loc, scale=1./self._beta)
 
   def _failureRateFunction(self):

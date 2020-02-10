@@ -61,12 +61,6 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase._checkInputParams(self, needDict)
-    for key, val in needDict.items():
-      if key == '_tm':
-        if val < 0:
-          raise IOError('Variable "Tm" should be nonnegative, but provided value is "{}"!'.format(val))
-      elif val <=0:
-        raise IOError('Variable "{}" should be nonnegative, but provided value is "{}"!'.format(key,val))
 
   def _probabilityFunction(self):
     """
