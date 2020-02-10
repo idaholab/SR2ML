@@ -14,6 +14,7 @@ from .ErlangianModel import ErlangianModel
 from .GammaModel import GammaModel
 from .LognormalModel import LognormalModel
 from .WeibullModel import WeibullModel
+from .FatigueLifeModel import FatigueLifeModel
 from .BathtubModel import BathtubModel
 from .Factory import knownTypes
 from .Factory import returnInstance
@@ -24,4 +25,5 @@ __all__ = ['ExponentialModel',
            'GammaModel',
            'LognormalModel',
            'WeibullModel',
+           'FatigueLifeModel',
            'BathtubModel']
