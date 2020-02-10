@@ -12,7 +12,7 @@ import abc
 import sys
 import os
 import numpy as np
-
+import numpy.ma as ma
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
@@ -114,12 +114,14 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm - self._loc
+    mask = self._tm < self._loc
+    tm = ma.array(self._tm-self._loc, mask=mask)
     term1 = c * alpha * np.power(tm/beta, alpha - 1.)
     term2 = (1.-c) * rho * np.power(tm/theta, rho -1.) * np.exp(np.power(tm/theta, alpha))
     term3 = -c * beta * np.power(tm/beta, alpha)
     term4 = -(1.-c) *(np.exp(np.power(tm/theta, rho)) - 1.)
     pdf = (term1+term2) * np.exp(term3+term4)
+    pdf = pdf.filled(0.)
     return pdf
 
   def _cumulativeFunction(self):
@@ -133,10 +135,12 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm - self._loc
+    mask = self._tm < self._loc
+    tm = ma.array(self._tm-self._loc, mask=mask)
     term3 = -c * beta * np.power(tm/beta, alpha)
     term4 = -(1.-c) *(np.exp(np.power(tm/theta, rho)) - 1.)
     cdf = 1. - np.exp(term3+term4)
+    cdf = cdf.filled(0.)
     return cdf
 
   def _reliabilityFunction(self):
@@ -150,10 +154,12 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm - self._loc
+    mask = self._tm < self._loc
+    tm = ma.array(self._tm-self._loc, mask=mask)
     term3 = -c * beta * np.power(tm/beta, alpha)
     term4 = -(1.-c) *(np.exp(np.power(tm/theta, rho)) - 1.)
     rdf = np.exp(term3+term4)
+    rdf = rdf.filled(1.0)
     return rdf
 
   def _failureRateFunction(self):
@@ -167,8 +173,10 @@ class BathtubModel(ReliabilityBase):
     c = self._c
     rho = self._rho
     theta = self._theta
-    tm = self._tm - self._loc
+    mask = self._tm < self._loc
+    tm = ma.array(self._tm-self._loc, mask=mask)
     term1 = c * alpha * np.power(tm/beta, alpha - 1.)
     term2 = (1.-c) * rho * np.power(tm/theta, rho -1.) * np.exp(np.power(tm/theta, alpha))
     frf = term1 + term2
+    frf = frf.filled(0.)
     return frf

@@ -75,11 +75,3 @@ class ErlangianModel(ScipyStatsModelBase):
     """
     ScipyStatsModelBase.initialize(self, inputDict)
     self._model = self._modelClass(self._k, loc=self._loc, scale=1./self._lambda)
-
-  def _failureRateFunction(self):
-    """
-      Function to calculate probability
-      @ In, None
-      @ Out, ht, float/numpy.array, the calculated failure rate value(s)
-    """
-    return self._probabilityFunction()/self._reliabilityFunction()
