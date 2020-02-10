@@ -42,7 +42,7 @@
   <Distributions>
     <Uniform name="uni_dist">
         <lowerBound>0.5</lowerBound>
-        <upperBound>4.0</upperBound>
+        <upperBound>2.0</upperBound>
     </Uniform>
   </Distributions>
 
