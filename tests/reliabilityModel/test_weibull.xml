@@ -27,6 +27,8 @@
         <beta>beta</beta>
         <!-- mission time -->
         <Tm>tm</Tm>
+        <!-- time delay -->
+        <Td>0.0</Td>
         <!-- shape parameter -->
         <alpha>alpha</alpha>
       </ReliabilityModel>

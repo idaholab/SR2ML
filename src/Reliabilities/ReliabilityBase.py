@@ -33,7 +33,7 @@ class ReliabilityBase:
     """
     inputSpecs = InputData.parameterInputFactory('ReliabilityModel')
     inputSpecs.addParam('type', param_type=InputTypes.StringType)
-    inputSpecs.addSub(InputData.parameterInputFactory('outputVariables', contentType=InputTypes.StringListType))
+    inputSpecs.addSub(InputData.parameterInputFactory('Td', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -64,6 +64,11 @@ class ReliabilityBase:
     """
     paramInput = self.getInputSpecification()()
     paramInput.parseNode(xmlNode)
+    td = paramInput.findFirst('Td')
+    if td is not None:
+      self._loc = self.setVariable(td.value)
+      if utils.isAString(self._loc):
+        self._variableDict['_loc'] = self._loc
     self._localHandleInput(paramInput)
 
   @abc.abstractmethod
