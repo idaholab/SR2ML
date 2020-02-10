@@ -77,4 +77,10 @@ class ExponentialModel(ScipyStatsModelBase):
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """
-    return self._lambda
+    # both numerical and analytic failure rate can be used.
+    # the parent class is using numerical method, and here we implemented the analytic method
+    mask = self._tm > self._loc
+    ht = np.zeros(len(self._tm))
+    ht = ma.array(ht, mask=mask)
+    ht = ht.filled(self._lambda[0])
+    return ht
