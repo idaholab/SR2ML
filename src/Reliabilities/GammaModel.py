@@ -59,16 +59,13 @@ class GammaModel(ScipyStatsModelBase):
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
-        if utils.isAString(self._alpha):
-          self._variableDict['_alpha'] = self._alpha
+        self._variableDict['_alpha'] = self._alpha
       elif child.getName().lower() == 'beta':
         self._beta = self.setVariable(child.value)
-        if utils.isAString(self._beta):
-          self._variableDict['_beta'] = self._beta
+        self._variableDict['_beta'] = self._beta
       elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
+        self._variableDict['_tm'] = self._tm
 
   def initialize(self, inputDict):
     """

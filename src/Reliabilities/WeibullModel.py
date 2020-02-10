@@ -60,16 +60,13 @@ class WeibullModel(ScipyStatsModelBase):
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
-        if utils.isAString(self._alpha):
-          self._variableDict['_alpha'] = self._alpha
+        self._variableDict['_alpha'] = self._alpha
       elif child.getName().lower() == 'beta':
         self._beta = self.setVariable(child.value)
-        if utils.isAString(self._beta):
-          self._variableDict['_beta'] = self._beta
+        self._variableDict['_beta'] = self._beta
       elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
+        self._variableDict['_tm'] = self._tm
 
   def initialize(self, inputDict):
     """
@@ -91,5 +88,9 @@ class WeibullModel(ScipyStatsModelBase):
     # Numerical Solution
     # ht = self._probabilityFunction()/self._reliabilityFunction()
     # Analytic Solution
-    ht = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
+    ht = None
+    if self._tm > self._loc:
+      ht = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
+    else:
+      ht = np.zeros(len(self._tm))
     return ht

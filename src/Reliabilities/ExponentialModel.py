@@ -57,14 +57,10 @@ class ExponentialModel(ScipyStatsModelBase):
     for child in paramInput.subparts:
       if child.getName().lower() == 'lambda':
         self._lambda = self.setVariable(child.value)
-        if utils.isAString(self._lambda):
-          self._variableDict['_lambda'] = self._lambda
+        self._variableDict['_lambda'] = self._lambda
       elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
-      elif child.getName() == 'outputVariables':
-        self._outputList = child.value
+        self._variableDict['_tm'] = self._tm
 
   def initialize(self, inputDict):
     """

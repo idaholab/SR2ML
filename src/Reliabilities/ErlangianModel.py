@@ -59,16 +59,13 @@ class ErlangianModel(ScipyStatsModelBase):
     for child in paramInput.subparts:
       if child.getName().lower() == 'lambda':
         self._lambda = self.setVariable(child.value)
-        if utils.isAString(self._lambda):
-          self._variableDict['_lambda'] = self._lambda
+        self._variableDict['_lambda'] = self._lambda
       elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
-        if utils.isAString(self._tm):
-          self._variableDict['_tm'] = self._tm
+        self._variableDict['_tm'] = self._tm
       elif child.getName() == 'k':
         self._k = self.setVariable(child.value)
-        if utils.isAString(self._k):
-          self._variableDict['_k'] = self._k
+        self._variableDict['_k'] = self._k
 
   def initialize(self, inputDict):
     """

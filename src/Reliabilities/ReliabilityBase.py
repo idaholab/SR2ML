@@ -67,8 +67,7 @@ class ReliabilityBase:
     td = paramInput.findFirst('Td')
     if td is not None:
       self._loc = self.setVariable(td.value)
-      if utils.isAString(self._loc):
-        self._variableDict['_loc'] = self._loc
+      self._variableDict['_loc'] = self._loc
     self._localHandleInput(paramInput)
 
   @abc.abstractmethod
