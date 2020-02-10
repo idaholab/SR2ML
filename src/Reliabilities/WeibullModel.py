@@ -12,6 +12,7 @@ import abc
 import sys
 import os
 import numpy as np
+import numpy.ma as ma
 from scipy.stats import weibull_min as weibull
 #External Modules End--------------------------------------------------------------------------------
 
@@ -86,9 +87,9 @@ class WeibullModel(ScipyStatsModelBase):
     # Numerical Solution
     # ht = self._probabilityFunction()/self._reliabilityFunction()
     # Analytic Solution
-    ht = None
-    if self._tm > self._loc:
-      ht = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
-    else:
-      ht = np.zeros(len(self._tm))
+    # ht = self._alpha/self._beta * np.power((self._tm-self._loc)/self._beta,self._alpha -1.)
+    mask = self._tm < self._loc
+    dt = ma.array(self._tm-self._loc, mask=mask)
+    ht = self._alpha/self._beta * np.power(dt/self._beta,self._alpha -1.)
+    ht = ht.filled(0)
     return ht

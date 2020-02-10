@@ -49,7 +49,7 @@ class ReliabilityBase:
     self._variableDict = {}
     self._model = None
     self._modelClass = None
-    self._loc = 0
+    self._loc = np.array([0])
     self._cdf = None
     self._pdf = None
     self._rdf = None
@@ -99,11 +99,16 @@ class ReliabilityBase:
       if key == '_tm' or key == '_loc':
         if np.any(val<0.):
           raise IOError('Variable "Tm" should be nonnegative, but provided value is "{}"!'.format(val))
-      elif key != '_c' and np.any(val<=0.):
-        raise IOError('Variable "{}" should be postive, but provided value is "{}"!'.format(key,val))
-    # if '_tm' in needDict and '_loc' in needDict:
-    #   if needDict['_tm'] < needDict['_loc']:
-    #     raise IOError('Variable "{}" with value "{}" is less than variable "{}" with value "{}", this is not allowed!'.format('_tm',needDict['_tm'],'_loc',needDict['_loc']))
+      else:
+       if key != '_c' and np.any(val<=0.):
+        raise IOError('Variable "{}" should be postive, but provided value is "{}"!'.format(key.strip('_'),val))
+       if len(val) > 1:
+         raise IOError('Multiple values "{}" are provided for variable {}, this is not allowed now!'.format(val, key.strip('_')))
+    if '_tm' in needDict and '_loc' in needDict:
+      if len(needDict['_tm']) != len(needDict['_loc']) and len(needDict['_loc']) != 1:
+        raise IOError('Variable "{}" and "{}" should have the same length, but "{}" != "{}"!'.format('Tm', 'Td', len(needDict['_tm']), len(needDict['_loc'])))
+      # if needDict['_tm'] < needDict['_loc']:
+      #   raise IOError('Variable "{}" with value "{}" is less than variable "{}" with value "{}", this is not allowed!'.format('_tm',needDict['_tm'],'_loc',needDict['_loc']))
 
   def isDynamic(self):
     """
@@ -123,8 +128,10 @@ class ReliabilityBase:
     ret = None
     # multi-entry or single-entry?
     if len(value) == 1:
-      # single entry should be either a float or string (raven variable)
-      ret = value[0]
+      if not utils.isAFloatOrInt(value[0]):
+        ret = value[0]
+      else:
+        ret = np.atleast_1d(value)
     else:
       # should be floats; InputData assures the entries are the same type already
       if not utils.isAFloatOrInt(value[0]):
