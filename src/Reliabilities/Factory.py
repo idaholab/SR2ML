@@ -12,6 +12,7 @@ from .GammaModel import GammaModel
 from .LognormalModel import LognormalModel
 from .WeibullModel import WeibullModel
 from .FatigueLifeModel import FatigueLifeModel
+from .NormalModel import NormalModel
 from .BathtubModel import BathtubModel
 
 """
@@ -25,6 +26,7 @@ __interfaceDict['gamma'] = GammaModel
 __interfaceDict['lognorm'] = LognormalModel
 __interfaceDict['weibull'] = WeibullModel
 __interfaceDict['fatiguelife'] = FatigueLifeModel
+__interfaceDict['normal'] = NormalModel
 __interfaceDict['bathtub'] = BathtubModel
 
 def knownTypes():

@@ -1,5 +1,5 @@
 """
-Created on Feb. 7, 2020
+Created on Feb. 10, 2020
 
 @author: wangc, mandd
 """
@@ -22,7 +22,7 @@ from .ScipyStatsModelBase import ScipyStatsModelBase
 
 class FatigueLifeModel(ScipyStatsModelBase):
   """
-    Fatigue life reliability models
+    Fatigue life (Birnbaum-Saunders distribution) reliability models
   """
 
   @classmethod

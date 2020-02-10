@@ -1,5 +1,5 @@
 """
-Created on Feb. 6, 2020
+Created on Feb. 10, 2020
 
 @author: wangc, mandd
 """
@@ -11,7 +11,7 @@ from __future__ import division, print_function, unicode_literals, absolute_impo
 import abc
 import sys
 import os
-from scipy.stats import erlang
+from scipy.stats import norm
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
@@ -20,9 +20,9 @@ from utils import InputData, InputTypes
 from .ScipyStatsModelBase import ScipyStatsModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
-class ErlangianModel(ScipyStatsModelBase):
+class NormalModel(ScipyStatsModelBase):
   """
-    Erlangian (or homogeneous poisson process) reliability models
+    Normal reliability models
   """
 
   @classmethod
@@ -32,9 +32,8 @@ class ErlangianModel(ScipyStatsModelBase):
       @ In, None
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = super(ErlangianModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType))
+    inputSpecs = super(NormalModel, cls).getInputSpecification()
+    inputSpecs.addSub(InputData.parameterInputFactory('sigma', contentType=InputTypes.InterpretedListType))
     return inputSpecs
 
   def __init__(self):
@@ -44,9 +43,9 @@ class ErlangianModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
-    self._lambda = None
-    self._k = 1
-    self._modelClass = erlang
+    self._alpha = None
+    self._sigma = 1
+    self._modelClass = norm
 
   def _localHandleInput(self, paramInput):
     """
@@ -57,15 +56,12 @@ class ErlangianModel(ScipyStatsModelBase):
     """
     ScipyStatsModelBase._localHandleInput(self, paramInput)
     for child in paramInput.subparts:
-      if child.getName().lower() == 'lambda':
-        self._lambda = self.setVariable(child.value)
-        self._variableDict['_lambda'] = self._lambda
+      if child.getName().lower() == 'sigma':
+        self._sigma = self.setVariable(child.value)
+        self._variableDict['_sigma'] = self._sigma
       elif child.getName().lower() == 'tm':
         self._tm = self.setVariable(child.value)
         self._variableDict['_tm'] = self._tm
-      elif child.getName() == 'k':
-        self._k = self.setVariable(child.value)
-        self._variableDict['_k'] = self._k
 
   def initialize(self, inputDict):
     """
@@ -74,4 +70,4 @@ class ErlangianModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.initialize(self, inputDict)
-    self._model = self._modelClass(self._k, loc=self._loc, scale=1./self._lambda)
+    self._model = self._modelClass(loc=self._loc, scale=self._sigma)
