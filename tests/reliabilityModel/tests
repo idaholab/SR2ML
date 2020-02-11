@@ -47,4 +47,36 @@
   rel_err = 0.0001
  [../]
 
+ [./fatiguelife]
+  type = 'RavenFramework'
+  input = 'test_fatiguelife.xml'
+  csv = 'simpleReliability/fatiguelifeOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./loglinear]
+  type = 'RavenFramework'
+  input = 'test_loglinear.xml'
+  csv = 'simpleReliability/loglinearOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./normal]
+  type = 'RavenFramework'
+  input = 'test_normal.xml'
+  csv = 'simpleReliability/normOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./powerlaw]
+  type = 'RavenFramework'
+  input = 'test_powerlaw.xml'
+  csv = 'simpleReliability/powerlawOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
 []
