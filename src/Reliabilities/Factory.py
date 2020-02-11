@@ -15,6 +15,7 @@ from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
 from .BathtubModel import BathtubModel
 from .PowerLawModel import PowerLawModel
+from .LogLinearModel import LogLinearModel
 
 """
  Interface Dictionary (factory) (private)
@@ -30,6 +31,7 @@ __interfaceDict['fatiguelife'] = FatigueLifeModel
 __interfaceDict['normal'] = NormalModel
 __interfaceDict['bathtub'] = BathtubModel
 __interfaceDict['powerlaw'] = PowerLawModel
+__interfaceDict['loglinear'] = LogLinearModel
 
 def knownTypes():
   """

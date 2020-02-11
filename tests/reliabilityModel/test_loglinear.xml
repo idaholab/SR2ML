@@ -5,7 +5,7 @@
     <created>2020-02-11</created>
     <classesTested>Models.ExternalModel</classesTested>
     <description>
-      This input tests reliability external model (i.e. powerlaw function) within SR2ML plugin
+      This input tests reliability external model (i.e. loglinear function) within SR2ML plugin
     </description>
     <revisions>
       <revision author="wangc" date="2020-02-11">Add test</revision>
@@ -15,17 +15,16 @@
 
   <RunInfo>
     <WorkingDir>simpleReliability</WorkingDir>
-    <Sequence>powerlawMCRun,printToFile</Sequence>
+    <Sequence>loglinearMCRun,printToFile</Sequence>
   </RunInfo>
 
   <Models>
     <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
       <variables>cdf_F, pdf_f, rdf_R, frf_h, alpha, beta, tm</variables>
       <!-- xml portion for this plugin only -->
-      <ReliabilityModel type="powerlaw">
+      <ReliabilityModel type="loglinear">
         <beta>beta</beta>
         <alpha>alpha</alpha>
-        <lambda>0.5</lambda>
         <Tm>tm</Tm>
       </ReliabilityModel>
     </ExternalModel>
@@ -67,7 +66,7 @@
   </DataObjects>
 
   <Steps>
-    <MultiRun name="powerlawMCRun">
+    <MultiRun name="loglinearMCRun">
       <Input          class="DataObjects"   type="PointSet">reliabilityInput</Input>
       <Model          class="Models"        type="ExternalModel">simple_reliability</Model>
       <Sampler        class="Samplers"      type="MonteCarlo">test_MC</Sampler>
@@ -75,12 +74,12 @@
     </MultiRun>
     <IOStep name="printToFile">
      <Input          class="DataObjects"   type="PointSet">reliabilityOutput</Input>
-     <Output         class="OutStreams"    type="Print">powerlawOutput</Output>
+     <Output         class="OutStreams"    type="Print">loglinearOutput</Output>
     </IOStep>
   </Steps>
 
   <OutStreams>
-    <Print name="powerlawOutput">
+    <Print name="loglinearOutput">
       <type>csv</type>
       <source>reliabilityOutput</source>
       <what>input,output</what>

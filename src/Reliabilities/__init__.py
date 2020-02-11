@@ -18,6 +18,7 @@ from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
 from .BathtubModel import BathtubModel
 from .PowerLawModel import PowerLawModel
+from .LogLinearModel import LogLinearModel
 from .Factory import knownTypes
 from .Factory import returnInstance
 from .Factory import returnClass
@@ -30,4 +31,5 @@ __all__ = ['ExponentialModel',
            'FatigueLifeModel',
            'NormalModel',
            'BathtubModel',
-           'PowerLawModel']
+           'PowerLawModel',
+           'LogLinearModel']
