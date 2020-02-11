@@ -17,6 +17,7 @@ from .WeibullModel import WeibullModel
 from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
 from .BathtubModel import BathtubModel
+from .PowerLawModel import PowerLawModel
 from .Factory import knownTypes
 from .Factory import returnInstance
 from .Factory import returnClass
@@ -28,4 +29,5 @@ __all__ = ['ExponentialModel',
            'WeibullModel',
            'FatigueLifeModel',
            'NormalModel',
-           'BathtubModel']
+           'BathtubModel',
+           'PowerLawModel']

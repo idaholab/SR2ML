@@ -14,6 +14,7 @@ from .WeibullModel import WeibullModel
 from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
 from .BathtubModel import BathtubModel
+from .PowerLawModel import PowerLawModel
 
 """
  Interface Dictionary (factory) (private)
@@ -28,6 +29,7 @@ __interfaceDict['weibull'] = WeibullModel
 __interfaceDict['fatiguelife'] = FatigueLifeModel
 __interfaceDict['normal'] = NormalModel
 __interfaceDict['bathtub'] = BathtubModel
+__interfaceDict['powerlaw'] = PowerLawModel
 
 def knownTypes():
   """
