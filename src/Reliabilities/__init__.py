@@ -16,6 +16,7 @@ from .LognormalModel import LognormalModel
 from .WeibullModel import WeibullModel
 from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
+from .ExponWeibullModel import ExponWeibullModel
 from .BathtubModel import BathtubModel
 from .PowerLawModel import PowerLawModel
 from .LogLinearModel import LogLinearModel
@@ -30,6 +31,7 @@ __all__ = ['ExponentialModel',
            'WeibullModel',
            'FatigueLifeModel',
            'NormalModel',
+           'ExponWeibullModel',
            'BathtubModel',
            'PowerLawModel',
            'LogLinearModel']

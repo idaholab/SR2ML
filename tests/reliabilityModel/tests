@@ -79,4 +79,12 @@
   rel_err = 0.0001
  [../]
 
+ [./exponweibull]
+  type = 'RavenFramework'
+  input = 'test_exponweibull.xml'
+  csv = 'simpleReliability/exponweibullOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
 []

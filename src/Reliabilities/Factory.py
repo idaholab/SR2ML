@@ -13,6 +13,7 @@ from .LognormalModel import LognormalModel
 from .WeibullModel import WeibullModel
 from .FatigueLifeModel import FatigueLifeModel
 from .NormalModel import NormalModel
+from .ExponWeibullModel import ExponWeibullModel
 from .BathtubModel import BathtubModel
 from .PowerLawModel import PowerLawModel
 from .LogLinearModel import LogLinearModel
@@ -29,6 +30,7 @@ __interfaceDict['lognorm'] = LognormalModel
 __interfaceDict['weibull'] = WeibullModel
 __interfaceDict['fatiguelife'] = FatigueLifeModel
 __interfaceDict['normal'] = NormalModel
+__interfaceDict['exponweibull'] = ExponWeibullModel
 __interfaceDict['bathtub'] = BathtubModel
 __interfaceDict['powerlaw'] = PowerLawModel
 __interfaceDict['loglinear'] = LogLinearModel
