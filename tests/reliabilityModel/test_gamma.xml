@@ -23,7 +23,7 @@
       <variables>cdf_F, pdf_f, rdf_R, frf_h, alpha, beta, tm</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="gamma">
-        <!-- mean failure rate -->
+        <!-- rate parameter -->
         <beta>beta</beta>
         <!-- mission time -->
         <Tm>tm</Tm>
