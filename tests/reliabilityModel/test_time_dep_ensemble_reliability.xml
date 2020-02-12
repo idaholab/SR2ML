@@ -1,6 +1,6 @@
 <Simulation verbosity="debug">
   <TestInfo>
-    <name>framework.timeDepReliability</name>
+    <name>framework.reliabilityModel.timeDepReliability</name>
     <author>wangc</author>
     <created>2020-02-12</created>
     <classesTested>Models.ExternalModel</classesTested>

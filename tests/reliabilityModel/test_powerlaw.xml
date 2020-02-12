@@ -1,6 +1,6 @@
 <Simulation verbosity="debug">
   <TestInfo>
-    <name>plugins/SR2ML.TestReliability</name>
+    <name>plugins/SR2ML.reliabilityModel.powerlaw</name>
     <author>wangc</author>
     <created>2020-02-11</created>
     <classesTested>Models.ExternalModel</classesTested>

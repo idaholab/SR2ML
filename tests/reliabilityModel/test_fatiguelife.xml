@@ -1,6 +1,6 @@
 <Simulation verbosity="debug">
   <TestInfo>
-    <name>plugins/SR2ML.TestReliability</name>
+    <name>plugins/SR2ML.reliabilityModel.fatiguelife</name>
     <author>wangc</author>
     <created>2020-02-04</created>
     <classesTested>Models.ExternalModel</classesTested>
