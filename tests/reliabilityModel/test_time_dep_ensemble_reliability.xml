@@ -434,7 +434,20 @@
 
     <HistorySet name="main">
       <Input>T0, Tf, steps</Input>
-      <Output>exp_F, exp_f, exp_R, exp_h, tm</Output>
+      <Output>
+        tm,
+        exp_F, exp_f, exp_R, exp_h,
+        erlang_F, erlang_f, erlang_R, erlang_h,
+        gamma_F, gamma_f, gamma_R, gamma_h,
+        lognorm_F, lognorm_f, lognorm_R, lognorm_h,
+        normal_F, normal_f, normal_R, normal_h,
+        fatiguelife_F, fatiguelife_f, fatiguelife_R, fatiguelife_h,
+        weibull_F, weibull_f, weibull_R, weibull_h,
+        exponweibull_F, exponweibull_f, exponweibull_R, exponweibull_h,
+        bathtub_F, bathtub_f, bathtub_R, bathtub_h,
+        powerlaw_F, powerlaw_f, powerlaw_R, powerlaw_h,
+        loglinear_F, loglinear_f, loglinear_R, loglinear_h
+      </Output>
         <options>
             <pivotParameter>time</pivotParameter>
         </options>

@@ -87,4 +87,12 @@
   rel_err = 0.0001
  [../]
 
+ [./timeDepReliability]
+  type = 'RavenFramework'
+  input = 'test_time_dep_ensemble_reliability.xml'
+  csv = 'timeDepReliability/Print_sim_PS_0.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
 []
