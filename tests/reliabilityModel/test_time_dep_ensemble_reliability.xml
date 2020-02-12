@@ -1,0 +1,454 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>framework.timeDepReliability</name>
+    <author>wangc</author>
+    <created>2020-02-12</created>
+    <classesTested>Models.ExternalModel</classesTested>
+    <description>
+       This test is aimed to check the reliablity model with time series input
+    </description>
+  </TestInfo>
+
+  <RunInfo>
+      <WorkingDir>timeDepReliability</WorkingDir>
+      <Sequence>MultiRun, print</Sequence>
+      <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Steps>
+      <MultiRun  name='MultiRun'>
+        <Input   class="DataObjects" type="PointSet"      >timeDataInput</Input>
+        <Model   class='Models'      type='ExternalModel' >Ensemble_Model</Model>
+        <Sampler class='Samplers'    type='MonteCarlo'    >MC_main</Sampler>
+        <Output  class='DataObjects' type='HistorySet'       >main</Output>
+        <!-- <Output  class='DataObjects' type='HistorySet'     >outHS</Output> -->
+      </MultiRun>
+      <IOStep name='print'>
+        <Input   class="DataObjects" type="DataSet"       >main</Input>
+        <Output  class='OutStreams'  type='Print'         >Print_sim_PS</Output>
+      </IOStep>
+  </Steps>
+
+  <Distributions>
+      <Uniform name='uniformDist'>
+        <lowerBound>0.1</lowerBound>
+        <upperBound>4.5</upperBound>
+      </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="MC_main">
+      <samplerInit>
+        <limit>1</limit>
+        <initialSeed>2561978</initialSeed>
+      </samplerInit>
+
+      <constant name='T0'>0.1</constant>
+      <constant name='Tf'>20.</constant>
+      <constant name='steps'>40</constant>
+
+      <variable name='shape'>
+        <distribution>uniformDist</distribution>
+      </variable>
+    </MonteCarlo>
+  </Samplers>
+
+  <Models>
+
+    <ExternalModel name="timeData" ModuleToLoad="timeData" subType="">
+      <variables>T0, Tf, steps, time, tm</variables>
+    </ExternalModel>
+
+    <ExternalModel name="expon" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="exponential">
+        <!-- mean failure rate -->
+        <lambda>1.</lambda>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='exp_F' type='output'>cdf_F</alias>
+      <alias variable='exp_f' type='output'>pdf_f</alias>
+      <alias variable='exp_R' type='output'>rdf_R</alias>
+      <alias variable='exp_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="erlangian" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="erlangian">
+        <!-- mean failure rate -->
+        <lambda>0.1</lambda>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- shape parameter -->
+        <k>2</k>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='erlang_F' type='output'>cdf_F</alias>
+      <alias variable='erlang_f' type='output'>pdf_f</alias>
+      <alias variable='erlang_R' type='output'>rdf_R</alias>
+      <alias variable='erlang_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="gamma" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="gamma">
+        <!-- rate parameter -->
+        <beta>0.1</beta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- shape parameter -->
+        <alpha>2.</alpha>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='gamma_F' type='output'>cdf_F</alias>
+      <alias variable='gamma_f' type='output'>pdf_f</alias>
+      <alias variable='gamma_R' type='output'>rdf_R</alias>
+      <alias variable='gamma_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="lognorm" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="lognorm">
+        <!-- scale parameter -->
+        <beta>1.</beta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- shape parameter -->
+        <alpha>1.</alpha>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='lognorm_F' type='output'>cdf_F</alias>
+      <alias variable='lognorm_f' type='output'>pdf_f</alias>
+      <alias variable='lognorm_R' type='output'>rdf_R</alias>
+      <alias variable='lognorm_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="normal" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="normal">
+        <!-- shape parameter -->
+        <sigma>1.0</sigma>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='normal_F' type='output'>cdf_F</alias>
+      <alias variable='normal_f' type='output'>pdf_f</alias>
+      <alias variable='normal_R' type='output'>rdf_R</alias>
+      <alias variable='normal_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="fatiguelife" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="fatiguelife">
+        <!-- scale parameter -->
+        <beta>1.</beta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- shape parameter -->
+        <alpha>1.0</alpha>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='fatiguelife_F' type='output'>cdf_F</alias>
+      <alias variable='fatiguelife_f' type='output'>pdf_f</alias>
+      <alias variable='fatiguelife_R' type='output'>rdf_R</alias>
+      <alias variable='fatiguelife_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="weibull" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="weibull">
+        <!-- scale parameter -->
+        <beta>1.</beta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- time delay -->
+        <Td>2.0</Td>
+        <!-- shape parameter -->
+        <alpha>1.0</alpha>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='weibull_F' type='output'>cdf_F</alias>
+      <alias variable='weibull_f' type='output'>pdf_f</alias>
+      <alias variable='weibull_R' type='output'>rdf_R</alias>
+      <alias variable='weibull_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="exponweibull" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="exponweibull">
+        <!-- scale parameter -->
+        <beta>1.</beta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- time delay -->
+        <Td>2.0</Td>
+        <!-- shape parameter -->
+        <alpha>1.0</alpha>
+        <gamma>0.5</gamma>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='exponweibull_F' type='output'>cdf_F</alias>
+      <alias variable='exponweibull_f' type='output'>pdf_f</alias>
+      <alias variable='exponweibull_R' type='output'>rdf_R</alias>
+      <alias variable='exponweibull_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="bathtub" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="bathtub">
+        <!-- scale parameter -->
+        <beta>1.</beta>
+        <theta>1.0</theta>
+        <!-- mission time -->
+        <Tm>tm</Tm>
+        <!-- shape parameter -->
+        <alpha>1.0</alpha>
+        <rho>0.5</rho>
+        <!-- weight parameter -->
+        <c>0.5</c>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='bathtub_F' type='output'>cdf_F</alias>
+      <alias variable='bathtub_f' type='output'>pdf_f</alias>
+      <alias variable='bathtub_R' type='output'>rdf_R</alias>
+      <alias variable='bathtub_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="powerlaw" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="powerlaw">
+        <beta>1.0</beta>
+        <alpha>1.0</alpha>
+        <lambda>0.5</lambda>
+        <Tm>tm</Tm>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='powerlaw_F' type='output'>cdf_F</alias>
+      <alias variable='powerlaw_f' type='output'>pdf_f</alias>
+      <alias variable='powerlaw_R' type='output'>rdf_R</alias>
+      <alias variable='powerlaw_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <ExternalModel name="loglinear" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="loglinear">
+        <beta>1.</beta>
+        <alpha>1.</alpha>
+        <Tm>tm</Tm>
+      </ReliabilityModel>
+      <!--  alias can be used to represent any input/output variables -->
+      <alias variable='loglinear_F' type='output'>cdf_F</alias>
+      <alias variable='loglinear_f' type='output'>pdf_f</alias>
+      <alias variable='loglinear_R' type='output'>rdf_R</alias>
+      <alias variable='loglinear_h' type='output'>frf_h</alias>
+    </ExternalModel>
+
+    <EnsembleModel name="Ensemble_Model" subType="">
+      <Model class="Models" type="ExternalModel">timeData
+        <Input            class="DataObjects" type="PointSet"   >timeDataInput</Input>
+        <TargetEvaluation class="DataObjects" type="HistorySet" >timeData_HS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">expon
+        <Input            class="DataObjects" type="PointSet"   >exponInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"    >expon_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">erlangian
+        <Input            class="DataObjects" type="PointSet"  >erlangInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >erlang_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">gamma
+        <Input            class="DataObjects" type="PointSet"  >gammaInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >gamma_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">lognorm
+        <Input            class="DataObjects" type="PointSet"  >lognormInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >lognorm_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">normal
+        <Input            class="DataObjects" type="PointSet"  >normalInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >normal_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">fatiguelife
+        <Input            class="DataObjects" type="PointSet"  >fatiguelifeInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >fatiguelife_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">weibull
+        <Input            class="DataObjects" type="PointSet"  >weibullInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >weibull_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">exponweibull
+        <Input            class="DataObjects" type="PointSet"  >exponweibullInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >exponweibull_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">bathtub
+        <Input            class="DataObjects" type="PointSet"  >bathtubInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >bathtub_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">powerlaw
+        <Input            class="DataObjects" type="PointSet"  >powerlawInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >powerlaw_DS</TargetEvaluation>
+      </Model>
+      <Model class="Models" type="ExternalModel">loglinear
+        <Input            class="DataObjects" type="PointSet"  >loglinearInput</Input>
+        <TargetEvaluation class="DataObjects" type="DataSet"   >loglinear_DS</TargetEvaluation>
+      </Model>
+    </EnsembleModel>
+  </Models>
+
+  <DataObjects>
+    <PointSet name="timeDataInput">
+      <Input>T0, Tf, steps</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <HistorySet name="timeData_HS">
+      <Input>T0, Tf, steps</Input>
+      <Output>tm, time</Output>
+        <options>
+            <pivotParameter>time</pivotParameter>
+        </options>
+    </HistorySet>
+
+    <PointSet name="exponInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="expon_DS">
+      <Input>tm</Input>
+      <Output>exp_F, exp_f, exp_R, exp_h</Output>
+      <Index var="time">exp_F, exp_f, exp_R, exp_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="erlangInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="erlang_DS">
+      <Input>tm</Input>
+      <Output>erlang_F, erlang_f, erlang_R, erlang_h</Output>
+      <Index var="time">erlang_F, erlang_f, erlang_R, erlang_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="gammaInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="gamma_DS">
+      <Input>tm</Input>
+      <Output>gamma_F, gamma_f, gamma_R, gamma_h</Output>
+      <Index var="time">gamma_F, gamma_f, gamma_R, gamma_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="lognormInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="lognorm_DS">
+      <Input>tm</Input>
+      <Output>lognorm_F, lognorm_f, lognorm_R, lognorm_h</Output>
+      <Index var="time">lognorm_F, lognorm_f, lognorm_R, lognorm_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="normalInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="normal_DS">
+      <Input>tm</Input>
+      <Output>normal_F, normal_f, normal_R, normal_h</Output>
+      <Index var="time">normal_F, normal_f, normal_R, normal_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="fatiguelifeInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="fatiguelife_DS">
+      <Input>tm</Input>
+      <Output>fatiguelife_F, fatiguelife_f, fatiguelife_R, fatiguelife_h</Output>
+      <Index var="time">fatiguelife_F, fatiguelife_f, fatiguelife_R, fatiguelife_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="weibullInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="weibull_DS">
+      <Input>tm</Input>
+      <Output>weibull_F, weibull_f, weibull_R, weibull_h</Output>
+      <Index var="time">weibull_F, weibull_f, weibull_R, weibull_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="exponweibullInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="exponweibull_DS">
+      <Input>tm</Input>
+      <Output>exponweibull_F, exponweibull_f, exponweibull_R, exponweibull_h</Output>
+      <Index var="time">exponweibull_F, exponweibull_f, exponweibull_R, exponweibull_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="bathtubInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="bathtub_DS">
+      <Input>tm</Input>
+      <Output>bathtub_F, bathtub_f, bathtub_R, bathtub_h</Output>
+      <Index var="time">bathtub_F, bathtub_f, bathtub_R, bathtub_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="powerlawInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="powerlaw_DS">
+      <Input>tm</Input>
+      <Output>powerlaw_F, powerlaw_f, powerlaw_R, powerlaw_h</Output>
+      <Index var="time">powerlaw_F, powerlaw_f, powerlaw_R, powerlaw_h, tm</Index>
+    </DataSet>
+
+    <PointSet name="loglinearInput">
+      <Input>tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <DataSet name="loglinear_DS">
+      <Input>tm</Input>
+      <Output>loglinear_F, loglinear_f, loglinear_R, loglinear_h</Output>
+      <Index var="time">loglinear_F, loglinear_f, loglinear_R, loglinear_h, tm</Index>
+    </DataSet>
+
+    <HistorySet name="main">
+      <Input>T0, Tf, steps</Input>
+      <Output>exp_F, exp_f, exp_R, exp_h, tm</Output>
+        <options>
+            <pivotParameter>time</pivotParameter>
+        </options>
+    </HistorySet>
+
+  </DataObjects>
+
+  <OutStreams>
+    <Print name="Print_sim_PS">
+      <type>csv</type>
+      <source>main</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+
+</Simulation>

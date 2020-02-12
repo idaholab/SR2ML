@@ -23,7 +23,7 @@
       <variables>cdf_F, pdf_f, rdf_R, frf_h, alpha, beta, tm</variables>
       <!-- xml portion for this plugin only -->
       <ReliabilityModel type="weibull">
-        <!-- mean failure rate -->
+        <!-- scale parameter -->
         <beta>beta</beta>
         <!-- mission time -->
         <Tm>tm</Tm>
