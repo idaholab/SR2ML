@@ -72,7 +72,7 @@ class ScipyStatsModelBase(ReliabilityBase):
 
   def _cumulativeFunction(self):
     """
-      Function to calculate probability
+      Function to calculate cumulative value
       @ In, None
       @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
     """
@@ -80,7 +80,7 @@ class ScipyStatsModelBase(ReliabilityBase):
 
   def _reliabilityFunction(self):
     """
-      Function to calculate probability
+      Function to calculate reliability value
       @ In, None
       @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
     """
@@ -88,7 +88,7 @@ class ScipyStatsModelBase(ReliabilityBase):
 
   def _failureRateFunction(self):
     """
-      Function to calculate probability
+      Function to calculate failure rate
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """

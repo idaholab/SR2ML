@@ -80,7 +80,7 @@ class WeibullModel(ScipyStatsModelBase):
 
   def _failureRateFunction(self):
     """
-      Function to calculate probability
+      Function to calculate failure rate function value 
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """

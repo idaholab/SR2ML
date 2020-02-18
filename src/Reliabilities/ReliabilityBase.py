@@ -185,7 +185,7 @@ class ReliabilityBase:
 
   def getPDF(self):
     """
-      get calculated cdf value
+      get calculated pdf value
       @ In, None
       @ Out, self._pdf, float/numpy.array, the calculated pdf value(s)
     """
@@ -193,7 +193,7 @@ class ReliabilityBase:
 
   def getRDF(self):
     """
-      get calculated cdf value
+      get calculated reliability distribution function value
       @ In, None
       @ Out, self._rdf, float/numpy.array, the calculated reliablity value(s)
     """
@@ -201,7 +201,7 @@ class ReliabilityBase:
 
   def getFRF(self):
     """
-      get calculated cdf value
+      get calculated failure rate function value
       @ In, None
       @ Out, self._frf, float/numpy.array, the calculated failure rate value(s)
     """
@@ -218,7 +218,7 @@ class ReliabilityBase:
   @abc.abstractmethod
   def _cumulativeFunction(self):
     """
-      Function to calculate probability
+      Function to calculate cumulative distribution function value
       @ In, None
       @ Out, _cumulativeFunction, float/numpy.array, the calculated cdf value(s)
     """
@@ -226,7 +226,7 @@ class ReliabilityBase:
   @abc.abstractmethod
   def _reliabilityFunction(self):
     """
-      Function to calculate probability
+      Function to calculate reliability distribution function value
       @ In, None
       @ Out, _reliabilityFunction, float/numpy.array, the calculated reliability value(s)
     """
@@ -234,7 +234,7 @@ class ReliabilityBase:
   @abc.abstractmethod
   def _failureRateFunction(self):
     """
-      Function to calculate probability
+      Function to calculate failure rate function value
       @ In, None
       @ Out, _failureRateFunction, float/numpy.array, the calculated failure rate value(s)
     """

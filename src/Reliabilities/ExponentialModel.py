@@ -75,7 +75,7 @@ class ExponentialModel(ScipyStatsModelBase):
 
   def _failureRateFunction(self):
     """
-      Function to calculate probability
+      Function to calculate failure rate
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """

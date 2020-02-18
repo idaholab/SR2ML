@@ -103,7 +103,7 @@ class PowerLawModel(ReliabilityBase):
 
   def _cumulativeFunction(self):
     """
-      Function to calculate probability
+      Function to calculate cumulative value
       @ In, None
       @ Out, cdf, float/numpy.array, the calculated cdf value(s)
     """
@@ -118,7 +118,7 @@ class PowerLawModel(ReliabilityBase):
 
   def _reliabilityFunction(self):
     """
-      Function to calculate probability
+      Function to calculate reliability value
       @ In, None
       @ Out, rdf, float/numpy.array, the calculated reliability value(s)
     """
@@ -133,7 +133,7 @@ class PowerLawModel(ReliabilityBase):
 
   def _failureRateFunction(self):
     """
-      Function to calculate probability
+      Function to calculate failure rate
       @ In, None
       @ Out, frf, float/numpy.array, the calculated failure rate value(s)
     """
