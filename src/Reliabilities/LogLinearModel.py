@@ -36,9 +36,16 @@ class LogLinearModel(ReliabilityBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(LogLinearModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Log Linear reliability models: lambda(t) = exp(alpha + (t-t0)*(beta))
+      This is called Cox-Lewis model.
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='The inverse is the scale parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType,
+      descr='Mission time'))
     return inputSpecs
 
   def __init__(self):
@@ -48,7 +55,9 @@ class LogLinearModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.__init__(self)
+    # Shape parameter
     self._alpha = 1.
+    # The inverse is the scale parameter
     self._beta = 1.
 
   def _localHandleInput(self, paramInput):

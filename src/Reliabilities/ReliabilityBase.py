@@ -32,8 +32,10 @@ class ReliabilityBase:
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = InputData.parameterInputFactory('ReliabilityModel')
-    inputSpecs.addParam('type', param_type=InputTypes.StringType)
-    inputSpecs.addSub(InputData.parameterInputFactory('Td', contentType=InputTypes.InterpretedListType))
+    inputSpecs.addParam('type', param_type=InputTypes.StringType,
+        descr='The reliablity model object identifier')
+    inputSpecs.addSub(InputData.parameterInputFactory('Td', contentType=InputTypes.InterpretedListType,
+        descr='The time delay before the onset of failure'))
     return inputSpecs
 
   def __init__(self):
@@ -44,15 +46,26 @@ class ReliabilityBase:
     """
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
-    self._dynamicHandling    = False
-    self._outputList = []
+    # not used yet
+    # True indicates reliablity model could accept time series input data, and returns
+    # time-dependent reliablity data (Default True)
+    self._dynamicHandling    = True
+    # dictionary: keys all required input parameters, and values either user provided values or
+    # variables determined by raven
     self._variableDict = {}
+    # instance of reliability model
     self._model = None
+    # class of reliablity model
     self._modelClass = None
+    # location parameter, i.e. time delay/shift
     self._loc = np.array([0])
+    # variable stores cdf value(s)
     self._cdf = None
+    # variable stores pdf value(s)
     self._pdf = None
+    # variable stores reliability distribution function value(s)
     self._rdf = None
+    # variable stores failure rate function value(s)
     self._frf = None
 
   def handleInput(self, xmlNode):

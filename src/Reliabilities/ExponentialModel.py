@@ -35,7 +35,11 @@ class ExponentialModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ExponentialModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Exponential reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType,
+      descr='The mean failure rate'))
     return inputSpecs
 
   def __init__(self):
@@ -45,7 +49,9 @@ class ExponentialModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
+    # mean failure rate
     self._lambda = None
+    # class of expon from scipy.stats
     self._modelClass = expon
 
   def _localHandleInput(self, paramInput):

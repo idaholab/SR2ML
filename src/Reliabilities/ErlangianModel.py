@@ -33,8 +33,13 @@ class ErlangianModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ErlangianModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Erlangian (or homogeneous poisson process) reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType,
+      descr='Mean failure rate for each event'))
+    inputSpecs.addSub(InputData.parameterInputFactory('k', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter (integer). Note that this restriction is not enforced.'))
     return inputSpecs
 
   def __init__(self):
@@ -44,8 +49,11 @@ class ErlangianModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
+    # Mean failure rate for each event
     self._lambda = None
+    # Shape parameter, integer but not enforced
     self._k = 1
+    # class of reliability model from scipy.stats
     self._modelClass = erlang
 
   def _localHandleInput(self, paramInput):

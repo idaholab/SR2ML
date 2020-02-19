@@ -33,7 +33,11 @@ class NormalModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(NormalModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('sigma', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Normal reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('sigma', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
     return inputSpecs
 
   def __init__(self):
@@ -43,8 +47,9 @@ class NormalModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
-    self._alpha = None
+    # Shape parameter
     self._sigma = 1
+    # class of norm from scipy.stats
     self._modelClass = norm
 
   def _localHandleInput(self, paramInput):

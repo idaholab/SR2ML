@@ -32,7 +32,8 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ScipyStatsModelBase, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType,
+      descr='Mission time'))
     return inputSpecs
 
   def __init__(self):
@@ -42,7 +43,7 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.__init__(self)
-    self._model = None
+    # variable to store mission time
     self._tm = None
 
   def _localHandleInput(self, paramInput):

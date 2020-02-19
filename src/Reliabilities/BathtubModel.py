@@ -35,12 +35,21 @@ class BathtubModel(ReliabilityBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(BathtubModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('c', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('theta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('rho', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Bathtub reliability model, see reference "B. S. Dhillon, "A Hazard Rate Model," IEEE Trans. Rel. 29, 150 (1979)"
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('c', contentType=InputTypes.InterpretedListType,
+      descr='Weight parameter, 0<=c<=1'))
+    inputSpecs.addSub(InputData.parameterInputFactory('theta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('rho', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType,
+      descr='Mission time'))
     return inputSpecs
 
   def __init__(self):
@@ -50,10 +59,15 @@ class BathtubModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.__init__(self)
+    # shape parameter
     self._alpha = None
+    # scale parameter
     self._beta = 1
+    # c \in [0,1], weight parameter
     self._c = 1
+    # scale parameter
     self._theta = 1
+    # shape parameter
     self._rho = 0.5
 
   def _localHandleInput(self, paramInput):

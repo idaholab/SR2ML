@@ -35,8 +35,13 @@ class WeibullModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(WeibullModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Weibull reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
     return inputSpecs
 
   def __init__(self):
@@ -46,9 +51,9 @@ class WeibullModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
-    self._alpha = None
-    self._beta = 1
-    self._modelClass = weibull
+    self._alpha = None # shape parameter
+    self._beta = 1 # scale parameter
+    self._modelClass = weibull # instance of weibull model from scipy.stats
 
   def _localHandleInput(self, paramInput):
     """
@@ -80,7 +85,7 @@ class WeibullModel(ScipyStatsModelBase):
 
   def _failureRateFunction(self):
     """
-      Function to calculate failure rate function value 
+      Function to calculate failure rate function value
       @ In, None
       @ Out, ht, float/numpy.array, the calculated failure rate value(s)
     """

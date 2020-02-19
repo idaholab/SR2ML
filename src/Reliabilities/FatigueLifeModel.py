@@ -33,8 +33,13 @@ class FatigueLifeModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(FatigueLifeModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Fatigue life (Birnbaum-Saunders distribution) reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
     return inputSpecs
 
   def __init__(self):
@@ -44,8 +49,11 @@ class FatigueLifeModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
+    # Shape parameter
     self._alpha = None
+    # Scale parameter
     self._beta = 1
+    # class of fatiguelife from scipy.stats
     self._modelClass = fatiguelife
 
   def _localHandleInput(self, paramInput):

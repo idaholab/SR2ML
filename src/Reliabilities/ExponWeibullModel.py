@@ -35,9 +35,15 @@ class ExponWeibullModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(ExponWeibullModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('gamma', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Exponential Weibull reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter of exponentiation'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('gamma', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter of the non-exponentiation Weibull law'))
 
     return inputSpecs
 
@@ -48,9 +54,13 @@ class ExponWeibullModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
+    # Shape parameter of exponentiation
     self._alpha = None
+    # Scale parameter
     self._beta = 1
+    # Shape parameter of the non-exponentiation Weibull law
     self._gamma = None
+    # class of exponweib
     self._modelClass = exponweib
 
   def _localHandleInput(self, paramInput):

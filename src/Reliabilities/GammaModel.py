@@ -33,8 +33,13 @@ class GammaModel(ScipyStatsModelBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(GammaModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Gamma reliability models
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Scale parameter'))
     return inputSpecs
 
   def __init__(self):
@@ -44,8 +49,11 @@ class GammaModel(ScipyStatsModelBase):
       @ Out, None
     """
     ScipyStatsModelBase.__init__(self)
+    # Shape parameter
     self._alpha = None
+    # Scale parameter
     self._beta = 1
+    # class of gamma from scipy.stats
     self._modelClass = gamma
 
   def _localHandleInput(self, paramInput):

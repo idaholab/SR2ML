@@ -36,10 +36,19 @@ class PowerLawModel(ReliabilityBase):
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = super(PowerLawModel, cls).getInputSpecification()
-    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType))
+    inputSpecs.description = r"""
+      Power Law reliability models: lambda(t) = lambda + alpha*(t-t0)**(beta)
+      Other names for the power law model are: the Duane Model and the AMSAA (Army Materials System Analysis Activity)
+      model.
+      """
+    inputSpecs.addSub(InputData.parameterInputFactory('alpha', contentType=InputTypes.InterpretedListType,
+      descr='Scale Parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('beta', contentType=InputTypes.InterpretedListType,
+      descr='Shape parameter'))
+    inputSpecs.addSub(InputData.parameterInputFactory('lambda', contentType=InputTypes.InterpretedListType,
+      descr='initial failure rate'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm', contentType=InputTypes.InterpretedListType,
+      descr='Mission time'))
     return inputSpecs
 
   def __init__(self):
@@ -49,8 +58,11 @@ class PowerLawModel(ReliabilityBase):
       @ Out, None
     """
     ReliabilityBase.__init__(self)
+    # Scale parameter
     self._alpha = 1.
+    # Shape parameter
     self._beta = 1.
+    # Initial failure rate
     self._lambda = 0.
 
   def _localHandleInput(self, paramInput):

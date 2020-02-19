@@ -5,7 +5,10 @@
     <created>2020-02-12</created>
     <classesTested>Models.ExternalModel</classesTested>
     <description>
-       This test is aimed to check the reliablity model with time series input
+       This test is aimed to check the reliablity model with time series input.
+       The reliability model will return time-dependent reliablity data, such as
+       failure rate, cumulative failure value, probability failure value, and reliablity
+       value.
     </description>
   </TestInfo>
 
