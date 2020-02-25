@@ -54,7 +54,7 @@ class TDFailureRateReliabilityModel(ExternalModelPluginBase):
     """
     container.mapping    = {}
     container.InvMapping = {}
-    allowedTypesParams   = {'constant':{'lambda0'}
+    allowedTypesParams   = {'constant':{'lambda0'},
                             'linear':{'lambda0','alpha','integrationTimeStep'},
                             'weibull':{'alpha','beta','integrationTimeStep'},
                             'customLambda':{'fileName','skipFirstRow','timeColumn','reliabilityDataColumn','integrationTimeStep'},

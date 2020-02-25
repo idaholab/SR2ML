@@ -1,0 +1,88 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>plugins/SR2ML.reliabilityModel.loglinear</name>
+    <author>wangc</author>
+    <created>2020-02-11</created>
+    <classesTested>Models.ExternalModel</classesTested>
+    <description>
+      This input tests reliability external model (i.e. loglinear function) within SR2ML plugin
+    </description>
+    <revisions>
+      <revision author="wangc" date="2020-02-11">Add test</revision>
+    </revisions>
+    <requirements>R-SR2ML-2</requirements>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>simpleReliability</WorkingDir>
+    <Sequence>loglinearMCRun,printToFile</Sequence>
+  </RunInfo>
+
+  <Models>
+    <ExternalModel name="simple_reliability" subType="SR2ML.ReliabilityModel">
+      <variables>cdf_F, pdf_f, rdf_R, frf_h, alpha, beta, tm</variables>
+      <!-- xml portion for this plugin only -->
+      <ReliabilityModel type="loglinear">
+        <beta>beta</beta>
+        <alpha>alpha</alpha>
+        <Tm>tm</Tm>
+      </ReliabilityModel>
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name="uni_dist">
+        <lowerBound>0.5</lowerBound>
+        <upperBound>2.0</upperBound>
+    </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="test_MC">
+      <samplerInit>
+        <limit>4</limit>
+      </samplerInit>
+      <variable name="alpha">
+          <distribution>uni_dist</distribution>
+      </variable>
+      <variable name="beta">
+          <distribution>uni_dist</distribution>
+      </variable>
+      <variable name="tm">
+          <distribution>uni_dist</distribution>
+      </variable>
+    </MonteCarlo>
+  </Samplers>
+
+  <DataObjects>
+    <PointSet name="reliabilityInput">
+      <Input>alpha, beta, tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="reliabilityOutput">
+      <Input>alpha, beta, tm</Input>
+      <Output>cdf_F, pdf_f, rdf_R, frf_h</Output>
+    </PointSet>
+  </DataObjects>
+
+  <Steps>
+    <MultiRun name="loglinearMCRun">
+      <Input          class="DataObjects"   type="PointSet">reliabilityInput</Input>
+      <Model          class="Models"        type="ExternalModel">simple_reliability</Model>
+      <Sampler        class="Samplers"      type="MonteCarlo">test_MC</Sampler>
+      <Output         class="DataObjects"   type="PointSet">reliabilityOutput</Output>
+    </MultiRun>
+    <IOStep name="printToFile">
+     <Input          class="DataObjects"   type="PointSet">reliabilityOutput</Input>
+     <Output         class="OutStreams"    type="Print">loglinearOutput</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="loglinearOutput">
+      <type>csv</type>
+      <source>reliabilityOutput</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+</Simulation>

@@ -1,0 +1,98 @@
+[Tests]
+ [./expon]
+  type = 'RavenFramework'
+  input = 'test_expon.xml'
+  csv = 'simpleReliability/exponOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./erlang]
+  type = 'RavenFramework'
+  input = 'test_erlangian.xml'
+  csv = 'simpleReliability/erlangianOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./lognorm]
+  type = 'RavenFramework'
+  input = 'test_lognorm.xml'
+  csv = 'simpleReliability/lognormOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./gamma]
+  type = 'RavenFramework'
+  input = 'test_gamma.xml'
+  csv = 'simpleReliability/gammaOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./weibull]
+  type = 'RavenFramework'
+  input = 'test_weibull.xml'
+  csv = 'simpleReliability/weibullOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./bathtub]
+  type = 'RavenFramework'
+  input = 'test_bathtub.xml'
+  csv = 'simpleReliability/bathtubOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./fatiguelife]
+  type = 'RavenFramework'
+  input = 'test_fatiguelife.xml'
+  csv = 'simpleReliability/fatiguelifeOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./loglinear]
+  type = 'RavenFramework'
+  input = 'test_loglinear.xml'
+  csv = 'simpleReliability/loglinearOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./normal]
+  type = 'RavenFramework'
+  input = 'test_normal.xml'
+  csv = 'simpleReliability/normOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./powerlaw]
+  type = 'RavenFramework'
+  input = 'test_powerlaw.xml'
+  csv = 'simpleReliability/powerlawOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./exponweibull]
+  type = 'RavenFramework'
+  input = 'test_exponweibull.xml'
+  csv = 'simpleReliability/exponweibullOutput.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./timeDepReliability]
+  type = 'RavenFramework'
+  input = 'test_time_dep_ensemble_reliability.xml'
+  csv = 'timeDepReliability/Print_sim_PS_0.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+[]

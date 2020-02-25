@@ -1,0 +1,40 @@
+.libs
+*.dylib
+*.la
+*.lo
+*.d
+*.o
+*.a
+*-opt
+*-dbg
+*-oprof
+*-devel
+*.e
+*.csv
+*.so
+*~
+*.ctf
+*.png
+*.toc
+*.log
+*.out
+*.aux
+*.pdf
+*.bbl
+*.blg
+
+# eclipse
+.project
+.cproject
+
+#osx
+.DS_Store
+
+# python
+*.pyc
+*.pyo
+
+# vim
+*~
+*.swp
+
