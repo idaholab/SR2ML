@@ -91,6 +91,114 @@ $T$, time to failure. Hence
 \end{equation}
 
 \subsection{The Lifetime Distributions or Aging Models}
+We will now consider several of the most useful reliability models based on different probability
+distributions for describing failure of continuous operating devices, including:
+\begin{itemize}
+	\item Exponential, i.e. model \xmlAttr{type} is \xmlString{exponential}
+	\item Erlangian, i.e. model \xmlAttr{type} is \xmlString{erlangian}
+	\item Gamma, i.e. model \xmlAttr{type} is \xmlString{gamma}
+	\item Lognorm, i.e. model \xmlAttr{type} is \xmlString{lognorm}
+	\item Fatigue Life, i.e. model \xmlAttr{type} is \xmlString{fatiguelife}
+	\item Weibull, i.e. model \xmlAttr{type} is \xmlString{weibull}
+	\item Exponential Weibull, i.e. model \xmlAttr{type} is \xmlString{exponweibull}
+	\item Bathtub, i.e. model \xmlAttr{type} is \xmlString{bathtub}
+	\item Power Law, i.e. model \xmlAttr{type} is \xmlString{powerlaw}
+	\item Log Linear, i.e. model \xmlAttr{type} is \xmlString{loglinear}
+\end{itemize}
+
+The specifications of these models must be defined within a RAVEN \xmlNode{ExternalModel}. These
+XML node accepts the following attributes:
+\begin{itemize}
+	\item \xmlAttr{name}, \xmlDesc{required string attribute}, user-defined identifier of this model.
+	\nb As with other objects, this identifier can be used to reference this specific entity from other
+	input blocks in the XML.
+	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the sub-types should
+	be used. For reliability models, must use \xmlString{SR2ML.ReliabilityModel} as sub-type.
+\end{itemize}
+In the reliability \xmlNode{ExternalModel} input block, the following XML sub-nodes are required:
+\begin{itemize}
+	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
+	names. Each variable name needs to match a variable used/defined in the reliability model or variable
+	coming from other RAVEN entity (i.e. Samplers, DataObjects and Models).
+	\nb For all the reliability models, the following outputs variables will be available. If the user
+	add these output variables in the node \xmlNode{variables}, these variables will be also available to
+	be used anywhere in the RAVEN input to refer to the reliability model output variables.
+	\begin{itemize}
+		\item \xmlString{pdf\_f}, variable contains the calculated pdf value or values at given time or times,
+		i.e. a series of times.
+		\item \xmlString{cdf\_F}, variable contains the calculated cdf value or values at given time or times,
+		i.e. a series of times.
+		\item \xmlString{rdf\_R}, variable contains the calculated reliability function (rdf) value or values at
+		given time or times, i.e. a series of times.
+		\item \xmlString{frf\_h}, variable contains the calculated failure rate function (frf) value or values
+		at given time or times, i.e. a series of times.
+	\end{itemize}
+	\nb When the external model variables are defined, at run time, RAVEN initializes
+	them and tracks their values during the simulation.
+	\item \xmlNode{ReliabilityModel}, \xmlDesc{required parameter}. The node is used to define the reliability
+	model, and it contains the following required XML attribute:
+	\begin{itemize}
+		\item \xmlAttr{type}, \xmlDesc{required string attribute}, user-defined identifier of the reliability model.
+		\nb the types for different reliability models can be found at the beginning of this section.
+	\end{itemize}
+	In addition, this node accepts several different sub-nodes representing the model parameters depending on the
+	\xmlAttr{type} of the reliability model. The common sub-node for all reliability model is:
+	\begin{itemize}
+		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time or a series
+		of times that the reliability models will use to compute pdf, cdf, rdf and frf values. If a string is provided,
+		the reliability model will treat it as an input variable that is coming from other entity of RAVEN. In this
+		case, this variable must be listed the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
+	\end{itemize}
+\end{itemize}
+In addition, if the user wants to use the alias system, the following XML block can be inputted:
+\begin{itemize}
+	\item \xmlNode{alias} \xmlDesc{string, optional field} specifies alias for
+	any variable of interest in the input or output space for the ExternalModel.
+	%
+	These aliases can be used anywhere in the RAVEN input to refer to the ExternalModel
+	variables.
+	%
+	In the body of this node the user specifies the name of the variable that the ExternalModel is
+	going to use (during its execution).
+	%
+	The actual alias, usable throughout the RAVEN input, is instead defined in the
+	\xmlAttr{variable} attribute of this tag.
+	\\The user can specify aliases for both the input and the output space. As sanity check, RAVEN
+	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output''.
+	%
+	\nb The user can specify as many aliases as needed.
+	%
+	\default{None}
+\end{itemize}
+
+Example XML (Bathtub Reliability Model):
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="bathtub" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="bathtub">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<theta>1.0</theta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<rho>0.5</rho>
+			<!-- weight parameter -->
+			<c>0.5</c>
+		</ReliabilityModel>
+		<!--  alias can be used to represent any input/output variables -->
+		<alias variable='bathtub_F' type='output'>cdf_F</alias>
+		<alias variable='bathtub_f' type='output'>pdf_f</alias>
+		<alias variable='bathtub_R' type='output'>rdf_R</alias>
+		<alias variable='bathtub_h' type='output'>frf_h</alias>
+	</ExternalModel>
+\end{lstlisting}
+
+
+
+
 
 
 \subsection{Reliability Models Reference Tests}
