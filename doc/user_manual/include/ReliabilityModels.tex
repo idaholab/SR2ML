@@ -1,0 +1,82 @@
+\section{Reliability Models}
+\label{sec:ReliabilityModels}
+
+\textbf{Reliability Models/Functions} are the most frequently used in life data analysis
+and reliability engineering. These models/functions give the probability of an component
+operating for a certain amount of time without failure. As such, the reliability models
+are function of time, in that every reliability value has an associated time value. In
+other words, one must specify a time value with the desired reliability value. This degree
+of flexibility makes the reliability model a much better reliability specification that the
+MTTF (Mean Time To Failure), which represents only one point along the entire reliability
+model.
+
+\subsection{The Probability Density and Cumulative Density Functions}
+From probability and statistics, given a continuous random variable $X$, we denote:
+\begin{itemize}
+	\item The probability density function (pdf), as $f(x)$.
+	\item The cumulative density function (cdf), as $F(x)$.
+\end{itemize}
+If $x$ is a continuous random variable, then the probability of $x$ takes on a value in the
+interval $[a,b]$ is the area under the pdf $f(x)$ from $a$ to $b$:
+\begin{equation}
+  P(a\leq x\leq b) = \int_{a}^{b} f(x)dx
+\end{equation}
+The cumulative distribution function is a function $F(x)$ of a random variable $x$, and is
+defined for a number $x_0$ by:
+\begin{equation}
+  F(x_0) = P(x\leq x_0) = \int_{-\infty}^{x_0} f(s)ds
+\end{equation}
+That is, for a given value $x_0$, $F(x_0)$ is the probability that the observed value of $x$
+will be at most $x_0$. The mathematical relationship between the pdf and cdf is given by:
+\begin{equation}
+  F(x) = \int_{-\infty}^{x} f(s)ds
+\end{equation}
+Conversely:
+\begin{equation}
+  f(x) = - \frac{dF(x)}{dx}
+\end{equation}
+The functions most commonly used in reliability engineering and life data analysis, namely the
+reliability function and failure rate function, can be determined directly from the pdf definition,
+or $f(t)$. Different distribuion exist, such as Lognormal, exponential, Weibull etc., and each of
+them has a predefined $f(t)$. These distributions were formulated by statisticians, mathematicians
+and engineers to mathematically model or represent certain behavior. Some distribution tend to better
+represent life data and are most commonly referred to as lifetime distribution.
+
+\subsection{The Reliability and Failure Rate Models}
+Given the mathematical representation of a distribution, we can derive all of the functions that needed
+for reliability analysis, i.e. reliability models/functions. This will only depend on the value of $t$
+after the value of the distribution parameters are estimated from data.
+Now, let $T$ be the random variable defining the lifetime of the component with cdf $F(t)$, which is the
+time the component will operate before failure. The cdf $F(t)$ of the random variable $T$ is given by:
+\begin{equation}
+  F(t) = \int_{-\infty}^{t} f(T)dT
+\end{equation}
+If $F(t)$ is a differentiable function, then the pdf $f(t)$ is given by:
+\begin{equation}
+  f(t) = - \frac{dF(t)}{dt}
+\end{equation}
+The reliability function or survive function $R(t)$ of the component is given by:
+\begin{equation}
+  R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
+\end{equation}
+
+
+
+\subsection{The Lifetime Distributions or Aging Models}
+
+
+\subsection{Reliability Models Reference Tests}
+\begin{itemize}
+	\item SR2ML/tests/reliabilityModel/test\_bathtub.xml
+  \item SR2ML/tests/reliabilityModel/test\_erlangian.xml
+	\item SR2ML/tests/reliabilityModel/test\_expon.xml
+  \item SR2ML/tests/reliabilityModel/test\_exponweibull.xml
+	\item SR2ML/tests/reliabilityModel/test\_fatiguelife.xml
+  \item SR2ML/tests/reliabilityModel/test\_gamma.xml
+	\item SR2ML/tests/reliabilityModel/test\_loglinear.xml
+  \item SR2ML/tests/reliabilityModeltest\_lognorm.xml
+	\item SR2ML/tests/reliabilityModel/test\_normal.xml
+  \item SR2ML/tests/reliabilityModel/test\_powerlaw.xml
+	\item SR2ML/tests/reliabilityModeltest\_weibull.xml
+	\item SR2ML/tests/reliabilityModel/test\_time\_dep\_ensemble\_reliability.xml
+\end{itemize}
