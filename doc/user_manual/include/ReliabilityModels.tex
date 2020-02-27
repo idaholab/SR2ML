@@ -59,8 +59,36 @@ The reliability function or survive function $R(t)$ of the component is given by
 \begin{equation}
   R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
 \end{equation}
-
-
+It is the probability that the component will operate after time t, sometimes called survival probability.
+The failure rate of a system during the interval $[t,t+\Delta t]$ is the probability that a failure per
+unit time occurs in the interval, given that a failure has not occurred prior to t, the beginning of the
+interval. The failure rate function (i.e. instantaneous failure rate, conditional failure rate) of hazard
+function is defined as the limit of the failure rate as the interval approaches zero. Hence
+\begin{equation}
+  \lambda (t)= \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta tR(t)}
+	 = \frac{1}{R(t)} \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta t}
+	 = \frac{1}{R(t)}\frac{dF(t)}{dt} = \frac{f(t)}{R(t)}
+\end{equation}
+The failure rate function is the rate of change of the conditional probability of failure at time $t$.
+It measures the likelihood that a component that has operated up until time $t$ fails in the next
+instant of time.
+Generally $\lambda (t)$ is the one tabulated because it is measured experimentally and because it tends to
+vary less rapidly with time than the other parameters. When $\lambda (t)$ is given, all other three
+parameters $F(t)$, $f(t)$, $R(t)$ can be computed as follows:
+\begin{equation}
+  R(t) = \exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+\begin{equation}
+	f(t) = \lambda (t)R(t) = \lambda (t)\exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+\begin{equation}
+ 	F(t) = 1 - R(t) = 1 - \exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+The mean time between failure (MTBF) can be obtained by finding the expected value of the random variable
+$T$, time to failure. Hence
+\begin{equation}
+  MTBF = E(T) = \int_{0}^{\infty} tf(t)dt = \int_{0}^{\infty} R(t)dt
+\end{equation}
 
 \subsection{The Lifetime Distributions or Aging Models}
 
