@@ -2,12 +2,20 @@
 \label{sec:ReliabilityModels}
 
 
-\newcommand{\aliasParameterDescription}[1]
+\newcommand{\aliasRequiredParameterDescription}[1]
 {
 	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
 	If a string is provided, the reliability model will treat it as an input variable that is coming
 	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
 	\xmlNode{variables} under \xmlNode{ExternalModel}.
+}
+\newcommand{\aliasOptionalParameterDescription}[1]
+{
+	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See above definition.
+	If a string is provided, the reliability model will treat it as an input variable that is coming
+	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
+	\xmlNode{variables} under \xmlNode{ExternalModel}.
+	\default{1.}
 }
 
 \textbf{Reliability Models/Functions} are the most frequently used in life data analysis
@@ -64,7 +72,7 @@ If $F(t)$ is a differentiable function, then the pdf $f(t)$ is given by:
 \begin{equation}
   f(t) = - \frac{dF(t)}{dt}
 \end{equation}
-The reliability function or survive function $R(t)$ of the component is given by:
+The reliability function or survival function $R(t)$ of the component is given by:
 \begin{equation}
   R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
 \end{equation}
@@ -157,6 +165,11 @@ In the reliability \xmlNode{ExternalModel} input block, the following XML sub-no
 		of times that the reliability models will use to compute pdf, cdf, rdf and frf values. If a string is provided,
 		the reliability model will treat it as an input variable that is coming from other entity of RAVEN. In this
 		case, this variable must be listed in the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
+		\item \xmlNode{Td}, \xmlDesc{string or float, optional parameter}. Time that the reliability models start to be active.
+		If a string is provided, the reliability model will treat it as an input variable that is coming
+		from other entity of RAVEN. In this case, this variable must be listed in the sub-node \xmlNode{variables}
+		under \xmlNode{ExternalModel}.
+		\default{0.}
 	\end{itemize}
 \end{itemize}
 In addition, if the user wants to use the alias system, the following XML block can be inputted:
@@ -205,17 +218,17 @@ Example XML (Bathtub Reliability Model):
 	</ExternalModel>
 \end{lstlisting}
 
-\subsubsection{The Lognormal Distribution}
+\subsubsection{The Lognormal Model}
 The probability density function of the lognormal is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \frac{1}{\alpha T_m\sqrt{2\pi}}\exp\left(-\frac{1}{2}\left(\frac{\ln{\frac{T_m-T_d}{\beta}}}{\alpha}\right)^2\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
 \end{itemize}
 
 Example XML:
@@ -233,17 +246,16 @@ Example XML:
 	</ExternalModel>
 \end{lstlisting}
 
-\subsubsection{The Exponential Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Exponential Model}
+The probability density function of the Exponential is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \lambda\exp\left(-\lambda\left(T_m-T_d\right)\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \lambda >0$, $\lambda$ is the mean failure rate or the inverse of scale parameter,
+and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{lambda}
 \end{itemize}
 
 Example XML:
@@ -260,17 +272,17 @@ Example XML:
 	</ExternalModel>
 \end{lstlisting}
 
-\subsubsection{The Weibull Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Weibull Model}
+The probability density function of the Weibull is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \frac{\alpha}{\beta}\left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
 \end{itemize}
 
 Example XML:
@@ -291,17 +303,18 @@ Example XML:
 	</ExternalModel>
 \end{lstlisting}
 
-\subsubsection{The Erlangian Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Erlangian Model}
+The probability density function of the Erlangian is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \frac{\lambda\left(\lambda T_m\right)^{k-1}\exp\left(-\lambda T_m\right)}{\left(k-1\right)!}
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \lambda >0$, and $\lambda$ is the inverse of scale parameter, $k$ is positive integer
+that control the shape, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{k}
+	\nb $k$ is a positive integer, if a float is provided, a warning will be raised.
 \end{itemize}
 
 Example XML:
@@ -321,17 +334,17 @@ Example XML:
 \end{lstlisting}
 
 
-\subsubsection{The Gamma Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Gamma Model}
+The probability density function of the Gamma is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \frac{\beta \left(\beta \left(T_m-T_d\right)\right)^{\alpha-1}\exp\left(-\beta\left(T_m-T_d\right)\right)}{\Gamma \left(\alpha\right)}
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the inverse of scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
 \end{itemize}
 
 Example XML:
@@ -351,17 +364,18 @@ Example XML:
 \end{lstlisting}
 
 
-\subsubsection{The Fatigue Life Distribution (Birnbaum-Saunders)}
-The probability density function of the lognormal is given by
+\subsubsection{The Fatigue Life Model (Birnbaum-Saunders)}
+The probability density function of the Fatigue Life is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \frac{\frac{T_m-T_d}{\beta}+1}{2\alpha\sqrt{2\pi\left(\frac{T_m-T_d}{\beta}\right)^3}}
+				 \exp\left(-\frac{\left(\frac{T_m-T_d}{\beta}-1\right)^2}{2\left(\frac{T_m-T_d}{\beta}\right)\alpha^2}\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
 \end{itemize}
 
 Example XML:
@@ -381,17 +395,19 @@ Example XML:
 \end{lstlisting}
 
 
-\subsubsection{The Exponentiated Weibull Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Exponentiated Weibull Model}
+The probability density function of the Exponentiated Weibull is given by
 \begin{equation}
-	f(t) =
+	f(T_m) = \gamma\alpha\left(1-\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)\right)^{\gamma-1}
+				 \left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \gamma>0$, and $\beta$ is the scale parameter, $\alpha$ and $\gamma$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{gamma}
 \end{itemize}
 
 Example XML:
@@ -414,17 +430,28 @@ Example XML:
 \end{lstlisting}
 
 
-\subsubsection{The Bathtub Distribution}
-The probability density function of the lognormal is given by
+\subsubsection{The Bathtub Model}
+The reliability function is given by:
 \begin{equation}
-	f(t) =
+  R(T_m) = \exp\left(-c\beta\left(\frac{T_m-T_d}{\beta}\right)^\alpha -(1-c)\left(\exp\left(\frac{T_m-T_d}{\theta}\right)^\rho -1\right)\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+The failure rate function is given by:
+\begin{equation}
+  \lambda(T_m) = c\alpha\left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}+(1-c)\rho\left(\frac{T_m-T_d}{\theta}\right)^{\rho-1}
+\end{equation}
+The probability density function of the Bathtub is given by
+\begin{equation}
+	f(T_m) = \lambda(T_m) R(T_m)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \theta, \rho, c >0$, and $\beta, \theta$ are the scale parameters,
+$\alpha, \rho$ are the shape parameters, $c \in [0,1]$ is the weight parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{theta}
+	\item \aliasOptionalParameterDescription{rho}
+	\item \aliasOptionalParameterDescription{c}
 \end{itemize}
 
 Example XML:
@@ -449,16 +476,17 @@ Example XML:
 
 
 \subsubsection{The Power Law Model for Failure Rate Function}
-The probability density function of the lognormal is given by
+The hazard rate satisfies a power law as a function of time:
 \begin{equation}
-	f(t) =
+	\lambda(T_m) = \lambda + \alpha(T_m-T_d)^\beta
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \lambda >0$,
+and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{lambda}
 \end{itemize}
 
 Example XML:
@@ -477,16 +505,15 @@ Example XML:
 
 
 \subsubsection{The Log Linear Model for Failure Rate Function}
-The probability density function of the lognormal is given by
+The hazard rate satisfies a exponential law as a function of time:
 \begin{equation}
-	f(t) =
+	\lambda(T_m) = \exp\left(\alpha+\beta(T_m-T_d)\right)
 \end{equation}
-where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
-parameter, and $t_0$ is the location parameter.
-This model accept the following sub-nodes:
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
 \begin{itemize}
-	\item \aliasParameterDescription{alpha}
-	\item \aliasParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
 \end{itemize}
 
 Example XML:

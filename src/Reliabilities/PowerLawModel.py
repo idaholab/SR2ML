@@ -63,7 +63,7 @@ class PowerLawModel(ReliabilityBase):
     # Shape parameter
     self._beta = 1.
     # Initial failure rate
-    self._lambda = 0.
+    self._lambda = 1.
 
   def _localHandleInput(self, paramInput):
     """
