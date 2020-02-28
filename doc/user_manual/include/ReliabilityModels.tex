@@ -1,6 +1,15 @@
 \section{Reliability Models}
 \label{sec:ReliabilityModels}
 
+
+\newcommand{\aliasParameterDescription}[1]
+{
+	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
+	If a string is provided, the reliability model will treat it as an input variable that is coming
+	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
+	\xmlNode{variables} under \xmlNode{ExternalModel}.
+}
+
 \textbf{Reliability Models/Functions} are the most frequently used in life data analysis
 and reliability engineering. These models/functions give the probability of an component
 operating for a certain amount of time without failure. As such, the reliability models
@@ -147,7 +156,7 @@ In the reliability \xmlNode{ExternalModel} input block, the following XML sub-no
 		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time or a series
 		of times that the reliability models will use to compute pdf, cdf, rdf and frf values. If a string is provided,
 		the reliability model will treat it as an input variable that is coming from other entity of RAVEN. In this
-		case, this variable must be listed the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
+		case, this variable must be listed in the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
 	\end{itemize}
 \end{itemize}
 In addition, if the user wants to use the alias system, the following XML block can be inputted:
@@ -196,9 +205,302 @@ Example XML (Bathtub Reliability Model):
 	</ExternalModel>
 \end{lstlisting}
 
+\subsubsection{The Lognormal Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="lognorm" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<ReliabilityModel type="lognorm">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Exponential Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="exponential" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="exponential">
+			<!-- mean failure rate -->
+			<lambda>1.</lambda>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Weibull Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="weibull" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="weibull">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- time delay -->
+			<Td>2.0</Td>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Erlangian Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="erlangian" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="erlangian">
+			<!-- mean failure rate -->
+			<lambda>0.1</lambda>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<k>2</k>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
 
 
+\subsubsection{The Gamma Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
 
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="gamma" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="gamma">
+			<!-- rate parameter -->
+			<beta>0.1</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>2.</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Fatigue Life Distribution (Birnbaum-Saunders)}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="fatiguelife" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="fatiguelife">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Exponentiated Weibull Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="exponweibull" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="exponweibull">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- time delay -->
+			<Td>2.0</Td>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<gamma>0.5</gamma>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Bathtub Distribution}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="bathtub" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="bathtub">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<theta>1.0</theta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<rho>0.5</rho>
+			<!-- weight parameter -->
+			<c>0.5</c>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Power Law Model for Failure Rate Function}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="powerlaw" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="powerlaw">
+			<beta>1.0</beta>
+			<alpha>1.0</alpha>
+			<lambda>0.5</lambda>
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Log Linear Model for Failure Rate Function}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(t) =
+\end{equation}
+where $t\geq t_0$, $t_0, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $t_0$ is the location parameter.
+This model accept the following sub-nodes:
+\begin{itemize}
+	\item \aliasParameterDescription{alpha}
+	\item \aliasParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="loglinear" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="loglinear">
+			<beta>1.</beta>
+			<alpha>1.</alpha>
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
 
 
 \subsection{Reliability Models Reference Tests}
