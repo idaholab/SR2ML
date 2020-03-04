@@ -40,11 +40,11 @@ The RBD must be specified in a specific format; as an example, the RBD of Fig.~\
   <node name="SG3">
   </node>
 </Graph>
-\end{lstlisting} 
+\end{lstlisting}
 
 \begin{figure}
     \centering
-    \centerline{\includegraphics[scale=0.5]{RBD.pdf}} 
+    \centerline{\includegraphics[scale=0.5]{RBD.pdf}}
     \caption{Example of RBD.}
     \label{fig:RBD}
 \end{figure}
@@ -52,7 +52,7 @@ The RBD must be specified in a specific format; as an example, the RBD of Fig.~\
 The FT of Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be defined in the RAVEN input file as follows:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=RBD model input example., label=lst:RBD_InputExample]
-  <Models> 
+  <Models>
     ...
     <ExternalModel name="graph" subType="GraphModel">
       <variables>
@@ -74,8 +74,8 @@ The FT of Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be de
   </Models>
 \end{lstlisting}
 
-All the specifications of the RBD model are given in the 
-\xmlNode{ExternalModel} block. 
+All the specifications of the RBD model are given in the
+\xmlNode{ExternalModel} block.
 Inside the \xmlNode{ExternalModel} block, the XML
 nodes that belong to this models are:
 \begin{itemize}
@@ -89,7 +89,7 @@ nodes that belong to this models are:
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition, the RBD model of Fig.~\ref{fig:RBD} and described in Listing~\ref{lst:RBDmodel}, 
+Provided this definition, the RBD model of Fig.~\ref{fig:RBD} and described in Listing~\ref{lst:RBDmodel},
 the resulting model in RAVEN is characterized by these variables:
 \begin{itemize}
 	\item Input variables: status2, status3, status4, status5
@@ -98,6 +98,6 @@ the resulting model in RAVEN is characterized by these variables:
 
 \subsection{RBD model reference tests}
 \begin{itemize}
-	\item test\_graphModel.xml
-	\item test\_graphModel\_TD.xml
+	\item SR2ML/tests/test\_graphModel.xml
+	\item SR2ML/tests/test\_graphModel\_TD.xml
 \end{itemize}

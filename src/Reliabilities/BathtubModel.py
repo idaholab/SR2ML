@@ -68,7 +68,7 @@ class BathtubModel(ReliabilityBase):
     # scale parameter
     self._theta = 1
     # shape parameter
-    self._rho = 0.5
+    self._rho = 1. 
 
   def _localHandleInput(self, paramInput):
     """

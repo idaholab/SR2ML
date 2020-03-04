@@ -6,7 +6,7 @@ As an example, the Markov chain of Fig.~\ref{fig:markov} is translated in the Op
 
 \begin{figure}
     \centering
-    \centerline{\includegraphics[scale=0.5]{markov.pdf}} 
+    \centerline{\includegraphics[scale=0.5]{markov.pdf}}
     \caption{Example of continuous time Markov chain (source Wikipedia: https://en.wikipedia.org/wiki/Markov\_chain).}
     \label{fig:markov}
 \end{figure}
@@ -29,12 +29,12 @@ As an example, the Markov chain of Fig.~\ref{fig:markov} is translated in the Op
       <state name="3"> <!-- Stagnant market -->
         <transition type="lambda" value="0.02">1</transition>
         <transition type="lambda" value="0.4" >2</transition>
-      </state>      
+      </state>
     </ExternalModel>
   </Models>
 \end{lstlisting}
 
-All the specifications of the Markov model are given in the \xmlNode{ExternalModel} block. 
+All the specifications of the Markov model are given in the \xmlNode{ExternalModel} block.
 Inside the \xmlNode{ExternalModel} block, the XML nodes that belong to this model are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
@@ -60,9 +60,9 @@ The following transition types are available:
 
 \subsection{Markov model reference tests}
 \begin{itemize}
-	\item test\_markovModel\_2states\_tau.xml
-	\item test\_markovModel\_2states.xml
-	\item test\_markovModel\_3states\_complexTrans.xml
-	\item test\_markovModel\_3states\_instantTrans.xml
-	\item test\_markovModel\_3states.xml
+	\item SR2ML/tests/test\_markovModel\_2states\_tau.xml
+	\item SR2ML/tests/test\_markovModel\_2states.xml
+	\item SR2ML/tests/test\_markovModel\_3states\_complexTrans.xml
+	\item SR2ML/tests/test\_markovModel\_3states\_instantTrans.xml
+	\item SR2ML/tests/test\_markovModel\_3states.xml
 \end{itemize}

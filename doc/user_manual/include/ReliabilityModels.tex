@@ -1,0 +1,547 @@
+\section{Reliability Models}
+\label{sec:ReliabilityModels}
+
+
+\newcommand{\aliasRequiredParameterDescription}[1]
+{
+	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
+	If a string was provided, the reliability model would treat it as an input variable that came
+	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
+	\xmlNode{variables} under \xmlNode{ExternalModel}.
+}
+\newcommand{\aliasOptionalParameterDescription}[1]
+{
+	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See above definition.
+	If a string was provided, the reliability model would treat it as an input variable that came
+	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
+	\xmlNode{variables} under \xmlNode{ExternalModel}.
+	\default{1.}
+}
+
+\textbf{Reliability Models/Functions} are the most frequently used in life data analysis
+and reliability engineering. These models/functions give the probability of an component
+operating for a certain amount of time without failure. As such, the reliability models
+are function of time, in that every reliability value has an associated time value. In
+other words, one must specify a time value with the desired reliability value. This degree
+of flexibility makes the reliability model a much better reliability specification that the
+MTTF (Mean Time To Failure), which represents only one point along the entire reliability
+model.
+
+\subsection{The Probability Density and Cumulative Density Functions}
+From probability and statistics, given a continuous random variable $X$, we denote:
+\begin{itemize}
+	\item The probability density function (pdf), as $f(x)$.
+	\item The cumulative density function (cdf), as $F(x)$.
+\end{itemize}
+If $x$ is a continuous random variable, then the probability of $x$ takes on a value in the
+interval $[a,b]$ is the area under the pdf $f(x)$ from $a$ to $b$:
+\begin{equation}
+  P(a\leq x\leq b) = \int_{a}^{b} f(x)dx
+\end{equation}
+The cumulative distribution function is a function $F(x)$ of a random variable $x$, and is
+defined for a number $x_0$ by:
+\begin{equation}
+  F(x_0) = P(x\leq x_0) = \int_{-\infty}^{x_0} f(s)ds
+\end{equation}
+That is, for a given value $x_0$, $F(x_0)$ is the probability that the observed value of $x$
+would be at most $x_0$. The mathematical relationship between the pdf and cdf is given by:
+\begin{equation}
+  F(x) = \int_{-\infty}^{x} f(s)ds
+\end{equation}
+Conversely:
+\begin{equation}
+  f(x) = - \frac{dF(x)}{dx}
+\end{equation}
+The functions most commonly used in reliability engineering and life data analysis, namely the
+reliability function and failure rate function, can be determined directly from the pdf definition,
+or $f(t)$. Different distribuion exist, such as Lognormal, exponential, Weibull etc., and each of
+them has a predefined $f(t)$. These distributions were formulated by statisticians, mathematicians
+and engineers to mathematically model or represent certain behavior. Some distribution tend to better
+represent life data and are most commonly referred to as lifetime distribution.
+
+\subsection{The Reliability and Failure Rate Models}
+Given the mathematical representation of a distribution, we can derive all of the functions that needed
+for reliability analysis, i.e. reliability models/functions. This would only depend on the value of $t$
+after the value of the distribution parameters are estimated from data.
+Now, let $T$ be the random variable defining the lifetime of the component with cdf $F(t)$, which is the
+time the component would operate before failure. The cdf $F(t)$ of the random variable $T$ is given by:
+\begin{equation}
+  F(t) = \int_{-\infty}^{t} f(T)dT
+\end{equation}
+If $F(t)$ is a differentiable function, then the pdf $f(t)$ is given by:
+\begin{equation}
+  f(t) = - \frac{dF(t)}{dt}
+\end{equation}
+The reliability function or survival function $R(t)$ of the component is given by:
+\begin{equation}
+  R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
+\end{equation}
+It is the probability that the component would operate after time t, sometimes called survival probability.
+The failure rate of a system during the interval $[t,t+\Delta t]$ is the probability that a failure per
+unit time occurs in the interval, given that a failure has not occurred prior to t, the beginning of the
+interval. The failure rate function (i.e. instantaneous failure rate, conditional failure rate) of hazard
+function is defined as the limit of the failure rate as the interval approaches zero. Hence
+\begin{equation}
+  \lambda (t)= \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta tR(t)}
+	 = \frac{1}{R(t)} \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta t}
+	 = \frac{1}{R(t)}\frac{dF(t)}{dt} = \frac{f(t)}{R(t)}
+\end{equation}
+The failure rate function is the rate of change of the conditional probability of failure at time $t$.
+It measures the likelihood that a component that has operated up until time $t$ fails in the next
+instant of time.
+Generally $\lambda (t)$ is the one tabulated because it is measured experimentally and because it tends to
+vary less rapidly with time than the other parameters. When $\lambda (t)$ is given, all other three
+parameters $F(t)$, $f(t)$, $R(t)$ can be computed as follows:
+\begin{equation}
+  R(t) = \exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+\begin{equation}
+	f(t) = \lambda (t)R(t) = \lambda (t)\exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+\begin{equation}
+ 	F(t) = 1 - R(t) = 1 - \exp(-\int_{0}^{t} \lambda (s)ds)
+\end{equation}
+The mean time between failure (MTBF) can be obtained by finding the expected value of the random variable
+$T$, time to failure. Hence
+\begin{equation}
+  MTBF = E(T) = \int_{0}^{\infty} tf(t)dt = \int_{0}^{\infty} R(t)dt
+\end{equation}
+
+\subsection{The Lifetime Distributions or Aging Models}
+We would consider several of the most useful reliability models based on different probability
+distributions for describing failure of continuous operating devices, including:
+\begin{itemize}
+	\item Exponential, i.e. model \xmlAttr{type} is \xmlString{exponential}
+	\item Erlangian, i.e. model \xmlAttr{type} is \xmlString{erlangian}
+	\item Gamma, i.e. model \xmlAttr{type} is \xmlString{gamma}
+	\item Lognorm, i.e. model \xmlAttr{type} is \xmlString{lognorm}
+	\item Fatigue Life, i.e. model \xmlAttr{type} is \xmlString{fatiguelife}
+	\item Weibull, i.e. model \xmlAttr{type} is \xmlString{weibull}
+	\item Exponential Weibull, i.e. model \xmlAttr{type} is \xmlString{exponweibull}
+	\item Bathtub, i.e. model \xmlAttr{type} is \xmlString{bathtub}
+	\item Power Law, i.e. model \xmlAttr{type} is \xmlString{powerlaw}
+	\item Log Linear, i.e. model \xmlAttr{type} is \xmlString{loglinear}
+\end{itemize}
+
+The specifications of these models must be defined within a RAVEN \xmlNode{ExternalModel}. These
+XML node accepts the following attributes:
+\begin{itemize}
+	\item \xmlAttr{name}, \xmlDesc{required string attribute}, user-defined identifier of this model.
+	\nb As with other objects, this identifier can be used to reference this specific entity from other
+	input blocks in the XML.
+	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the sub-types should
+	be used. For reliability models, must use \xmlString{SR2ML.ReliabilityModel} as sub-type.
+\end{itemize}
+In the reliability \xmlNode{ExternalModel} input block, the following XML sub-nodes are required:
+\begin{itemize}
+	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
+	names. Each variable name needs to match a variable used/defined in the reliability model or variable
+	coming from other RAVEN entity (i.e. Samplers, DataObjects and Models).
+	\nb For all the reliability models, the following outputs variables would be available. If the user
+	add these output variables in the node \xmlNode{variables}, these variables would be also available to
+	be used anywhere in the RAVEN input to refer to the reliability model output variables.
+	\begin{itemize}
+		\item \xmlString{pdf\_f}, variable contains the calculated pdf value or values at given time instance(s),
+		i.e. a series of times.
+		\item \xmlString{cdf\_F}, variable contains the calculated cdf value or values at given time instance(s),
+		i.e. a series of times.
+		\item \xmlString{rdf\_R}, variable contains the calculated reliability function (rdf) value or values at
+		given time instance(s), i.e. a series of times.
+		\item \xmlString{frf\_h}, variable contains the calculated failure rate function (frf) value or values
+		at given time instance(s), i.e. a series of times.
+	\end{itemize}
+	\nb When the external model variables are defined, at run time, RAVEN initializes
+	them and tracks their values during the simulation.
+	\item \xmlNode{ReliabilityModel}, \xmlDesc{required parameter}. The node is used to define the reliability
+	model, and it contains the following required XML attribute:
+	\begin{itemize}
+		\item \xmlAttr{type}, \xmlDesc{required string attribute}, user-defined identifier of the reliability model.
+		\nb the types for different reliability models can be found at the beginning of this section.
+	\end{itemize}
+	In addition, this node accepts several different sub-nodes representing the model parameters depending on the
+	\xmlAttr{type} of the reliability model. The common sub-node for all reliability model is:
+	\begin{itemize}
+		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time instance(s)
+		that the reliability models would use to compute pdf, cdf, rdf and frf values. If a string was provided,
+		the reliability model would treat it as an input variable that came from other entity of RAVEN. In this
+		case, this variable must be listed in the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
+		\item \xmlNode{Td}, \xmlDesc{string or float, optional parameter}. Time that the reliability models start to be active.
+		If a string was provided, the reliability model would treat it as an input variable that came
+		from other entity of RAVEN. In this case, this variable must be listed in the sub-node \xmlNode{variables}
+		under \xmlNode{ExternalModel}.
+		\default{0.}
+	\end{itemize}
+\end{itemize}
+In addition, if the user wants to use the alias system, the following XML block can be inputted:
+\begin{itemize}
+	\item \xmlNode{alias} \xmlDesc{string, optional field} specifies alias for
+	any variable of interest in the input or output space for the ExternalModel.
+	%
+	These aliases can be used anywhere in the RAVEN input to refer to the ExternalModel
+	variables.
+	%
+	In the body of this node the user specifies the name of the variable that the ExternalModel is
+	going to use (during its execution).
+	%
+	The actual alias, usable throughout the RAVEN input, is instead defined in the
+	\xmlAttr{variable} attribute of this tag.
+	\\The user can specify aliases for both the input and the output space. As sanity check, RAVEN
+	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output''.
+	%
+	\nb The user can specify as many aliases as needed.
+	%
+	\default{None}
+\end{itemize}
+
+Example XML (Bathtub Reliability Model):
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="bathtub" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="bathtub">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<theta>1.0</theta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<rho>0.5</rho>
+			<!-- weight parameter -->
+			<c>0.5</c>
+		</ReliabilityModel>
+		<!--  alias can be used to represent any input/output variables -->
+		<alias variable='bathtub_F' type='output'>cdf_F</alias>
+		<alias variable='bathtub_f' type='output'>pdf_f</alias>
+		<alias variable='bathtub_R' type='output'>rdf_R</alias>
+		<alias variable='bathtub_h' type='output'>frf_h</alias>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Lognormal Model}
+The probability density function of the lognormal is given by
+\begin{equation}
+	f(T_m) = \frac{1}{\alpha T_m\sqrt{2\pi}}\exp\left(-\frac{1}{2}\left(\frac{\ln{\frac{T_m-T_d}{\beta}}}{\alpha}\right)^2\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="lognorm" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<ReliabilityModel type="lognorm">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Exponential Model}
+The probability density function of the Exponential is given by
+\begin{equation}
+	f(T_m) = \lambda\exp\left(-\lambda\left(T_m-T_d\right)\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \lambda >0$, $\lambda$ is the mean failure rate or the inverse of scale parameter,
+and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{lambda}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="exponential" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="exponential">
+			<!-- mean failure rate -->
+			<lambda>1.</lambda>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Weibull Model}
+The probability density function of the Weibull is given by
+\begin{equation}
+	f(T_m) = \frac{\alpha}{\beta}\left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="weibull" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="weibull">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- time delay -->
+			<Td>2.0</Td>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+\subsubsection{The Erlangian Model}
+The probability density function of the Erlangian is given by
+\begin{equation}
+	f(T_m) = \frac{\lambda\left(\lambda T_m\right)^{k-1}\exp\left(-\lambda T_m\right)}{\left(k-1\right)!}
+\end{equation}
+where $T_m\geq T_d$, $T_d, \lambda >0$, and $\lambda$ is the inverse of scale parameter, $k$ is positive integer
+that control the shape, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{k}
+	\nb $k$ is a positive integer, if a float was provided, a warning would be raised.
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="erlangian" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="erlangian">
+			<!-- mean failure rate -->
+			<lambda>0.1</lambda>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<k>2</k>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Gamma Model}
+The probability density function of the Gamma is given by
+\begin{equation}
+	f(T_m) = \frac{\beta \left(\beta \left(T_m-T_d\right)\right)^{\alpha-1}\exp\left(-\beta\left(T_m-T_d\right)\right)}{\Gamma \left(\alpha\right)}
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the inverse of scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="gamma" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="gamma">
+			<!-- rate parameter -->
+			<beta>0.1</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>2.</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Fatigue Life Model (Birnbaum-Saunders)}
+The probability density function of the Fatigue Life is given by
+\begin{equation}
+	f(T_m) = \frac{\frac{T_m-T_d}{\beta}+1}{2\alpha\sqrt{2\pi\left(\frac{T_m-T_d}{\beta}\right)^3}}
+				 \exp\left(-\frac{\left(\frac{T_m-T_d}{\beta}-1\right)^2}{2\left(\frac{T_m-T_d}{\beta}\right)\alpha^2}\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="fatiguelife" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="fatiguelife">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Exponentiated Weibull Model}
+The probability density function of the Exponentiated Weibull is given by
+\begin{equation}
+	f(T_m) = \gamma\alpha\left(1-\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)\right)^{\gamma-1}
+				 \left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \gamma>0$, and $\beta$ is the scale parameter, $\alpha$ and $\gamma$ is the shape
+parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasRequiredParameterDescription{gamma}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="exponweibull" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="exponweibull">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- time delay -->
+			<Td>2.0</Td>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<gamma>0.5</gamma>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Bathtub Model}
+The reliability function is given by:
+\begin{equation}
+  R(T_m) = \exp\left(-c\beta\left(\frac{T_m-T_d}{\beta}\right)^\alpha -(1-c)\left(\exp\left(\frac{T_m-T_d}{\theta}\right)^\rho -1\right)\right)
+\end{equation}
+The failure rate function is given by:
+\begin{equation}
+  \lambda(T_m) = c\alpha\left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}+(1-c)\rho\left(\frac{T_m-T_d}{\theta}\right)^{\rho-1}
+\end{equation}
+The probability density function of the Bathtub is given by
+\begin{equation}
+	f(T_m) = \lambda(T_m) R(T_m)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \theta, \rho, c >0$, and $\beta, \theta$ are the scale parameters,
+$\alpha, \rho$ are the shape parameters, $c \in [0,1]$ is the weight parameter, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasRequiredParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{theta}
+	\item \aliasOptionalParameterDescription{rho}
+	\item \aliasOptionalParameterDescription{c}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="bathtub" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="bathtub">
+			<!-- scale parameter -->
+			<beta>1.</beta>
+			<theta>1.0</theta>
+			<!-- mission time -->
+			<Tm>tm</Tm>
+			<!-- shape parameter -->
+			<alpha>1.0</alpha>
+			<rho>0.5</rho>
+			<!-- weight parameter -->
+			<c>0.5</c>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Power Law Model for Failure Rate Function}
+The hazard rate satisfies a power law as a function of time:
+\begin{equation}
+	\lambda(T_m) = \lambda + \alpha(T_m-T_d)^\beta
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta, \lambda >0$,
+and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasOptionalParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+	\item \aliasOptionalParameterDescription{lambda}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="powerlaw" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="powerlaw">
+			<beta>1.0</beta>
+			<alpha>1.0</alpha>
+			<lambda>0.5</lambda>
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsubsection{The Log Linear Model for Failure Rate Function}
+The hazard rate satisfies a exponential law as a function of time:
+\begin{equation}
+	\lambda(T_m) = \exp\left(\alpha+\beta(T_m-T_d)\right)
+\end{equation}
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $T_d$ is the location parameter.
+This model accept the following additional sub-nodes:
+\begin{itemize}
+	\item \aliasOptionalParameterDescription{alpha}
+	\item \aliasOptionalParameterDescription{beta}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+	<ExternalModel name="loglinear" subType="SR2ML.ReliabilityModel">
+		<variables>cdf_F, pdf_f, rdf_R, frf_h, tm</variables>
+		<!-- xml portion for this plugin only -->
+		<ReliabilityModel type="loglinear">
+			<beta>1.</beta>
+			<alpha>1.</alpha>
+			<Tm>tm</Tm>
+		</ReliabilityModel>
+	</ExternalModel>
+\end{lstlisting}
+
+
+\subsection{Reliability Models Reference Tests}
+\begin{itemize}
+	\item SR2ML/tests/reliabilityModel/test\_bathtub.xml
+  \item SR2ML/tests/reliabilityModel/test\_erlangian.xml
+	\item SR2ML/tests/reliabilityModel/test\_expon.xml
+  \item SR2ML/tests/reliabilityModel/test\_exponweibull.xml
+	\item SR2ML/tests/reliabilityModel/test\_fatiguelife.xml
+  \item SR2ML/tests/reliabilityModel/test\_gamma.xml
+	\item SR2ML/tests/reliabilityModel/test\_loglinear.xml
+  \item SR2ML/tests/reliabilityModeltest\_lognorm.xml
+	\item SR2ML/tests/reliabilityModel/test\_normal.xml
+  \item SR2ML/tests/reliabilityModel/test\_powerlaw.xml
+	\item SR2ML/tests/reliabilityModeltest\_weibull.xml
+	\item SR2ML/tests/reliabilityModel/test\_time\_dep\_ensemble\_reliability.xml
+\end{itemize}
