@@ -5,14 +5,14 @@
 \newcommand{\aliasRequiredParameterDescription}[1]
 {
 	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
-	If a string is provided, the reliability model will treat it as an input variable that is coming
+	If a string was provided, the reliability model would treat it as an input variable that came
 	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
 	\xmlNode{variables} under \xmlNode{ExternalModel}.
 }
 \newcommand{\aliasOptionalParameterDescription}[1]
 {
 	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See above definition.
-	If a string is provided, the reliability model will treat it as an input variable that is coming
+	If a string was provided, the reliability model would treat it as an input variable that came
 	from other entity of RAVEN. In this case, this variable must be listed in the sub-node
 	\xmlNode{variables} under \xmlNode{ExternalModel}.
 	\default{1.}
@@ -44,7 +44,7 @@ defined for a number $x_0$ by:
   F(x_0) = P(x\leq x_0) = \int_{-\infty}^{x_0} f(s)ds
 \end{equation}
 That is, for a given value $x_0$, $F(x_0)$ is the probability that the observed value of $x$
-will be at most $x_0$. The mathematical relationship between the pdf and cdf is given by:
+would be at most $x_0$. The mathematical relationship between the pdf and cdf is given by:
 \begin{equation}
   F(x) = \int_{-\infty}^{x} f(s)ds
 \end{equation}
@@ -61,10 +61,10 @@ represent life data and are most commonly referred to as lifetime distribution.
 
 \subsection{The Reliability and Failure Rate Models}
 Given the mathematical representation of a distribution, we can derive all of the functions that needed
-for reliability analysis, i.e. reliability models/functions. This will only depend on the value of $t$
+for reliability analysis, i.e. reliability models/functions. This would only depend on the value of $t$
 after the value of the distribution parameters are estimated from data.
 Now, let $T$ be the random variable defining the lifetime of the component with cdf $F(t)$, which is the
-time the component will operate before failure. The cdf $F(t)$ of the random variable $T$ is given by:
+time the component would operate before failure. The cdf $F(t)$ of the random variable $T$ is given by:
 \begin{equation}
   F(t) = \int_{-\infty}^{t} f(T)dT
 \end{equation}
@@ -76,7 +76,7 @@ The reliability function or survival function $R(t)$ of the component is given b
 \begin{equation}
   R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
 \end{equation}
-It is the probability that the component will operate after time t, sometimes called survival probability.
+It is the probability that the component would operate after time t, sometimes called survival probability.
 The failure rate of a system during the interval $[t,t+\Delta t]$ is the probability that a failure per
 unit time occurs in the interval, given that a failure has not occurred prior to t, the beginning of the
 interval. The failure rate function (i.e. instantaneous failure rate, conditional failure rate) of hazard
@@ -108,7 +108,7 @@ $T$, time to failure. Hence
 \end{equation}
 
 \subsection{The Lifetime Distributions or Aging Models}
-We will now consider several of the most useful reliability models based on different probability
+We would consider several of the most useful reliability models based on different probability
 distributions for describing failure of continuous operating devices, including:
 \begin{itemize}
 	\item Exponential, i.e. model \xmlAttr{type} is \xmlString{exponential}
@@ -137,18 +137,18 @@ In the reliability \xmlNode{ExternalModel} input block, the following XML sub-no
 	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
 	names. Each variable name needs to match a variable used/defined in the reliability model or variable
 	coming from other RAVEN entity (i.e. Samplers, DataObjects and Models).
-	\nb For all the reliability models, the following outputs variables will be available. If the user
-	add these output variables in the node \xmlNode{variables}, these variables will be also available to
+	\nb For all the reliability models, the following outputs variables would be available. If the user
+	add these output variables in the node \xmlNode{variables}, these variables would be also available to
 	be used anywhere in the RAVEN input to refer to the reliability model output variables.
 	\begin{itemize}
-		\item \xmlString{pdf\_f}, variable contains the calculated pdf value or values at given time or times,
+		\item \xmlString{pdf\_f}, variable contains the calculated pdf value or values at given time instance(s),
 		i.e. a series of times.
-		\item \xmlString{cdf\_F}, variable contains the calculated cdf value or values at given time or times,
+		\item \xmlString{cdf\_F}, variable contains the calculated cdf value or values at given time instance(s),
 		i.e. a series of times.
 		\item \xmlString{rdf\_R}, variable contains the calculated reliability function (rdf) value or values at
-		given time or times, i.e. a series of times.
+		given time instance(s), i.e. a series of times.
 		\item \xmlString{frf\_h}, variable contains the calculated failure rate function (frf) value or values
-		at given time or times, i.e. a series of times.
+		at given time instance(s), i.e. a series of times.
 	\end{itemize}
 	\nb When the external model variables are defined, at run time, RAVEN initializes
 	them and tracks their values during the simulation.
@@ -161,12 +161,12 @@ In the reliability \xmlNode{ExternalModel} input block, the following XML sub-no
 	In addition, this node accepts several different sub-nodes representing the model parameters depending on the
 	\xmlAttr{type} of the reliability model. The common sub-node for all reliability model is:
 	\begin{itemize}
-		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time or a series
-		of times that the reliability models will use to compute pdf, cdf, rdf and frf values. If a string is provided,
-		the reliability model will treat it as an input variable that is coming from other entity of RAVEN. In this
+		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time instance(s)
+		that the reliability models would use to compute pdf, cdf, rdf and frf values. If a string was provided,
+		the reliability model would treat it as an input variable that came from other entity of RAVEN. In this
 		case, this variable must be listed in the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
 		\item \xmlNode{Td}, \xmlDesc{string or float, optional parameter}. Time that the reliability models start to be active.
-		If a string is provided, the reliability model will treat it as an input variable that is coming
+		If a string was provided, the reliability model would treat it as an input variable that came
 		from other entity of RAVEN. In this case, this variable must be listed in the sub-node \xmlNode{variables}
 		under \xmlNode{ExternalModel}.
 		\default{0.}
@@ -314,7 +314,7 @@ This model accept the following additional sub-nodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{k}
-	\nb $k$ is a positive integer, if a float is provided, a warning will be raised.
+	\nb $k$ is a positive integer, if a float was provided, a warning would be raised.
 \end{itemize}
 
 Example XML:
