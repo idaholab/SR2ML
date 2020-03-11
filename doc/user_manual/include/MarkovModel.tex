@@ -45,17 +45,18 @@ Inside the \xmlNode{ExternalModel} block, the XML nodes that belong to this mode
                           in the \xmlNode{transition} xml sub-nodes:
 	  \begin{itemize}
 	  	\item \xmlAttr{transition}, \xmlDesc{required string attribute}, arrival state
-	    \item \xmlAttr{type}, \xmlDesc{required string attribute}, type of transition. Allowed transition types are: The ET of Fig.~\ref{fig:ET} and defined in Listing~\ref{lst:ETmodel} can be defined in the RAVEN input file as follows: lambda, tau, instant and unif (see below)
-	    \item \xmlAttr{value}, \xmlDesc{required string attribute}, value associated to the particular transition
+	    \item \xmlAttr{type}, \xmlDesc{required string attribute}, type of transition. Allowed transition types are:
+      lambda, tau, instant and unif (see below)
+	    \item \xmlAttr{value}, \xmlDesc{required string attribute}, value associated to the particular transition.
 	  \end{itemize}
 \end{itemize}
 
 The following transition types are available:
 \begin{itemize}
-  \item lambda: classical continuous time Markov chain transition rate in $\lambda$ form
-  \item tau: classical continuous time Markov chain transition rate in the $\tau = \frac{1}{\lambda}$ form
-  \item instant: deterministic transition out of particular state; the exact transition time is provided in input
-  \item unif: transition time is uniformly sampled between the two provided values in the \xmlAttr{value} node
+  \item \textbf{lambda}: classical continuous time Markov chain transition rate in $\lambda$ form
+  \item \textbf{tau}: classical continuous time Markov chain transition rate in the $\tau = \frac{1}{\lambda}$ form
+  \item \textbf{instant}: deterministic transition out of particular state; the exact transition time is provided in input
+  \item \textbf{unif}: transition time is uniformly sampled between the two provided values in the \xmlAttr{value} node.
 \end{itemize}
 
 \subsection{Markov model reference tests}

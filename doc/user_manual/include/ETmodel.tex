@@ -1,8 +1,9 @@
 \section{ET Model}
 \label{sec:ETModel}
 
-This model is designed to read from file the structure of the ET and to import such Boolean logic structure as a RAVEN model.
-The ET must be specified in a specific format: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
+This model is designed to read from file the structure of the event tree (ET) and to
+import such Boolean logic structure as a RAVEN~\cite{RAVEN,RAVENtheoryMan} model.
+The ET must be specified in: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
 As an example, the ET of Fig.~\ref{fig:ET} is translated in the OpenPSA format as shown below:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=ET of Fig.~\ref{fig:ET} in OpenPSA format., label=lst:ETModel]
@@ -44,8 +45,8 @@ As an example, the ET of Fig.~\ref{fig:ET} is translated in the OpenPSA format a
 \begin{figure}
     \centering
     \centerline{\includegraphics[scale=0.5]{ET.pdf}}
-    \caption{Example of ET.}
-    \label{fig:ET}
+    \caption{Folder tree of Logos repository}
+    \label{fig:Logos}
 \end{figure}
 
 The ET of Fig.~\ref{fig:ET} and defined in Listing~\ref{lst:ETModel} can be defined in the RAVEN input file as follows:
@@ -71,10 +72,10 @@ Inside the \xmlNode{ExternalModel} block, the XML
 nodes that belong to this models are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
-  \item  \xmlNode{sequenceID},\xmlDesc{string, required parameter}, the name of the alias variable that indicate the branch ID
-  \item  \xmlNode{map},\xmlDesc{string, required parameter}, the name ID of the ET branching variable
+  \item  \xmlNode{sequenceID}, \xmlDesc{string, required parameter}, the name of the alias variable that indicate the branch ID
+  \item  \xmlNode{map}, \xmlDesc{string, required parameter}, the name ID of the ET branching variable
 	  \begin{itemize}
-	    \item \xmlAttr{var}, \xmlDesc{required string attribute}, the ALIAS name ID of the ET branching variable
+	    \item \xmlAttr{var}, \xmlDesc{required string attribute}, the ALIAS name ID of the ET branching variable.
 	  \end{itemize}
 \end{itemize}
 

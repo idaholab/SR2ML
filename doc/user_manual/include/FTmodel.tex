@@ -1,8 +1,8 @@
 \section{FT Model}
 \label{sec:FTModel}
 
-This model is designed to read from file the structure of the FT and to import such Boolean logic structure as a RAVEN model.
-The FT must be specified in a specific format: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
+This model is designed to read from file the structure of the fault tree (FT) and to import such Boolean logic structure as a RAVEN model.
+The FT must be specified in: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
 As an example, the FT of Fig.~\ref{fig:FT} is translated in the OpenPSA as shown below:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=FT in OpenPSA format., label=lst:FTModel]
@@ -87,14 +87,14 @@ Inside the \xmlNode{ExternalModel} block, the XML
 nodes that belong to this models are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
-  \item  \xmlNode{topEvents},\xmlDesc{string, required parameter}, the name of the alias Top Event
-  \item  \xmlNode{map},\xmlDesc{string, required parameter}, the name ID of the FT basic events
+  \item  \xmlNode{topEvents}, \xmlDesc{string, required parameter}, the name of the alias Top Event
+  \item  \xmlNode{map}, \xmlDesc{string, required parameter}, the name ID of the FT basic events
 	  \begin{itemize}
 	    \item \xmlAttr{var}, \xmlDesc{required string attribute}, the ALIAS name ID of the FT basic events
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition, the FT model of Fig.~\ref{fig:ET} and described in Listing~\ref{lst:ETmodel},
+Provided this definition, the FT model of Fig.~\ref{fig:FT} and described in Listing~\ref{lst:FTmodel},
 the resulting model in RAVEN is characterized by these variables:
 \begin{itemize}
 	\item Input variables: statusBE1, statusBE2, statusBE3, statusBE4

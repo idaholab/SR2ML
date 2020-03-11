@@ -1,8 +1,8 @@
 \section{RBD Model}
 \label{sec:RBDmodel}
 
-This model is designed to read from file the structure of the RBD and import such Boolean logic structure as a RAVEN model.
-The RBD must be specified in a specific format; as an example, the RBD of Fig.~\ref{fig:RBD} is translated in the RAVEN format as shown below:
+This model is designed to read from file the structure of the reliability block diagram (RBD) and import such Boolean logic structure as a RAVEN model.
+The RBD must be specified in a specific format. As an example, the RBD of Fig.~\ref{fig:RBD} is translated in the RAVEN format as shown below:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=RBD input file., label=lst:RBDmodel]
 <Graph name="testGraph">
@@ -49,7 +49,7 @@ The RBD must be specified in a specific format; as an example, the RBD of Fig.~\
     \label{fig:RBD}
 \end{figure}
 
-The FT of Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be defined in the RAVEN input file as follows:
+The FT of RBD illustrated in Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be defined in the RAVEN input file as follows:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=RBD model input example., label=lst:RBD_InputExample]
   <Models>
@@ -77,27 +77,27 @@ The FT of Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be de
 All the specifications of the RBD model are given in the
 \xmlNode{ExternalModel} block.
 Inside the \xmlNode{ExternalModel} block, the XML
-nodes that belong to this models are:
+nodes that belong to this model are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
-  \item  \xmlNode{modelFile},\xmlDesc{string, required parameter}, the name of the file that provide the RBD structure
-  \item  \xmlNode{nodesIN},\xmlDesc{string, required parameter}, the name of the input nodes
-  \item  \xmlNode{nodesOUT},\xmlDesc{string, required parameter}, the name of the output nodes
-  \item  \xmlNode{map},\xmlDesc{string, required parameter}, the name ID of the RBD node
+  \item  \xmlNode{modelFile}, \xmlDesc{string, required parameter}, the name of the file that provide the RBD structure
+  \item  \xmlNode{nodesIN}, \xmlDesc{string, required parameter}, the name of the input nodes
+  \item  \xmlNode{nodesOUT}, \xmlDesc{string, required parameter}, the name of the output nodes
+  \item  \xmlNode{map}, \xmlDesc{string, required parameter}, the name ID of the RBD node
 	  \begin{itemize}
 	    \item \xmlAttr{var}, \xmlDesc{required string attribute}, the ALIAS name ID of the RBD node
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition, the RBD model of Fig.~\ref{fig:RBD} and described in Listing~\ref{lst:RBDmodel},
-the resulting model in RAVEN is characterized by these variables:
+Provided this definition, the RBD model of Fig.~\ref{fig:RBD} described in Listing~\ref{lst:RBDmodel},
+is the resulting model in RAVEN characterized by these variables:
 \begin{itemize}
 	\item Input variables: status2, status3, status4, status5
-	\item Output variable: statusSG1, statusSG2, statusSG3
+	\item Output variable: statusSG1, statusSG2, statusSG3.
 \end{itemize}
 
 \subsection{RBD model reference tests}
 \begin{itemize}
 	\item SR2ML/tests/test\_graphModel.xml
-	\item SR2ML/tests/test\_graphModel\_TD.xml
+	\item SR2ML/tests/test\_graphModel\_TD.xml.
 \end{itemize}
