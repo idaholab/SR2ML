@@ -6,6 +6,7 @@
   UnorderedCsv   = 'testMC/Print_sim_PS.csv'
   output = 'testMC/1-plot_P1P2_scatter.png testMC/1-plot_SG_scatter.png testMC/1-plot_V1_scatter.png testMC/1-plot_V2_scatter.png'
   rel_err = 1.0E-5
+  skip_if_OS = windows
  [../]
 
  [./time_dep_fw_cost]
