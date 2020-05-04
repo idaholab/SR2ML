@@ -2,8 +2,8 @@
 #
 #
 """
-Created on Feb. 21, 2019
-@author: wangc, mandd
+Created on March 21, 2019
+@author: mandd,wangc
 """
 
 from .PMmodel import PMmodel

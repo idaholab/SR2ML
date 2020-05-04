@@ -153,17 +153,17 @@ class MaintenanceBase:
     """
       get calculated availability value
       @ In, None
-      @ Out, self._cdf, float/numpy.array, the calculated availability value(s)
+      @ Out, self._avail, float/numpy.array, the calculated availability value
     """
-    return self._cdf
+    return self._avail
 
   def getUnavail(self):
     """
       get calculated unavailability value
       @ In, None
-      @ Out, self._pdf, float/numpy.array, the calculated unavailability value(s)
+      @ Out, self._unavail, float/numpy.array, the calculated unavailability value
     """
-    return self._pdf
+    return self._unavail
 
   def run(self):
     """
