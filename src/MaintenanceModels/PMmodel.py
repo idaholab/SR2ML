@@ -1,7 +1,7 @@
 """
 Created on May 1 2020
 
-@author: mandd,
+@author: mandd,wangc
 """
 #for future compatibility with Python 3--------------------------------------------------------------
 from __future__ import division, print_function, unicode_literals, absolute_import
@@ -81,16 +81,16 @@ class PMmodel(MaintenanceBase):
 
   def _availabilityFunction(self, inputDict):
     if self._type = 'standby':
-      availability = 1.0 - vaurioModelStandby(self._rho, self._outageTime , inputDict['T'], inputDict['lambda'])
+      availability = 1.0 - vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
     else:
-      availability = 1.0 - vaurioModelOperating(self._tau, inputDict['T'], inputDict['lambda'])
+      availability = 1.0 - vaurioModelOperating(self._tau, self._outageTime, inputDict['T'], inputDict['lambda'])
     return availability
 
   def _unavailabilityFunction(self, inputDict):
     if self._type = 'standby':
-      unavailability = vaurioModelStandby(self._rho, self._outageTime , inputDict['T'], inputDict['lambda'])
+      unavailability = vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
     else:
-      availability = 1.0 - vaurioModelOperating(self._tau, inputDict['T'], inputDict['lambda'])
+      availability = 1.0 - vaurioModelOperating(self._tau, self._outageTime, inputDict['T'], inputDict['lambda'])
     return unavailability
 
   def vaurioModelStandby(rho, delta, T, lamb):

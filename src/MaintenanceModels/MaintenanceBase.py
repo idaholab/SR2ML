@@ -1,7 +1,7 @@
 """
-Created on Jan. 30 2020
+Created on April 20 2020
 
-@author: wangc, mandd
+@author: mandd,wangc
 """
 #for future compatibility with Python 3--------------------------------------------------------------
 from __future__ import division, print_function, unicode_literals, absolute_import
