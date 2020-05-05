@@ -34,7 +34,7 @@ class PMmodel(MaintenanceBase):
     """
     inputSpecs = super(PMmodel, cls).getInputSpecification()
     inputSpecs.description = r"""
-      Exponential reliability models
+      Preventive maintenance reliability models
       """
     inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
     return inputSpecs
@@ -48,6 +48,9 @@ class PMmodel(MaintenanceBase):
     MaintenanceBase.__init__(self)
     # Component type
     self._type = None
+    self._outageTime = None
+    self._rho = None
+    self._tau = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -95,7 +98,9 @@ class PMmodel(MaintenanceBase):
 
   def vaurioModelStandby(rho, delta, T, lamb):
     u = rho+delta/T+0.5*lamb*T
+    return u
 
   def vaurioModelOperating(tau, delta, T, lamb):
     rho = lamb*tau/(1.0+lamb*tau)
     u = rho+delta/T+0.5*lamb*T
+    return u
