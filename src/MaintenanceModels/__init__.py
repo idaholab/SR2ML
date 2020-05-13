@@ -9,7 +9,7 @@ Created on April 23rd, 2020
 
 from __future__ import absolute_import
 
-from .PMmodel import PMmodel
+from .PMmodel import PMModel
 
 
-__all__ = ['PMmodel']
+__all__ = ['PMModel']

@@ -54,7 +54,7 @@ class MaintenanceBase:
     # variable stores unavailability value
     self._unavail = None
     # variable stores availability value
-    self.avail = None
+    self._avail = None
 
   def handleInput(self, xmlNode):
     """
@@ -173,3 +173,21 @@ class MaintenanceBase:
     """
     self._avail   = self._availabilityFunction()
     self._unavail = self._unavailabilityFunction()
+
+  @abc.abstractmethod
+  def _availabilityFunction(self):
+    """
+      Method to calculate availability value
+      @ In, None
+      @ Out, None
+    """
+    pass
+
+  @abc.abstractmethod
+  def _unavailabilityFunction(self):
+    """
+      Method to calculate unavailability value
+      @ In, None
+      @ Out, None
+    """
+    pass

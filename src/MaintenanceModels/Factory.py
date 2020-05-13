@@ -6,14 +6,14 @@ Created on March 21, 2019
 @author: mandd,wangc
 """
 
-from .PMmodel import PMmodel
+from .PMmodel import PMModel
 
 """
  Interface Dictionary (factory) (private)
 """
 __base = 'MaintenanceBase'
 __interfaceDict = {}
-__interfaceDict['PMmodel'] = PMmodel
+__interfaceDict['PMModel'] = PMModel
 
 def knownTypes():
   """

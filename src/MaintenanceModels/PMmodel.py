@@ -20,7 +20,7 @@ from utils import mathUtils as utils
 from utils import InputData, InputTypes
 #Internal Modules End--------------------------------------------------------------------------------
 
-class PMmodel(MaintenanceBase):
+class PMModel(MaintenanceBase):
   """
     Basic Preventive Maintenance (PM) model
   """
@@ -32,11 +32,14 @@ class PMmodel(MaintenanceBase):
       @ In, None
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = super(PMmodel, cls).getInputSpecification()
+    inputSpecs = super(PMModel, cls).getInputSpecification()
     inputSpecs.description = r"""
       Preventive maintenance reliability models
       """
-    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('type',       contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('outageTime', contentType=InputTypes.InterpretedListType, descr='Time required to perfrom PM activities'))
+    inputSpecs.addSub(InputData.parameterInputFactory('rho',        contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
+    inputSpecs.addSub(InputData.parameterInputFactory('tau',        contentType=InputTypes.InterpretedListType, descr='Average repair time'))
     return inputSpecs
 
   def __init__(self):
@@ -83,6 +86,11 @@ class PMmodel(MaintenanceBase):
     MaintenanceBase.initialize(self, inputDict)
 
   def _availabilityFunction(self, inputDict):
+    """
+      Method to calculate component availability
+      @ In, inputDict, dict, dictionary of inputs
+      @ Out, availability, float, compoennt availability
+    """
     if self._type = 'standby':
       availability = 1.0 - vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
     else:
@@ -90,6 +98,11 @@ class PMmodel(MaintenanceBase):
     return availability
 
   def _unavailabilityFunction(self, inputDict):
+    """
+      Method to calculate component unavailability
+      @ In, inputDict, dict, dictionary of inputs
+      @ Out, availability, float, compoennt unavailability
+    """
     if self._type = 'standby':
       unavailability = vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
     else:
@@ -97,10 +110,20 @@ class PMmodel(MaintenanceBase):
     return unavailability
 
   def vaurioModelStandby(rho, delta, T, lamb):
+    """
+      Method to calculate unavailability for a component in a stand-by configuration 
+      @ In, inputDict, dict, dictionary of inputs
+      @ Out, availability, float, component unavailability
+    """
     u = rho+delta/T+0.5*lamb*T
     return u
 
   def vaurioModelOperating(tau, delta, T, lamb):
+    """
+      Method to calculate unavailability for a component which is continuosly oeprating 
+      @ In, inputDict, dict, dictionary of inputs
+      @ Out, availability, float, component unavailability
+    """
     rho = lamb*tau/(1.0+lamb*tau)
     u = rho+delta/T+0.5*lamb*T
     return u
