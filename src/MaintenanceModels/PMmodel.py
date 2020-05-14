@@ -23,6 +23,10 @@ from utils import InputData, InputTypes
 class PMModel(MaintenanceBase):
   """
     Basic Preventive Maintenance (PM) model
+    Reference: 
+      D. Kancev, M. Cepin 148
+      Evaluation of risk and cost using an age-dependent unavailability modelling of test and maintenance for standby components
+      Journal of Loss Prevention in the Process Industries 24 (2011) pp. 146-155.
   """
 
   @classmethod
@@ -36,10 +40,11 @@ class PMModel(MaintenanceBase):
     inputSpecs.description = r"""
       Preventive maintenance reliability models
       """
-    inputSpecs.addSub(InputData.parameterInputFactory('type',       contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
-    inputSpecs.addSub(InputData.parameterInputFactory('outageTime', contentType=InputTypes.InterpretedListType, descr='Time required to perfrom PM activities'))
-    inputSpecs.addSub(InputData.parameterInputFactory('rho',        contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
-    inputSpecs.addSub(InputData.parameterInputFactory('tau',        contentType=InputTypes.InterpretedListType, descr='Average repair time'))
+    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('rho',  contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tpm',  contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tr',   contentType=InputTypes.InterpretedListType, descr='Average repair time'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tt',   contentType=InputTypes.InterpretedListType, descr='Average test duration'))
     return inputSpecs
 
   def __init__(self):
@@ -51,9 +56,10 @@ class PMModel(MaintenanceBase):
     MaintenanceBase.__init__(self)
     # Component type
     self._type = None
-    self._outageTime = None
-    self._rho = None
-    self._tau = None
+    self._rho  = None
+    self._Tpm  = None
+    self._Tr   = None
+    self._Tt   = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -67,15 +73,18 @@ class PMModel(MaintenanceBase):
       if child.getName().lower() == 'type':
         self._type = self.setVariable(child.value)
         self._variableDict['_type'] = self._type
-      if child.getName().lower() == 'outageTime':
-        self._outageTime = self.setVariable(child.value)
-        self._variableDict['_outageTime'] = self._outageTime  
       if child.getName().lower() == 'rho':
         self._rho = self.setVariable(child.value)
         self._variableDict['_rho'] = self._rho  
-      if child.getName().lower() == 'tau':
-        self._tau = self.setVariable(child.value)
-        self._variableDict['_tau'] = self._tau    
+      if child.getName().lower() == 'Tpm':
+        self._Tpm = self.setVariable(child.value)
+        self._variableDict['_Tpm'] = self._Tpm   
+      if child.getName().lower() == 'Tr':
+        self._Tr = self.setVariable(child.value)
+        self._variableDict['_Tr'] = self._Tr    
+      if child.getName().lower() == 'Tt':
+        self._Tt = self.setVariable(child.value)
+        self._variableDict['_Tt'] = self._Tt  
 
   def initialize(self, inputDict):
     """
@@ -92,9 +101,9 @@ class PMModel(MaintenanceBase):
       @ Out, availability, float, compoennt availability
     """
     if self._type = 'standby':
-      availability = 1.0 - vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
+      availability = 1.0 - standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
-      availability = 1.0 - vaurioModelOperating(self._tau, self._outageTime, inputDict['T'], inputDict['lambda'])
+      availability = 1.0 - operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     return availability
 
   def _unavailabilityFunction(self, inputDict):
@@ -104,26 +113,32 @@ class PMModel(MaintenanceBase):
       @ Out, availability, float, compoennt unavailability
     """
     if self._type = 'standby':
-      unavailability = vaurioModelStandby(self._rho, self._outageTime, inputDict['T'], inputDict['lambda'])
+      unavailability = standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
-      availability = 1.0 - vaurioModelOperating(self._tau, self._outageTime, inputDict['T'], inputDict['lambda'])
+      unavailability = operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     return unavailability
 
-  def vaurioModelStandby(rho, delta, T, lamb):
+  def standbyModel(rho, Ti, Tr, Tt, Tpm, Tm, lamb):
     """
       Method to calculate unavailability for a component in a stand-by configuration 
-      @ In, inputDict, dict, dictionary of inputs
-      @ Out, availability, float, component unavailability
+      @ In, rho, float, failure probability perdemand
+      @ In, Ti,  float, surveillance test interval
+      @ In, Tr,  float, mean time to repair
+      @ In, Tt,  float, test duration
+      @ In, Tpm, float, mean time to perform preventive maintenance
+      @ In, Tm,  float, preventive maintenance interval
+      @ Out, unavailability, float, component unavailability
     """
-    u = rho+delta/T+0.5*lamb*T
+    u = rho + 0.5*lamb*Ti + Tt/Ti + (rho+lamb*Ti)*Tr/Ti + Tpm/Tm
     return u
 
-  def vaurioModelOperating(tau, delta, T, lamb):
+  def operatingModel(tau, Tpm, Tm, lamb):
     """
-      Method to calculate unavailability for a component which is continuosly oeprating 
-      @ In, inputDict, dict, dictionary of inputs
-      @ Out, availability, float, component unavailability
+      Method to calculate unavailability for a component which is continuosly operating 
+      @ In, Tr,  float, mean time to repair
+      @ In, Tpm, float, mean time to perform preventive maintenance
+      @ In, Tm,  float, preventive maintenance interval
+      @ Out, unavailability, float, component unavailability
     """
-    rho = lamb*tau/(1.0+lamb*tau)
-    u = rho+delta/T+0.5*lamb*T
+    u = lamb*tau/(1.0+lamb*tau) + Tpm/Tm
     return u
