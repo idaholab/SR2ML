@@ -1,27 +1,21 @@
 <Simulation verbosity="debug">
   <RunInfo>
-    <WorkingDir>PMstandby</WorkingDir>
+    <WorkingDir>PMoperating</WorkingDir>
     <Sequence>MCRun,print</Sequence>
   </RunInfo>
   <Models>
-    <ExternalModel name="PMmodelStandby" subType="SR2ML.PMmodel">
+    <ExternalModel name="PMmodelOperating" subType="SR2ML.PMmodel">
       <variables>lambda,T</variables>
       <MaintenanceModel type="PMmodel">
-        <type>standby</type>
-        <Tr>12</Tr>
-        <Tt>24</Tt>
+        <type>operating</type>
+        <tau>12</tau>
         <Tpm>0.01</Tpm>
-        <rho>0.01</rho>
       </MaintenanceModel>
     </ExternalModel>
   </Models>
 
   <Distributions>
     <Uniform name="lambda_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
-    </Uniform>
-    <Uniform name="Ti_dist">
         <lowerBound>1.E-4</lowerBound>
         <upperBound>1.E-3</upperBound>
     </Uniform>
@@ -37,12 +31,9 @@
         <limit>4</limit>
       </samplerInit>
       <variable name="lambda">
-          <distribution>uni_dist</distribution>
+          <distribution>lambda_dist</distribution>
       </variable>
-      <variable name="Ti">
-          <distribution>Ti_dist</distribution>
-      </variable>
-        <variable name="Tm">
+      <variable name="Tm">
           <distribution>Tm_dist</distribution>
       </variable>
     </MonteCarlo>
@@ -50,11 +41,11 @@
 
   <DataObjects>
     <PointSet name="Input">
-      <Input>lambda,Ti,Tm</Input>
+      <Input>lambda,Tm</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="Output">
-      <Input>lambda,Ti,Tm</Input>
+      <Input>lambda,Tm</Input>
       <Output>avail,unavail</Output>
     </PointSet>
   </DataObjects>
