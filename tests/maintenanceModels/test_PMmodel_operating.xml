@@ -8,8 +8,8 @@
       <variables>lambda,T</variables>
       <MaintenanceModel type="PMmodel">
         <type>operating</type>
-        <tau>12</tau>
-        <Tpm>0.01</Tpm>
+        <Tr>24</Tr>
+        <Tpm>10</Tpm>
       </MaintenanceModel>
     </ExternalModel>
   </Models>
@@ -20,8 +20,8 @@
         <upperBound>1.E-3</upperBound>
     </Uniform>
     <Uniform name="Tm_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
+        <lowerBound>1.6E3</lowerBound>
+        <upperBound>8.0E3</upperBound>
     </Uniform>
   </Distributions>
 

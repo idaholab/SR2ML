@@ -8,9 +8,9 @@
       <variables>lambda,T</variables>
       <MaintenanceModel type="PMmodel">
         <type>standby</type>
-        <Tr>12</Tr>
-        <Tt>24</Tt>
-        <Tpm>0.01</Tpm>
+        <Tr>24</Tr>
+        <Tpm>10</Tpm>
+        <Tt>5</Tt>
         <rho>0.01</rho>
       </MaintenanceModel>
     </ExternalModel>
@@ -22,12 +22,12 @@
         <upperBound>1.E-3</upperBound>
     </Uniform>
     <Uniform name="Ti_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
+        <lowerBound>2.E3</lowerBound>
+        <upperBound>4.E3</upperBound>
     </Uniform>
     <Uniform name="Tm_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
+        <lowerBound>8.E3</lowerBound>
+        <upperBound>16.E3</upperBound>
     </Uniform>
   </Distributions>
 
