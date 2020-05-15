@@ -114,9 +114,9 @@ class PMModel(MaintenanceBase):
       @ Out, availability, float, compoennt unavailability
     """
     if self._type == 'standby':
-      unavailability = standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      unavailability = self.standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
-      unavailability = operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      unavailability = self.operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     return unavailability
 
   def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):
