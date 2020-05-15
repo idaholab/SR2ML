@@ -165,14 +165,14 @@ class MaintenanceBase:
     """
     return self._unavail
 
-  def run(self):
+  def run(self,inputDict):
     """
       Method to calculate availability/unavailability related quantities
       @ In, None
       @ Out, None
     """
-    self._avail   = self._availabilityFunction()
-    self._unavail = self._unavailabilityFunction()
+    self._avail   = self._availabilityFunction(inputDict)
+    self._unavail = self._unavailabilityFunction(inputDict)
 
   @abc.abstractmethod
   def _availabilityFunction(self, inputDict):
