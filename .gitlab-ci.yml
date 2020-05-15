@@ -7,8 +7,6 @@ before_script:
       # we technically still need moose for running the tests, currently
     - git checkout master
     - git clean -xfd
-      # check that we have conda
-    - export PATH=$HOME/miniconda2/bin:$PATH
     - if which conda 2> /dev/null; then
         echo "Conda found!";
         conda update conda;
@@ -21,11 +19,13 @@ before_script:
     - ./build_raven
       # Install plugin branch ...
     - cd scripts
-    - python install_plugins.py -s ../../
+    - python install_plugins.py -s `pwd`/../../
       # return to project path main dir
     - cd ../..
 
 test:
     script:
+      - echo PATH $PATH
       - cd raven
-      - ./run_tests -j4 --re=plugins/SR2ML --no-color # does this return a failed status?
+      - ./run_tests --library-report
+      - ./run_tests -j4 --plugins
