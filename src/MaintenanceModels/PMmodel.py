@@ -18,6 +18,7 @@ import numpy.ma as ma
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
 from utils import InputData, InputTypes
+from .MaintenanceBase import MaintenanceBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class PMModel(MaintenanceBase):
