@@ -37,7 +37,7 @@
         <limit>4</limit>
       </samplerInit>
       <variable name="lambda">
-          <distribution>uni_dist</distribution>
+          <distribution>lambda_dist</distribution>
       </variable>
       <variable name="Ti">
           <distribution>Ti_dist</distribution>
