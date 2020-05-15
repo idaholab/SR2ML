@@ -100,7 +100,7 @@ class PMModel(MaintenanceBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, availability, float, compoennt availability
     """
-    if self._type = 'standby':
+    if self._type == 'standby':
       availability = 1.0 - standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
       availability = 1.0 - operatingModel(self._Tr, self._Tpm, inputDict['Tm'], inputDict['lambda'])
@@ -112,7 +112,7 @@ class PMModel(MaintenanceBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, availability, float, compoennt unavailability
     """
-    if self._type = 'standby':
+    if self._type == 'standby':
       unavailability = standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
       unavailability = operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
