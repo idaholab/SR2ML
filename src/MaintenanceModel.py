@@ -85,7 +85,7 @@ class MaintenanceModel(ExternalModelPluginBase):
     """
     self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
-    self._model.run()
+    self._model.run(inputDict)
     outputDict = {}
     outputDict['avail']   = self._model.getAvail()
     outputDict['unavail'] = self._model.getUnavail()
