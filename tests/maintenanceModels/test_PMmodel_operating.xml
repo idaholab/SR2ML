@@ -4,9 +4,9 @@
     <Sequence>MCRun,print</Sequence>
   </RunInfo>
   <Models>
-    <ExternalModel name="PMmodelOperating" subType="SR2ML.PMmodel">
+    <ExternalModel name="PMmodelOperating" subType="SR2ML.MaintenanceModel">
       <variables>lambda,T</variables>
-      <MaintenanceModel type="PMmodel">
+      <MaintenanceModel type="PMModel">
         <type>operating</type>
         <Tr>24</Tr>
         <Tpm>10</Tpm>
