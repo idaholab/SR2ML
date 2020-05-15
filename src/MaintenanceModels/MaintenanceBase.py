@@ -175,19 +175,19 @@ class MaintenanceBase:
     self._unavail = self._unavailabilityFunction()
 
   @abc.abstractmethod
-  def _availabilityFunction(self):
+  def _availabilityFunction(self, inputDict):
     """
       Method to calculate availability value
-      @ In, None
+      @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
     pass
 
   @abc.abstractmethod
-  def _unavailabilityFunction(self):
+  def _unavailabilityFunction(self, inputDict):
     """
       Method to calculate unavailability value
-      @ In, None
+      @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
     pass
