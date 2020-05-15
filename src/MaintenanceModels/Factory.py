@@ -40,6 +40,6 @@ def returnClass(classType):
     @ Out, returnClass, class, reference to the subclass
   """
   try:
-    return __interfaceDict[classType.lower()]
+    return __interfaceDict[classType]
   except KeyError:
     raise IOError(__name__ + ': unknown ' + __base + ' type ' + classType)
