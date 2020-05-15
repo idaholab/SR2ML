@@ -32,8 +32,7 @@ class MaintenanceBase:
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = InputData.parameterInputFactory('MaintenanceModel')
-    inputSpecs.addParam('type', param_type=InputTypes.StringType,
-        descr='The maintenance model object identifier')
+    inputSpecs.addParam('type', param_type=InputTypes.StringType, descr='The maintenance model object identifier')
     return inputSpecs
 
   def __init__(self):
@@ -73,6 +72,7 @@ class MaintenanceBase:
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
+    pass
 
   def initialize(self, inputDict):
     """
