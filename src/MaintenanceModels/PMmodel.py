@@ -121,7 +121,7 @@ class PMModel(MaintenanceBase):
   def standbyModel(rho, Ti, Tr, Tt, Tpm, Tm, lamb):
     """
       Method to calculate unavailability for a component in a stand-by configuration 
-      @ In, rho, float, failure probability perdemand
+      @ In, rho, float, failure probability per demand
       @ In, Ti,  float, surveillance test interval
       @ In, Tr,  float, mean time to repair
       @ In, Tt,  float, test duration
