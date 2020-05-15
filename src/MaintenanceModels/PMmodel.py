@@ -119,7 +119,7 @@ class PMModel(MaintenanceBase):
       unavailability = operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     return unavailability
 
-  def standbyModel(rho, Ti, Tr, Tt, Tpm, Tm, lamb):
+  def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):
     """
       Method to calculate unavailability for a component in a stand-by configuration 
       @ In, rho, float, failure probability per demand
@@ -133,7 +133,7 @@ class PMModel(MaintenanceBase):
     u = rho + 0.5*lamb*Ti + Tt/Ti + (rho+lamb*Ti)*Tr/Ti + Tpm/Tm
     return u
 
-  def operatingModel(Tr, Tpm, Tm, lamb):
+  def operatingModel(self, Tr, Tpm, Tm, lamb):
     """
       Method to calculate unavailability for a component which is continuosly operating 
       @ In, Tr,  float, mean time to repair
