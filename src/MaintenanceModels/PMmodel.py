@@ -24,7 +24,7 @@ from .MaintenanceBase import MaintenanceBase
 class PMModel(MaintenanceBase):
   """
     Basic Preventive Maintenance (PM) model
-    Reference: 
+    Reference:
       D. Kancev, M. Cepin 148
       Evaluation of risk and cost using an age-dependent unavailability modelling of test and maintenance for standby components
       Journal of Loss Prevention in the Process Industries 24 (2011) pp. 146-155.
@@ -41,7 +41,7 @@ class PMModel(MaintenanceBase):
     inputSpecs.description = r"""
       Preventive maintenance reliability models
       """
-    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.InterpretedListType, descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.StringType, descr='Type of SSC considered: stand-by or operating'))
     inputSpecs.addSub(InputData.parameterInputFactory('rho',  contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tpm',  contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tr',   contentType=InputTypes.InterpretedListType, descr='Average repair time'))
@@ -72,20 +72,19 @@ class PMModel(MaintenanceBase):
     MaintenanceBase._localHandleInput(self, paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'type':
-        self._type = self.setVariable(child.value)
-        self._variableDict['_type'] = self._type
+        self._type = child.value
       if child.getName().lower() == 'rho':
         self._rho = self.setVariable(child.value)
-        self._variableDict['_rho'] = self._rho  
-      if child.getName().lower() == 'Tpm':
+        self._variableDict['_rho'] = self._rho
+      if child.getName().lower() == 'tpm':
         self._Tpm = self.setVariable(child.value)
-        self._variableDict['_Tpm'] = self._Tpm   
-      if child.getName().lower() == 'Tr':
+        self._variableDict['_Tpm'] = self._Tpm
+      if child.getName().lower() == 'tr':
         self._Tr = self.setVariable(child.value)
-        self._variableDict['_Tr'] = self._Tr    
-      if child.getName().lower() == 'Tt':
+        self._variableDict['_Tr'] = self._Tr
+      if child.getName().lower() == 'tt':
         self._Tt = self.setVariable(child.value)
-        self._variableDict['_Tt'] = self._Tt  
+        self._variableDict['_Tt'] = self._Tt
 
   def initialize(self, inputDict):
     """
@@ -121,7 +120,7 @@ class PMModel(MaintenanceBase):
 
   def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):
     """
-      Method to calculate unavailability for a component in a stand-by configuration 
+      Method to calculate unavailability for a component in a stand-by configuration
       @ In, rho, float, failure probability per demand
       @ In, Ti,  float, surveillance test interval
       @ In, Tr,  float, mean time to repair
@@ -135,7 +134,7 @@ class PMModel(MaintenanceBase):
 
   def operatingModel(self, Tr, Tpm, Tm, lamb):
     """
-      Method to calculate unavailability for a component which is continuosly operating 
+      Method to calculate unavailability for a component which is continuosly operating
       @ In, Tr,  float, mean time to repair
       @ In, Tpm, float, mean time to perform preventive maintenance
       @ In, Tm,  float, preventive maintenance interval

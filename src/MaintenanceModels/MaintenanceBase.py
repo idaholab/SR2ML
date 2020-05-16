@@ -64,6 +64,7 @@ class MaintenanceBase:
     """
     paramInput = self.getInputSpecification()()
     paramInput.parseNode(xmlNode)
+    self._localHandleInput(paramInput)
 
   @abc.abstractmethod
   def _localHandleInput(self, paramInput):
