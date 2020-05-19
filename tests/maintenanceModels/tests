@@ -1,0 +1,17 @@
+[Tests]
+ [./operating]
+  type = 'RavenFramework'
+  input = 'test_PMmodel_operating.xml'
+  csv = 'PMoperating/Out.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+
+ [./standby]
+  type = 'RavenFramework'
+  input = 'test_PMmodel_standby.xml'
+  csv = 'PMstandby/Out.csv'
+  max_time = 20
+  rel_err = 0.0001
+ [../]
+[]
