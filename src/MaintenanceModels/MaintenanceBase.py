@@ -3,9 +3,6 @@ Created on April 20 2020
 
 @author: mandd,wangc
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
 import os
@@ -28,7 +25,7 @@ class MaintenanceBase:
   def getInputSpecification(cls):
     """
       Collects input specifications for this class.
-      @ In, None
+      @ In, cls, class instance
       @ Out, inputSpecs, InputData, specs
     """
     inputSpecs = InputData.parameterInputFactory('MaintenanceModel')
@@ -179,7 +176,7 @@ class MaintenanceBase:
     """
       Method to calculate availability value
       @ In, inputDict, dict, dictionary of inputs
-      @ Out, None
+      @ Out, availability, float, value of unavailability for the considered model
     """
     pass
 
@@ -188,6 +185,6 @@ class MaintenanceBase:
     """
       Method to calculate unavailability value
       @ In, inputDict, dict, dictionary of inputs
-      @ Out, None
+      @ Out, availability, float, value of availability for the considered model
     """
     pass

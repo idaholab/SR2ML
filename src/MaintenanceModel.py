@@ -3,9 +3,6 @@ Created on March 23 2020
 
 @author: mandd, wangc
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
 import abc
@@ -33,7 +30,7 @@ from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 
 class MaintenanceModel(ExternalModelPluginBase):
   """
-     RAVEN ExternalModel for Maintenance Modelss
+     RAVEN ExternalModel for Maintenance Models
   """
 
   def __init__(self):
@@ -81,7 +78,7 @@ class MaintenanceModel(ExternalModelPluginBase):
       This is a simple example of the run method in a plugin.
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputDict, dict, dictionary of inputs from RAVEN
-      @ Out,
+      @ Out, None
     """
     self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)

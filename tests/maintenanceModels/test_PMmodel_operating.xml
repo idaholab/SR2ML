@@ -5,7 +5,7 @@
   </RunInfo>
   <Models>
     <ExternalModel name="PMmodelOperating" subType="SR2ML.MaintenanceModel">
-      <variables>lambda,T</variables>
+      <variables>lambda,Tm,avail,unavail</variables>
       <MaintenanceModel type="PMModel">
         <type>operating</type>
         <Tr>24</Tr>
@@ -16,12 +16,12 @@
 
   <Distributions>
     <Uniform name="lambda_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
+        <lowerBound>1.E-5</lowerBound>
+        <upperBound>1.E-4</upperBound>
     </Uniform>
     <Uniform name="Tm_dist">
-        <lowerBound>1.6E3</lowerBound>
-        <upperBound>8.0E3</upperBound>
+        <lowerBound>8.E2</lowerBound>
+        <upperBound>16.E2</upperBound>
     </Uniform>
   </Distributions>
 
@@ -53,7 +53,7 @@
   <Steps>
     <MultiRun name="MCRun">
       <Input          class="DataObjects"   type="PointSet">Input</Input>
-      <Model          class="Models"        type="ExternalModel">PMmodelStandby</Model>
+      <Model          class="Models"        type="ExternalModel">PMmodelOperating</Model>
       <Sampler        class="Samplers"      type="MonteCarlo">MC</Sampler>
       <Output         class="DataObjects"   type="PointSet">Output</Output>
     </MultiRun>

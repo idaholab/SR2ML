@@ -18,8 +18,8 @@
 
   <Distributions>
     <Uniform name="lambda_dist">
-        <lowerBound>1.E-4</lowerBound>
-        <upperBound>1.E-3</upperBound>
+        <lowerBound>1.E-5</lowerBound>
+        <upperBound>1.E-4</upperBound>
     </Uniform>
     <Uniform name="Ti_dist">
         <lowerBound>2.E2</lowerBound>

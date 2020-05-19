@@ -3,9 +3,6 @@ Created on May 1 2020
 
 @author: mandd,wangc
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
 import abc
@@ -23,7 +20,7 @@ from .MaintenanceBase import MaintenanceBase
 
 class PMModel(MaintenanceBase):
   """
-    Basic Preventive Maintenance (PM) model
+    Basic reference for Preventive Maintenance (PM) modeling
     Reference:
       D. Kancev, M. Cepin 148
       Evaluation of risk and cost using an age-dependent unavailability modelling of test and maintenance for standby components
@@ -34,14 +31,15 @@ class PMModel(MaintenanceBase):
   def getInputSpecification(cls):
     """
       Collects input specifications for this class.
-      @ In, None
+      @ In, cls, class instance
       @ Out, inputSpecs, InputData, specs
     """
+    typeEnum = InputTypes.makeEnumType('PMType', 'PMTypeType', ['standby','operating'])
     inputSpecs = super(PMModel, cls).getInputSpecification()
     inputSpecs.description = r"""
       Preventive maintenance reliability models
       """
-    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=InputTypes.StringType, descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=typeEnum,                       descr='Type of SSC considered: stand-by or operating'))
     inputSpecs.addSub(InputData.parameterInputFactory('rho',  contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tpm',  contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tr',   contentType=InputTypes.InterpretedListType, descr='Average repair time'))
@@ -98,7 +96,7 @@ class PMModel(MaintenanceBase):
     """
       Method to calculate component availability
       @ In, inputDict, dict, dictionary of inputs
-      @ Out, availability, float, compoennt availability
+      @ Out, availability, float, component availability
     """
     if self._type == 'standby':
       availability = 1.0 - self.standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
@@ -110,12 +108,12 @@ class PMModel(MaintenanceBase):
     """
       Method to calculate component unavailability
       @ In, inputDict, dict, dictionary of inputs
-      @ Out, availability, float, compoennt unavailability
+      @ Out, availability, float, component unavailability
     """
     if self._type == 'standby':
       unavailability = self.standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     else:
-      unavailability = self.operatingModel(self._tau, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      unavailability = self.operatingModel(self._Tr, self._Tpm, inputDict['Tm'], inputDict['lambda'])
     return unavailability
 
   def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):
@@ -127,6 +125,7 @@ class PMModel(MaintenanceBase):
       @ In, Tt,  float, test duration
       @ In, Tpm, float, mean time to perform preventive maintenance
       @ In, Tm,  float, preventive maintenance interval
+      @ In, lamb,float, component failure rate
       @ Out, unavailability, float, component unavailability
     """
     u = rho + 0.5*lamb*Ti + Tt/Ti + (rho+lamb*Ti)*Tr/Ti + Tpm/Tm
@@ -138,6 +137,7 @@ class PMModel(MaintenanceBase):
       @ In, Tr,  float, mean time to repair
       @ In, Tpm, float, mean time to perform preventive maintenance
       @ In, Tm,  float, preventive maintenance interval
+      @ In, lamb,float, component failure rate
       @ Out, unavailability, float, component unavailability
     """
     u = lamb*Tr/(1.0+lamb*Tr) + Tpm/Tm
