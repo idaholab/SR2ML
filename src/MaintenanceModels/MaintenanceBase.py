@@ -121,8 +121,6 @@ class MaintenanceBase:
       @ Out, need, dict, the dict of parameters updated with variables
     """
     # load variable values from variables as needed
-    print(need)
-    print(inputDict)
     for key, val in need.items():
       if utils.isAString(val):
         value = inputDict.get(val, None)

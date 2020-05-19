@@ -5,7 +5,7 @@
   </RunInfo>
   <Models>
     <ExternalModel name="PMmodelStandby" subType="SR2ML.MaintenanceModel">
-      <variables>lambda,Tm</variables>
+      <variables>lambda,Tm,Ti,avail,unavail</variables>
       <MaintenanceModel type="PMModel">
         <type>standby</type>
         <Tr>24</Tr>
@@ -22,12 +22,12 @@
         <upperBound>1.E-3</upperBound>
     </Uniform>
     <Uniform name="Ti_dist">
-        <lowerBound>2.E3</lowerBound>
-        <upperBound>4.E3</upperBound>
+        <lowerBound>2.E2</lowerBound>
+        <upperBound>4.E2</upperBound>
     </Uniform>
     <Uniform name="Tm_dist">
-        <lowerBound>8.E3</lowerBound>
-        <upperBound>16.E3</upperBound>
+        <lowerBound>8.E2</lowerBound>
+        <upperBound>16.E2</upperBound>
     </Uniform>
   </Distributions>
 
