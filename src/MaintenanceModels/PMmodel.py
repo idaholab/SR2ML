@@ -114,9 +114,9 @@ class PMModel(MaintenanceBase):
       @ Out, availability, float, component availability
     """
     if self._type == 'standby':
-      availability = 1.0 - self.standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      availability = 1.0 - self.standbyModel(self._rho, self._Ti, self._Tr, self._Tt, self._Tpm, self._Tm, self._lambda)
     else:
-      availability = 1.0 - self.operatingModel(self._Tr, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      availability = 1.0 - self.operatingModel(self._Tr, self._Tpm, self._Tm, self._lambda)
     return availability
 
   def _unavailabilityFunction(self, inputDict):
@@ -126,9 +126,9 @@ class PMModel(MaintenanceBase):
       @ Out, availability, float, component unavailability
     """
     if self._type == 'standby':
-      unavailability = self.standbyModel(self._rho, inputDict['Ti'], self._Tr, self._Tt, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      unavailability = self.standbyModel(self._rho, self._Ti, self._Tr, self._Tt, self._Tpm, self._Tm, self._lambda)
     else:
-      unavailability = self.operatingModel(self._Tr, self._Tpm, inputDict['Tm'], inputDict['lambda'])
+      unavailability = self.operatingModel(self._Tr, self._Tpm, self._Tm, self._lambda)
     return unavailability
 
   def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):
