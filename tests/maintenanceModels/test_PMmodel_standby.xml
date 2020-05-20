@@ -12,6 +12,9 @@
         <Tpm>10</Tpm>
         <Tt>5</Tt>
         <rho>0.01</rho>
+        <lambda>lambda</lambda>
+        <Ti>Ti</Ti>
+        <Tm>Tm</Tm>
       </MaintenanceModel>
     </ExternalModel>
   </Models>

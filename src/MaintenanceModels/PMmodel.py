@@ -39,11 +39,14 @@ class PMModel(MaintenanceBase):
     inputSpecs.description = r"""
       Preventive maintenance reliability models
       """
-    inputSpecs.addSub(InputData.parameterInputFactory('type', contentType=typeEnum,                       descr='Type of SSC considered: stand-by or operating'))
-    inputSpecs.addSub(InputData.parameterInputFactory('rho',  contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tpm',  contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tr',   contentType=InputTypes.InterpretedListType, descr='Average repair time'))
-    inputSpecs.addSub(InputData.parameterInputFactory('Tt',   contentType=InputTypes.InterpretedListType, descr='Average test duration'))
+    inputSpecs.addSub(InputData.parameterInputFactory('type',  contentType=typeEnum,                       descr='Type of SSC considered: stand-by or operating'))
+    inputSpecs.addSub(InputData.parameterInputFactory('rho',   contentType=InputTypes.InterpretedListType, descr='Failure probability on demand'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tpm',   contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tr',    contentType=InputTypes.InterpretedListType, descr='Average repair time'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tt',    contentType=InputTypes.InterpretedListType, descr='Average test duration'))
+    inputSpecs.addSub(InputData.parameterInputFactory('lambda',contentType=InputTypes.InterpretedListType, descr='Component failure rate'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Tm',    contentType=InputTypes.InterpretedListType, descr='Preventive maintenance interval'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Ti',    contentType=InputTypes.InterpretedListType, descr='Surveillance test interval'))
     return inputSpecs
 
   def __init__(self):
@@ -59,6 +62,9 @@ class PMModel(MaintenanceBase):
     self._Tpm  = None
     self._Tr   = None
     self._Tt   = None
+    self._lambda = None
+    self._Tm   = None
+    self._Ti   = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -83,6 +89,15 @@ class PMModel(MaintenanceBase):
       if child.getName().lower() == 'tt':
         self._Tt = self.setVariable(child.value)
         self._variableDict['_Tt'] = self._Tt
+      if child.getName().lower() == 'lambda':
+        self._alpha = self.setVariable(child.value)
+        self._variableDict['_lambda'] = self._lambda
+      if child.getName().lower() == 'tm':
+        self._Tpm = self.setVariable(child.value)
+        self._variableDict['_Tm'] = self._Tm
+      if child.getName().lower() == 'ti':
+        self._Tpm = self.setVariable(child.value)
+        self._variableDict['_Ti'] = self._Ti
 
   def initialize(self, inputDict):
     """

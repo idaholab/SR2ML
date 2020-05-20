@@ -10,6 +10,8 @@
         <type>operating</type>
         <Tr>24</Tr>
         <Tpm>10</Tpm>
+        <lambda>lambda</lambda>
+        <Tm>Tm</Tm>
       </MaintenanceModel>
     </ExternalModel>
   </Models>
