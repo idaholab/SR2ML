@@ -2,21 +2,7 @@
 \label{sec:MaintenanceModels}
 
 
-\newcommand{\aliasRequiredParameterDescription}[1]
-{
-	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
-	If a string was provided, the reliability model would treat it as an input variable that came
-	from other entity of RAVEN. In this case, the variable must be listed in the sub-node
-	\xmlNode{variables} under \xmlNode{ExternalModel}.
-}
-\newcommand{\aliasOptionalParameterDescription}[1]
-{
-	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See above definition.
-	If a string was provided, the reliability model would treat it as an input variable that came
-	from other entity of RAVEN. In this case, the variable must be listed in the sub-node
-	\xmlNode{variables} under \xmlNode{ExternalModel}.
-	\default{1.}
-}
+
 
 \textbf{Maintenance Models} are models designed to model maintenance and testing from a reliability perspective. 
 These models are designed to optimize preventive maintenance at the system level. 

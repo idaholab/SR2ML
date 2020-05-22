@@ -44,7 +44,7 @@ class PMModel(MaintenanceBase):
     inputSpecs.addSub(InputData.parameterInputFactory('Tpm',   contentType=InputTypes.InterpretedListType, descr='Time required to perform PM activities'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tr',    contentType=InputTypes.InterpretedListType, descr='Average repair time'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tt',    contentType=InputTypes.InterpretedListType, descr='Average test duration'))
-    inputSpecs.addSub(InputData.parameterInputFactory('lambda',contentType=InputTypes.InterpretedListType, descr='Component failure rate'))
+    inputSpecs.addSub(InputData.parameterInputFactory('Lambda',contentType=InputTypes.InterpretedListType, descr='Component failure rate'))
     inputSpecs.addSub(InputData.parameterInputFactory('Tm',    contentType=InputTypes.InterpretedListType, descr='Preventive maintenance interval'))
     inputSpecs.addSub(InputData.parameterInputFactory('Ti',    contentType=InputTypes.InterpretedListType, descr='Surveillance test interval'))
     return inputSpecs
@@ -57,14 +57,14 @@ class PMModel(MaintenanceBase):
     """
     MaintenanceBase.__init__(self)
     # Component type
-    self._type = None
-    self._rho  = None
-    self._Tpm  = None
-    self._Tr   = None
-    self._Tt   = None
-    self._lambda = None
-    self._Tm   = None
-    self._Ti   = None
+    self.type = None
+    self.rho  = None
+    self.Tpm  = None
+    self.Tr   = None
+    self.Tt   = None
+    self.Lambda = None
+    self.Tm   = None
+    self.Ti   = None
 
   def _localHandleInput(self, paramInput):
     """
@@ -76,28 +76,28 @@ class PMModel(MaintenanceBase):
     MaintenanceBase._localHandleInput(self, paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'type':
-        self._type = child.value
+        self.type = child.value
       if child.getName().lower() == 'rho':
-        self._rho = self.setVariable(child.value)
-        self._variableDict['_rho'] = self._rho
+        self.rho = self.setVariable(child.value)
+        self._variableDict['rho'] = self.rho
       if child.getName().lower() == 'tpm':
-        self._Tpm = self.setVariable(child.value)
-        self._variableDict['_Tpm'] = self._Tpm
+        self.Tpm = self.setVariable(child.value)
+        self._variableDict['Tpm'] = self.Tpm
       if child.getName().lower() == 'tr':
-        self._Tr = self.setVariable(child.value)
-        self._variableDict['_Tr'] = self._Tr
+        self.Tr = self.setVariable(child.value)
+        self._variableDict['Tr'] = self.Tr
       if child.getName().lower() == 'tt':
-        self._Tt = self.setVariable(child.value)
-        self._variableDict['_Tt'] = self._Tt
+        self.Tt = self.setVariable(child.value)
+        self._variableDict['Tt'] = self.Tt
       if child.getName().lower() == 'lambda':
-        self._alpha = self.setVariable(child.value)
-        self._variableDict['_lambda'] = self._lambda
+        self.alpha = self.setVariable(child.value)
+        self._variableDict['Lambda'] = self.Lambda
       if child.getName().lower() == 'tm':
-        self._Tpm = self.setVariable(child.value)
-        self._variableDict['_Tm'] = self._Tm
+        self.Tpm = self.setVariable(child.value)
+        self._variableDict['Tm'] = self.Tm
       if child.getName().lower() == 'ti':
-        self._Tpm = self.setVariable(child.value)
-        self._variableDict['_Ti'] = self._Ti
+        self.Tpm = self.setVariable(child.value)
+        self._variableDict['Ti'] = self.Ti
 
   def initialize(self, inputDict):
     """
@@ -113,10 +113,10 @@ class PMModel(MaintenanceBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, availability, float, component availability
     """
-    if self._type == 'standby':
-      availability = 1.0 - self.standbyModel(self._rho, self._Ti, self._Tr, self._Tt, self._Tpm, self._Tm, self._lambda)
+    if self.type == 'standby':
+      availability = 1.0 - self.standbyModel(self.rho, self.Ti, self.Tr, self.Tt, self.Tpm, self.Tm, self.Lambda)
     else:
-      availability = 1.0 - self.operatingModel(self._Tr, self._Tpm, self._Tm, self._lambda)
+      availability = 1.0 - self.operatingModel(self.Tr, self.Tpm, self.Tm, self.Lambda)
     return availability
 
   def _unavailabilityFunction(self, inputDict):
@@ -125,10 +125,10 @@ class PMModel(MaintenanceBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, availability, float, component unavailability
     """
-    if self._type == 'standby':
-      unavailability = self.standbyModel(self._rho, self._Ti, self._Tr, self._Tt, self._Tpm, self._Tm, self._lambda)
+    if self.type == 'standby':
+      unavailability = self.standbyModel(self.rho, self.Ti, self.Tr, self.Tt, self.Tpm, self.Tm, self.Lambda)
     else:
-      unavailability = self.operatingModel(self._Tr, self._Tpm, self._Tm, self._lambda)
+      unavailability = self.operatingModel(self.Tr, self.Tpm, self.Tm, self.Lambda)
     return unavailability
 
   def standbyModel(self, rho, Ti, Tr, Tt, Tpm, Tm, lamb):

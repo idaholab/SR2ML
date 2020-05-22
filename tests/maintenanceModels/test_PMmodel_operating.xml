@@ -5,19 +5,19 @@
   </RunInfo>
   <Models>
     <ExternalModel name="PMmodelOperating" subType="SR2ML.MaintenanceModel">
-      <variables>lambda,Tm,avail,unavail</variables>
+      <variables>Lambda,Tm,avail,unavail</variables>
       <MaintenanceModel type="PMModel">
         <type>operating</type>
         <Tr>24</Tr>
         <Tpm>10</Tpm>
-        <lambda>lambda</lambda>
+        <Lambda>Lambda</Lambda>
         <Tm>Tm</Tm>
       </MaintenanceModel>
     </ExternalModel>
   </Models>
 
   <Distributions>
-    <Uniform name="lambda_dist">
+    <Uniform name="Lambda_dist">
         <lowerBound>1.E-5</lowerBound>
         <upperBound>1.E-4</upperBound>
     </Uniform>
@@ -32,8 +32,8 @@
       <samplerInit>
         <limit>4</limit>
       </samplerInit>
-      <variable name="lambda">
-          <distribution>lambda_dist</distribution>
+      <variable name="Lambda">
+          <distribution>Lambda_dist</distribution>
       </variable>
       <variable name="Tm">
           <distribution>Tm_dist</distribution>
@@ -43,11 +43,11 @@
 
   <DataObjects>
     <PointSet name="Input">
-      <Input>lambda,Tm</Input>
+      <Input>Lambda,Tm</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="Output">
-      <Input>lambda,Tm</Input>
+      <Input>Lambda,Tm</Input>
       <Output>avail,unavail</Output>
     </PointSet>
   </DataObjects>
