@@ -90,13 +90,13 @@ class PMModel(MaintenanceBase):
         self.Tt = self.setVariable(child.value)
         self._variableDict['Tt'] = self.Tt
       if child.getName().lower() == 'lambda':
-        self.alpha = self.setVariable(child.value)
+        self.Lambda = self.setVariable(child.value)
         self._variableDict['Lambda'] = self.Lambda
       if child.getName().lower() == 'tm':
-        self.Tpm = self.setVariable(child.value)
+        self.Tm = self.setVariable(child.value)
         self._variableDict['Tm'] = self.Tm
       if child.getName().lower() == 'ti':
-        self.Tpm = self.setVariable(child.value)
+        self.Ti = self.setVariable(child.value)
         self._variableDict['Ti'] = self.Ti
 
   def initialize(self, inputDict):

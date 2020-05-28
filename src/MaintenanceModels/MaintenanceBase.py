@@ -117,14 +117,12 @@ class MaintenanceBase:
       @ In, inputDict, dict, the dict of parameters that is provided from other sources
       @ Out, need, dict, the dict of parameters updated with variables
     """
-    # load variable values from variables as needed
-    for key in need.keys():
-      value = need[key]
-      if value is None:
-        if inputDict[key] is None:
-          raise KeyError('Looking for variable "{}" to fill "{}" but not found among variables!'.format(value, key))
-        else:
-          need[key] = np.atleast_1d(inputDict[key])
+    for key, val in need.items():
+      if utils.isAString(val):
+        value = inputDict.get(val, None)
+        if value is None:
+          raise KeyError('Looking for variable "{}" to fill "{}" but not found among variables!'.format(val, key))
+        need[key] = np.atleast_1d(value)
     return need
 
   def getParams(self):
