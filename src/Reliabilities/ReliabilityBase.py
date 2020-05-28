@@ -47,15 +47,15 @@ class ReliabilityBase:
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
     # not used yet
-    # True indicates reliablity model could accept time series input data, and returns
-    # time-dependent reliablity data (Default True)
+    # True indicates reliability model could accept time series input data, and returns
+    # time-dependent reliability data (Default True)
     self._dynamicHandling    = True
     # dictionary: keys all required input parameters, and values either user provided values or
     # variables determined by raven
     self._variableDict = {}
     # instance of reliability model
     self._model = None
-    # class of reliablity model
+    # class of reliability model
     self._modelClass = None
     # location parameter, i.e. time delay/shift
     self._loc = np.array([0])

@@ -1,11 +1,8 @@
 """
-Created on Jan. 30 2020
+Created on March 23 2020
 
-@author: wangc, mandd
+@author: mandd, wangc
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
 import abc
@@ -15,7 +12,7 @@ import os
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from SR2ML.src import Reliabilities
+from SR2ML.src import MaintenanceModels
 from utils import mathUtils as utils
 from utils import InputData
 from utils import InputTypes
@@ -31,9 +28,9 @@ from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 # fh.setFormatter(formatter)
 # logger.addHandler(fh)
 
-class ReliabilityModel(ExternalModelPluginBase):
+class MaintenanceModel(ExternalModelPluginBase):
   """
-     RAVEN ExternalModel for reliability analysis
+     RAVEN ExternalModel for Maintenance Models
   """
 
   def __init__(self):
@@ -60,24 +57,15 @@ class ReliabilityModel(ExternalModelPluginBase):
     variables = xmlNode.find('variables')
     delimiter = ',' if ',' in variables.text else None
     container.variables = [var.strip() for var in variables.text.split(delimiter)]
-    self._modelXMLInput = xmlNode.find('ReliabilityModel')
+    self._modelXMLInput = xmlNode.find('MaintenanceModel')
     self._modelType = self._modelXMLInput.get('type')
     if self._modelType is None:
-      raise IOError("Required attribute 'type' for node 'ReliabilityModel' is not provided!")
-    self._model = Reliabilities.returnInstance(self._modelType)
-
-  def isDynamic(self):
-    """
-      This method is utility function that tells if the metric is able to
-      treat dynamic data on its own or not
-      @ In, None
-      @ Out, isDynamic, bool, True if the metric is able to treat dynamic data, False otherwise
-    """
-    return self._dynamicHandling
+      raise IOError("Required attribute 'type' for node 'MaintenanceModel' is not provided!")
+    self._model = MaintenanceModels.returnInstance(self._modelType)
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
-      Method to initialize the Reliability Model
+      Method to initialize the Maintenance Model
       @ In, container, object, self-like object where all the variables can be stored
       @ In, runInfoDict, dict, dictionary containing all the RunInfo parameters (XML node <RunInfo>)
       @ In, inputFiles, list, list of input files (if any)
@@ -90,15 +78,13 @@ class ReliabilityModel(ExternalModelPluginBase):
       This is a simple example of the run method in a plugin.
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputDict, dict, dictionary of inputs from RAVEN
-      @ Out,
+      @ Out, None
     """
     self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
-    self._model.run()
+    self._model.run(inputDict)
     outputDict = {}
-    outputDict['cdf_F'] = self._model.getCDF()
-    outputDict['pdf_f'] = self._model.getPDF()
-    outputDict['rdf_R'] = self._model.getRDF()
-    outputDict['frf_h'] = self._model.getFRF()
+    outputDict['avail']   = self._model.getAvail()
+    outputDict['unavail'] = self._model.getUnavail()
     for key, val in outputDict.items():
       setattr(container, key, val)
