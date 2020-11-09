@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 """
 Created on Feb. 7, 2020
 

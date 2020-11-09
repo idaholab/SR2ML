@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -15,4 +17,3 @@ def run(self,Input):
 
   self.p_V1_ET = self.p_V1
   self.t_V1_ET = self.t_V1
-

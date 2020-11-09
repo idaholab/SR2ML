@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -9,5 +11,3 @@ def run(self,Input):
   # output: outcome
 
   self.outcome_V1 = self.p_V1 * np.ones(Input['time'].size)
-
-

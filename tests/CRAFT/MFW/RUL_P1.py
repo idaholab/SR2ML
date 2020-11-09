@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 from scipy.stats import beta
 from scipy.integrate import quad
@@ -22,5 +24,3 @@ def run(self,Input):
 
   for index,value in np.ndenumerate(Input['time']):
      self.p_P1[index[0]] = beta.cdf(value/7300,Input['alpha_P1'],Input['beta_P1'])
-
-

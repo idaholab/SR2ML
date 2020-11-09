@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 """
 Created on Feb. 7, 2020
 
@@ -68,7 +70,7 @@ class BathtubModel(ReliabilityBase):
     # scale parameter
     self._theta = 1
     # shape parameter
-    self._rho = 1. 
+    self._rho = 1.
 
   def _localHandleInput(self, paramInput):
     """

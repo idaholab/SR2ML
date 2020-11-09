@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 from SR2ML.src import ETModel
 from SR2ML.src import FTModel
 from SR2ML.src import GraphModel

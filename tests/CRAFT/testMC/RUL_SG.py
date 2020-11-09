@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 from scipy.stats import norm
 from scipy.integrate import quad
 import random
@@ -25,4 +27,3 @@ def run(self,Input):
   else:
     self.t_SG = Input['T']+ 1.0
     self.p_SG = 1.0 - float(RULmodel(Input['alpha_SG'], Input['beta_SG'], self.t_SG))
-
