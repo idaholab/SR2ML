@@ -1,9 +1,11 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import random
 import numpy as np
 
 def run(self,Input):
-  # intput: 
-  # output: 
+  # intput:
+  # output:
 
   self.CDF_mean = np.zeros(len(self.time))
   self.CDF_5p   = np.zeros(len(self.time))
@@ -14,7 +16,7 @@ def run(self,Input):
       dt = self.time[ts]
     else:
       dt = self.time[ts] - self.time[ts-1]
-    
+
     pV1_1y = self.p_V1[ts] * 1./dt
     pV2_1y = self.p_V2[ts] * 1./dt
     pP1_1y = self.p_P1[ts] * 1./dt

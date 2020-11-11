@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -29,4 +31,3 @@ def run(self,Input):
   else:
     self.t_V1 = Input['T'] + 1.
     self.p_V1 = quad(pdfFailure, self.t_V1, np.inf, args=(Input['a_V1'],Input['b_V1']))[0]
-

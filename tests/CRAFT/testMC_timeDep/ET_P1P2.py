@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -16,6 +18,3 @@ def run(self,Input):
     self.outcome_P1P2_0[index[0]] = (1.-Input['p_P1'][index[0]]) * (1.-Input['p_P2'][index[0]])
     self.outcome_P1P2_1[index[0]] = Input['p_P1'][index[0]]*(1.-Input['p_P2'][index[0]])
     self.outcome_P1P2_2[index[0]] = Input['p_P1'][index[0]] * Input['p_P2'][index[0]]
-
-
-
