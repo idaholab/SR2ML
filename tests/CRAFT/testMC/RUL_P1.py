@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 from scipy.stats import beta
 from scipy.integrate import quad
 import random
@@ -24,4 +26,3 @@ def run(self,Input):
 
   self.t_P1 = RULmodel(Input['alpha_P1'],Input['beta_P1'])
   self.p_P1 = 1.0
-

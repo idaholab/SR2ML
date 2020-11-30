@@ -1,4 +1,4 @@
-# SR2ML: Safety Risk Reliability Model Library
+# SR2ML: Safety Risk and Reliability Model Library
 
 SR2ML is a software package which contains a set of safety and reliability models
 designed to be interfaced with the INL developed RAVEN code. These models can be
@@ -40,6 +40,12 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 [Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
 
 
-Licensing
+### Licensing
 -----
 This software is licensed under the terms you may find in the file named "LICENSE" in this directory.
+
+### Developers
+-----
+By contributing to this software project, you are agreeing to the following terms and conditions for your contributions:
+
+You agree your contributions are submitted under the Apache license. You represent you are authorized to make the contributions and grant the license. If your employer has rights to intellectual property that includes your contributions, you represent that you have received permission to make contributions and grant the required license on behalf of that employer.

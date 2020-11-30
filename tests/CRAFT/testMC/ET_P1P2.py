@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -22,5 +24,3 @@ def run(self,Input):
     self.t_P1P2_ET = self.t_P1
   else:
     print('error')
-
-

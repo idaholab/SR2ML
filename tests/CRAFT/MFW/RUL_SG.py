@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 from scipy.stats import norm
 from scipy.integrate import quad
 import random
@@ -18,4 +20,3 @@ def run(self,Input):
 
   for ts in range(len(self.time)):
     self.p_SG[ts] = RULmodel(updatedMean, updatedsigma, self.time[ts])
-

@@ -1,3 +1,5 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
 import numpy as np
 import math
 import random
@@ -22,4 +24,3 @@ def run(self,Input):
   for index,value in np.ndenumerate(Input['time']):
     #self.p_V2[index[0]] = quad(pdfFailure, 0, value, args=(Input['a_V2'],Input['b_V2']))[0]
     self.p_V2[index[0]] = 1. - math.exp(-quad(timeDepLambda, 0, value, args=(Input['a_V2'],Input['b_V2']))[0])
-
