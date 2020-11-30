@@ -37,6 +37,17 @@ get started with SR2ML. This typically involves the following steps:
     required dependencies.
 \end{itemize}
 
+\subsection{Accessing SR2ML from within RAVEN}
+The SR2ML can be accessed as a special subtype of the External model.
+The syntax is given in Listing \ref{lst:SR2MLfromRAVEN}.
+
+\begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Call SR2ML.FTModel from RAVEN input., label=lst:SR2MLfromRAVEN]
+<ExternalModel name="FaultTree" subType="SR2ML.FTModel">
+  <variables> Input and output variables needed by SR2ML </variables>
+  ...
+</ExternalModel>
+\end{lstlisting}
+
 \subsection{User Manual Formats}
 In this manual, we employ the following formats to highlight certain parts with
 particular meanings (i.e. input structure, examples, and terminal commands):
