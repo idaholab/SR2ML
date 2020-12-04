@@ -41,8 +41,7 @@ Inside the \xmlNode{ExternalModel} block, the XML nodes that belong to this mode
   \item  \xmlNode{initState}, \xmlDesc{string, required parameter}, variable ID corresponding to initial state
   \item  \xmlNode{finState}, \xmlDesc{string, required parameter}, variable ID corresponding to final state
   \item  \xmlNode{endTime}, \xmlDesc{float, required parameter}, time horizon to evaluate Markov chain transition history
-  \item  \xmlNode{state}, specifies a single node; inside a \xmlNode{state} all possible transitions OUT of this state must be specified
-                          in the \xmlNode{transition} xml sub-nodes:
+  \item  \xmlNode{state}, specifies a single node; inside a \xmlNode{state} all possible transitions OUT of this state must be specified in the \xmlNode{transition} xml sub-nodes:
 	  \begin{itemize}
 	  	\item \xmlAttr{transition}, \xmlDesc{required string attribute}, arrival state
 	    \item \xmlAttr{type}, \xmlDesc{required string attribute}, type of transition. Allowed transition types are:
