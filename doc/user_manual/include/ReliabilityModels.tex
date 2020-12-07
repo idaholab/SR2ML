@@ -1,7 +1,6 @@
 \section{Reliability Models}
 \label{sec:ReliabilityModels}
 
-
 \newcommand{\aliasRequiredParameterDescription}[1]
 {
 	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
@@ -24,7 +23,7 @@ operating for a certain amount of time without failure. As such, the reliability
 are function of time, in that every reliability value has an associated time value. In
 other words, one must specify a time value with the desired reliability value. This degree
 of flexibility makes the reliability model a much better reliability specification that the
-Mean Time To Failure (MTTF), which represents only one point along the entire reliability
+mean time to failure (MTTF), which represents only one point along the entire reliability
 model.
 
 \subsection{The Probability Density and Cumulative Density Functions}
@@ -114,7 +113,7 @@ distributions for describing failure of continuous operating devices, including:
 	\item Exponential, i.e. model \xmlAttr{type} is \xmlString{exponential}
 	\item Erlangian, i.e. model \xmlAttr{type} is \xmlString{erlangian}
 	\item Gamma, i.e. model \xmlAttr{type} is \xmlString{gamma}
-	\item Lognorm, i.e. model \xmlAttr{type} is \xmlString{lognorm}
+	\item Lognormal, i.e. model \xmlAttr{type} is \xmlString{lognorm}
 	\item Fatigue Life, i.e. model \xmlAttr{type} is \xmlString{fatiguelife}
 	\item Weibull, i.e. model \xmlAttr{type} is \xmlString{weibull}
 	\item Exponential Weibull, i.e. model \xmlAttr{type} is \xmlString{exponweibull}
@@ -365,7 +364,7 @@ Example XML:
 
 
 \subsubsection{The Fatigue Life Model (Birnbaum-Saunders)}
-The probability density function of the Fatigue Life is given by
+The probability density function of the fatigue life is given by
 \begin{equation}
 	f(T_m) = \frac{\frac{T_m-T_d}{\beta}+1}{2\alpha\sqrt{2\pi\left(\frac{T_m-T_d}{\beta}\right)^3}}
 				 \exp\left(-\frac{\left(\frac{T_m-T_d}{\beta}-1\right)^2}{2\left(\frac{T_m-T_d}{\beta}\right)\alpha^2}\right)
@@ -396,7 +395,7 @@ Example XML:
 
 
 \subsubsection{The Exponentiated Weibull Model}
-The probability density function of the Exponentiated Weibull is given by
+The probability density function of the exponentiated Weibull is given by
 \begin{equation}
 	f(T_m) = \gamma\alpha\left(1-\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)\right)^{\gamma-1}
 				 \left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}\exp\left(-\left(\frac{T_m-T_d}{\beta}\right)^\alpha\right)
