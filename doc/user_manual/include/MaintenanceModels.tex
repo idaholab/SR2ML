@@ -1,10 +1,10 @@
 \section{Maintenance Models}
 \label{sec:MaintenanceModels}
 
-\textbf{Maintenance Models} are models designed to model maintenance and testing from a reliability perspective. 
-These models are designed to optimize preventive maintenance at the system level. 
+\textbf{Maintenance Models} are models designed to model maintenance and testing from a reliability perspective.
+These models are designed to optimize preventive maintenance at the system level.
 
-Two classes of models are here considered:
+Two classes of models are considered here:
 \begin{itemize}
 	\item Operating, i.e. model \xmlAttr{type} is \xmlString{Operating}
 	\item Standby, i.e. model \xmlAttr{type} is \xmlString{Standby}
@@ -16,14 +16,14 @@ XML node accepts the following attributes:
 	\item \xmlAttr{name}, \xmlDesc{required string attribute}, user-defined identifier of this model.
 	\nb As with other objects, this identifier can be used to reference this specific entity from other
 	input blocks in the XML.
-	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the sub-types should
-	be used. For maintenance models, must use \xmlString{SR2ML.MaintenanceModel} as sub-type.
+	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the subtypes should
+	be used. For maintenance models, the user must use \xmlString{SR2ML.MaintenanceModel} as subtype.
 \end{itemize}
-In the maintenance \xmlNode{ExternalModel} input block, the following XML sub-nodes are required:
+In the maintenance \xmlNode{ExternalModel} input block, the following XML subnodes are required:
 \begin{itemize}
 	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
-	names. Each variable name needs to match a variable used/defined in the maintenance model or variable
-	coming from other RAVEN entity (i.e., Samplers, DataObjects and Models).
+	names. Each variable name needs to match a variable used or defined in the maintenance model or variable
+	coming from other RAVEN entities (i.e., Samplers, DataObjects, and Models).
 	\nb For all the maintenance models, the following outputs variables would be available. If the user
 	added these output variables in the node \xmlNode{variables}, these variables would be also available to
 	for use anywhere in the RAVEN input to refer to the maintenance model output variables.
@@ -48,13 +48,13 @@ In addition, if the user wants to use the \textbf{alias} system, the following X
 	These aliases can be used anywhere in the RAVEN input to refer to the ExternalModel
 	variables.
 	%
-	In the body of this node the user specifies the name of the variable that the ExternalModel is
+	In the body of this node, the user specifies the name of the variable that the ExternalModel is
 	going to use (during its execution).
 	%
 	The actual alias, usable throughout the RAVEN input, is instead defined in the
 	\xmlAttr{variable} attribute of this tag.
-	\\The user can specify aliases for both the input and the output space. As sanity check, RAVEN
-	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output''.
+	\\The user can specify aliases for both the input and the output space. As a sanity check, RAVEN
+	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output.''
 	%
 	\nb The user can specify as many aliases as needed.
 	%
@@ -62,8 +62,8 @@ In addition, if the user wants to use the \textbf{alias} system, the following X
 \end{itemize}
 
 
-\subsubsection{Operating Model}
-For an operating model, the unavailability $u$ is calculated as: 
+\subsection{Operating Model}
+For an operating model, the unavailability $u$ is calculated as
 \begin{equation}
 	u = lambda*Tr/(1.0+lambda*Tr) + Tpm/Tm
 \end{equation}
@@ -89,8 +89,8 @@ Example XML:
     </ExternalModel>
 \end{lstlisting}
 
-\subsubsection{Standby Model}
-For an operating model, the unavailability $u$ is calculated as: 
+\subsection{Standby Model}
+For an operating model, the unavailability $u$ is calculated as:
 \begin{equation}
   u = rho + 0.5*lambda*Ti + Tt/Ti + (rho+lambda*Ti)*Tr/Ti + Tpm/Tm
 \end{equation}

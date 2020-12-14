@@ -1,9 +1,9 @@
-\section{FT Model}
+\section{Fault Tree Model}
 \label{sec:FTModel}
 
-This model is designed to read from file the structure of the fault tree (FT) and to import such Boolean logic structure as a RAVEN model.
-The FT must be specified in: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
-As an example, the FT of Fig.~\ref{fig:FT} is translated in the OpenPSA as shown below:
+This model is designed to read the structure of the fault tree (FT) from the file and to import such Boolean logic structures as a RAVEN model.
+The FT must be specified in the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
+As an example, the FT of Figure~\ref{fig:FT} is translated in the OpenPSA as shown below:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=FT in OpenPSA format., label=lst:FTModel]
 <opsa-mef>
@@ -62,7 +62,7 @@ As an example, the FT of Fig.~\ref{fig:FT} is translated in the OpenPSA as shown
     \label{fig:FT}
 \end{figure}
 
-The FT of Fig.~\ref{fig:FT} described in Listing~\ref{lst:FTModel} can be defined in the RAVEN input file as follows:
+The FT of Figure~\ref{fig:FT} described in Listing~\ref{lst:FTModel} can be defined in the RAVEN input file as follows:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=FT model input example., label=lst:FT_InputExample]
   <Models>
@@ -94,14 +94,14 @@ nodes that belong to this models are:
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition, the FT model of Fig.~\ref{fig:FT} and described in Listing~\ref{lst:FT_InputExample},
+Provided this definition and the FT model of Figure~\ref{fig:FT} described in Listing~\ref{lst:FT_InputExample},
 the resulting model in RAVEN is characterized by these variables:
 \begin{itemize}
 	\item Input variables: statusBE1, statusBE2, statusBE3, statusBE4
 	\item Output variable: TOP
 \end{itemize}
 
-\subsection{FT model reference tests}
+\subsection{FT Model Reference Tests}
 \begin{itemize}
 	\item SR2ML/tests/test\_FTmodel.xml
 	\item SR2ML/tests/test\_FTmodel\_TD.xml

@@ -3,27 +3,27 @@
 
 \newcommand{\aliasRequiredParameterDescription}[1]
 {
-	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See above definition.
+	\xmlNode{#1}, \xmlDesc{string or float, required parameter}. See the above definition.
 	If a string was provided, the reliability model would treat it as an input variable that came
-	from other entity of RAVEN. In this case, the variable must be listed in the sub-node
+	from other RAVEN entity. In this case, the variable must be listed in the subnode
 	\xmlNode{variables} under \xmlNode{ExternalModel}.
 }
 \newcommand{\aliasOptionalParameterDescription}[1]
 {
-	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See above definition.
+	\xmlNode{#1}, \xmlDesc{string or float, optional parameter}. See the above definition.
 	If a string was provided, the reliability model would treat it as an input variable that came
-	from other entity of RAVEN. In this case, the variable must be listed in the sub-node
+	from other RAVEN entity. In this case, the variable must be listed in the subnode
 	\xmlNode{variables} under \xmlNode{ExternalModel}.
-	\default{1.}
+	\default{1}
 }
 
-\textbf{Reliability Models/Functions} are the most frequently used in life data analysis
+\textbf{Reliability Models} are the most frequently used in life data analysis
 and reliability engineering. These models/functions give the probability of a component
 operating for a certain amount of time without failure. As such, the reliability models
 are function of time, in that every reliability value has an associated time value. In
 other words, one must specify a time value with the desired reliability value. This degree
 of flexibility makes the reliability model a much better reliability specification that the
-mean time to failure (MTTF), which represents only one point along the entire reliability
+mean time to failure (MTTF), which only represents one point along the entire reliability
 model.
 
 \subsection{The Probability Density and Cumulative Density Functions}
@@ -33,12 +33,12 @@ From probability and statistics, given a continuous random variable $X$, we deno
 	\item The cumulative density function (cdf), as $F(x)$.
 \end{itemize}
 If $x$ is a continuous random variable, then the probability of $x$ takes on a value in the
-interval $[a,b]$ is the area under the pdf $f(x)$ from $a$ to $b$:
+interval $[a,b]$ is the area under the pdf $f(x)$ from $a$ to $b$
 \begin{equation}
   P(a\leq x\leq b) = \int_{a}^{b} f(x)dx
 \end{equation}
-The cumulative distribution function is a function $F(x)$ of a random variable $x$, and is
-defined for a number $x_0$ by:
+The cumulative distribution function is a function $F(x)$ of a random variable $x$ and is
+defined for a number $x_0$ by
 \begin{equation}
   F(x_0) = P(x\leq x_0) = \int_{-\infty}^{x_0} f(s)ds
 \end{equation}
@@ -47,50 +47,50 @@ would be, at most, $x_0$. The mathematical relationship between the pdf and cdf 
 \begin{equation}
   F(x) = \int_{-\infty}^{x} f(s)ds
 \end{equation}
-Conversely:
+Conversely
 \begin{equation}
   f(x) = - \frac{dF(x)}{dx}
 \end{equation}
 The functions most commonly used in reliability engineering and life data analysis, namely the
 reliability function and failure rate function, can be determined directly from the pdf definition,
-or $f(t)$. Different distributions exist, such as Lognormal, Exponential, Weibull etc., and each of
-them has a predefined $f(t)$. These distributions were formulated by statisticians, mathematicians
+or $f(t)$. Different distributions exist, such as Lognormal, Exponential, Weibull, etc., and each of
+them has a predefined $f(t)$. These distributions were formulated by statisticians, mathematicians,
 and engineers to mathematically model or represent certain behavior. Some distributions tend to better
-represent life data and are most commonly referred to as lifetime distribution.
+represent life data and are most commonly referred to as lifetime distributions.
 
 \subsection{The Reliability and Failure Rate Models}
 Given the mathematical representation of a distribution, we can derive all functions needed
-for reliability analysis, i.e. reliability models/functions. This would only depend on the value of $t$
+for reliability analysis (i.e., reliability models/functions). This would only depend on the value of $t$
 after the value of the distribution parameters are estimated from data.
 Now, let $T$ be the random variable defining the lifetime of the component with cdf $F(t)$, which is the
-time the component would operate before failure. The cdf $F(t)$ of the random variable $T$ is given by:
+time the component would operate before failure. The cdf $F(t)$ of the random variable $T$ is given by
 \begin{equation}
   F(t) = \int_{-\infty}^{t} f(T)dT
 \end{equation}
-If $F(t)$ is a differentiable function, then the pdf $f(t)$ is given by:
+If $F(t)$ is a differentiable function, the pdf $f(t)$ is given by
 \begin{equation}
   f(t) = - \frac{dF(t)}{dt}
 \end{equation}
-The reliability function or survival function $R(t)$ of the component is given by:
+The reliability function or survival function $R(t)$ of the component is given by
 \begin{equation}
   R(t) = P(T>t) = 1 - P(T\leq t) = 1-F(t)
 \end{equation}
-This is the probability that the component would operate after time t, sometimes called survival probability.
+This is the probability that the component would operate after time t, sometimes called the survival probability.
 The failure rate of a system during the interval $[t,t+\Delta t]$ is the probability that a failure per
 unit time occurs in the interval, given that a failure has not occurred prior to t, the beginning of the
-interval. The failure rate function (i.e. instantaneous failure rate, conditional failure rate) of hazard
-function is defined as the limit of the failure rate as the interval approaches zero:
+interval. The failure rate function (i.e., instantaneous failure rate, conditional failure rate) of the hazard
+function is defined as the limit of the failure rate as the interval approaches zero
 \begin{equation}
   \lambda (t)= \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta tR(t)}
 	 = \frac{1}{R(t)} \lim_{\Delta t\rightarrow 0} \frac{F(t+\Delta t) - F(t)}{\Delta t}
 	 = \frac{1}{R(t)}\frac{dF(t)}{dt} = \frac{f(t)}{R(t)}
 \end{equation}
-The failure rate function is the rate of change of the conditional probability of failure at time $t$.
+The failure rate function is the rate of change of the conditional probability of a failure at time $t$.
 It measures the likelihood that a component that has operated up until time $t$ fails in the next
-instant of time.
-Generally $\lambda (t)$ is the one tabulated because it is measured experimentally and because it tends to
+instance of time.
+Generally, $\lambda (t)$ is the one tabulated because it is measured experimentally and because it tends to
 vary less rapidly with time than the other parameters. When $\lambda (t)$ is given, all other three
-parameters $F(t)$, $f(t)$, $R(t)$ can be computed as follows:
+parameters, $F(t)$, $f(t)$, $R(t)$, can be computed as follows
 \begin{equation}
   R(t) = \exp(-\int_{0}^{t} \lambda (s)ds)
 \end{equation}
@@ -108,18 +108,18 @@ $T$, time to failure. Hence
 
 \subsection{The Lifetime Distributions or Aging Models}
 We would consider several of the most useful reliability models based on different probability
-distributions for describing failure of continuous operating devices, including:
+distributions for describing the failure of continuous operating devices, including:
 \begin{itemize}
-	\item Exponential, i.e. model \xmlAttr{type} is \xmlString{exponential}
-	\item Erlangian, i.e. model \xmlAttr{type} is \xmlString{erlangian}
-	\item Gamma, i.e. model \xmlAttr{type} is \xmlString{gamma}
-	\item Lognormal, i.e. model \xmlAttr{type} is \xmlString{lognorm}
-	\item Fatigue Life, i.e. model \xmlAttr{type} is \xmlString{fatiguelife}
-	\item Weibull, i.e. model \xmlAttr{type} is \xmlString{weibull}
-	\item Exponential Weibull, i.e. model \xmlAttr{type} is \xmlString{exponweibull}
-	\item Bathtub, i.e. model \xmlAttr{type} is \xmlString{bathtub}
-	\item Power Law, i.e. model \xmlAttr{type} is \xmlString{powerlaw}
-	\item Log Linear, i.e. model \xmlAttr{type} is \xmlString{loglinear}.
+	\item Exponential, model \xmlAttr{type} is \xmlString{exponential}
+	\item Erlangian, model \xmlAttr{type} is \xmlString{erlangian}
+	\item Gamma, model \xmlAttr{type} is \xmlString{gamma}
+	\item Lognormal, model \xmlAttr{type} is \xmlString{lognorm}
+	\item Fatigue Life, model \xmlAttr{type} is \xmlString{fatiguelife}
+	\item Weibull, model \xmlAttr{type} is \xmlString{weibull}
+	\item Exponential Weibull, model \xmlAttr{type} is \xmlString{exponweibull}
+	\item Bathtub, model \xmlAttr{type} is \xmlString{bathtub}
+	\item Power Law, model \xmlAttr{type} is \xmlString{powerlaw}
+	\item Log Linear, model \xmlAttr{type} is \xmlString{loglinear}.
 \end{itemize}
 
 The specifications of these models must be defined within a RAVEN \xmlNode{ExternalModel}. This
@@ -128,26 +128,26 @@ XML node accepts the following attributes:
 	\item \xmlAttr{name}, \xmlDesc{required string attribute}, user-defined identifier of this model.
 	\nb As with other objects, this identifier can be used to reference this specific entity from other
 	input blocks in the XML.
-	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the sub-types should
-	be used. For reliability models, must use \xmlString{SR2ML.ReliabilityModel} as sub-type.
+	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the subtypes should
+	be used. For reliability models, the user must use \xmlString{SR2ML.ReliabilityModel} as the subtype.
 \end{itemize}
-In the reliability \xmlNode{ExternalModel} input block, the following XML sub-nodes are required:
+In the reliability \xmlNode{ExternalModel} input block, the following XML subnodes are required:
 \begin{itemize}
 	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
-	names. Each variable name needs to match a variable used/defined in the reliability model or variable
-	coming from other RAVEN entity (i.e. Samplers, DataObjects and Models).
+	names. Each variable name needs to match a variable used or defined in the reliability model or variable
+	coming from another RAVEN entity (i.e. Samplers, DataObjects and Models).
 	\nb For all the reliability models, the following outputs variables would be available. If the user
 	added these output variables in the node \xmlNode{variables}, these variables would be also available to
 	for use anywhere in the RAVEN input to refer to the reliability model output variables.
 	\begin{itemize}
 		\item \xmlString{pdf\_f}, variable contains the calculated pdf value or values at given time instance(s),
-		i.e. a series of times.
+		(i.e., a series of times).
 		\item \xmlString{cdf\_F}, variable contains the calculated cdf value or values at given time instance(s),
-		i.e. a series of times.
+		(i.e., a series of times).
 		\item \xmlString{rdf\_R}, variable contains the calculated reliability function (rdf) value or values at
-		given time instance(s), i.e. a series of times.
+		given time instance(s), (i.e., a series of times).
 		\item \xmlString{frf\_h}, variable contains the calculated failure rate function (frf) value or values
-		at given time instance(s), i.e. a series of times.
+		at given time instance(s), (i.e., a series of times).
 	\end{itemize}
 	\nb When the external model variables are defined, at run time, RAVEN initializes
 	them and tracks their values during the simulation.
@@ -157,35 +157,35 @@ In the reliability \xmlNode{ExternalModel} input block, the following XML sub-no
 		\item \xmlAttr{type}, \xmlDesc{required string attribute}, user-defined identifier of the reliability model.
 		\nb the types for different reliability models can be found at the beginning of this section.
 	\end{itemize}
-	In addition, this node accepts several different sub-nodes representing the model parameters depending on the
-	\xmlAttr{type} of the reliability model. The common sub-nodes for all reliability models are:
+	In addition, this node accepts several different subnodes representing the model parameters depending on the
+	\xmlAttr{type} of the reliability model. The common subnodes for all reliability models are:
 	\begin{itemize}
 		\item \xmlNode{Tm}, \xmlDesc{string or float or comma-separated float, required parameter}. Time instance(s)
-		that the reliability models would use to compute pdf, cdf, rdf, and frf values. If a string was provided,
+		that the reliability models would use to compute the pdf, cdf, rdf, and frf values. If a string was provided,
 		the reliability model would treat it as an input variable that came from entities of RAVEN. In this
 		case, the variable must be listed in the sub-node \xmlNode{variables} under \xmlNode{ExternalModel}.
-		\item \xmlNode{Td}, \xmlDesc{string or float, optional parameter}. Time that the reliability models start to be active.
+		\item \xmlNode{Td}, \xmlDesc{string or float, optional parameter}. The time that the reliability models start to be active.
 		If a string was provided, the reliability model would treat it as an input variable that came
-		from entities of RAVEN. In this case, the variable must be listed in the sub-node \xmlNode{variables}
+		from RAVEN entities. In this case, the variable must be listed in the sub-node \xmlNode{variables}
 		under \xmlNode{ExternalModel}.
 		\default{0.}
 	\end{itemize}
 \end{itemize}
 In addition, if the user wants to use the \textbf{alias} system, the following XML block can be input:
 \begin{itemize}
-	\item \xmlNode{alias} \xmlDesc{string, optional field} specifies alias for
+	\item \xmlNode{alias} \xmlDesc{string, optional field} specifies an alias for
 	any variable of interest in the input or output space for the ExternalModel.
 	%
 	These aliases can be used anywhere in the RAVEN input to refer to the ExternalModel
 	variables.
 	%
-	In the body of this node the user specifies the name of the variable that the ExternalModel is
+	In the body of this node, the user specifies the name of the variable that the ExternalModel is
 	going to use (during its execution).
 	%
 	The actual alias, usable throughout the RAVEN input, is instead defined in the
 	\xmlAttr{variable} attribute of this tag.
-	\\The user can specify aliases for both the input and the output space. As sanity check, RAVEN
-	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output''.
+	\\The user can specify aliases for both the input and the output space. As a sanity check, RAVEN
+	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output.''
 	%
 	\nb The user can specify as many aliases as needed.
 	%
@@ -222,7 +222,7 @@ The probability density function of the lognormal is given by
 \begin{equation}
 	f(T_m) = \frac{1}{\alpha T_m\sqrt{2\pi}}\exp\left(-\frac{1}{2}\left(\frac{\ln{\frac{T_m-T_d}{\beta}}}{\alpha}\right)^2\right)
 \end{equation}
-where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
+where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, $\beta$ is the scale parameter, $\alpha$ is the shape
 parameter, and $T_d$ is the location parameter.
 This model accepts the following additional sub-nodes:
 \begin{itemize}
@@ -246,13 +246,13 @@ Example XML:
 \end{lstlisting}
 
 \subsubsection{The Exponential Model}
-The probability density function of the Exponential is given by
+The probability density function of the exponential is given by
 \begin{equation}
 	f(T_m) = \lambda\exp\left(-\lambda\left(T_m-T_d\right)\right)
 \end{equation}
 where $T_m\geq T_d$, $T_d, \lambda >0$, $\lambda$ is the mean failure rate or the inverse of scale parameter,
 and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{lambda}
 \end{itemize}
@@ -278,7 +278,7 @@ The probability density function of the Weibull is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
 parameter, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -309,7 +309,7 @@ The probability density function of the Erlangian is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \lambda >0$, and $\lambda$ is the inverse of scale parameter, $k$ is positive integer
 that control the shape, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{k}
@@ -340,7 +340,7 @@ The probability density function of the Gamma is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the inverse of scale parameter, $\alpha$ is the shape
 parameter, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -371,7 +371,7 @@ The probability density function of the fatigue life is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $\beta$ is the scale parameter, $\alpha$ is the shape
 parameter, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -402,7 +402,7 @@ The probability density function of the exponentiated Weibull is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta, \gamma>0$, and $\beta$ is the scale parameter, $\alpha$ and $\gamma$ is the shape
 parameter, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -434,7 +434,7 @@ The reliability function is given by:
 \begin{equation}
   R(T_m) = \exp\left(-c\beta\left(\frac{T_m-T_d}{\beta}\right)^\alpha -(1-c)\left(\exp\left(\frac{T_m-T_d}{\theta}\right)^\rho -1\right)\right)
 \end{equation}
-The failure rate function is given by:
+The failure rate function is given by
 \begin{equation}
   \lambda(T_m) = c\alpha\left(\frac{T_m-T_d}{\beta}\right)^{\alpha-1}+(1-c)\rho\left(\frac{T_m-T_d}{\theta}\right)^{\rho-1}
 \end{equation}
@@ -444,7 +444,7 @@ The probability density function of the Bathtub is given by
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta, \theta, \rho, c >0$, and $\beta, \theta$ are the scale parameters,
 $\alpha, \rho$ are the shape parameters, $c \in [0,1]$ is the weight parameter, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasRequiredParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -475,13 +475,13 @@ Example XML:
 
 
 \subsubsection{The Power Law Model for Failure Rate Function}
-The hazard rate satisfies a power law as a function of time:
+The hazard rate satisfies a power law as a function of time
 \begin{equation}
 	\lambda(T_m) = \lambda + \alpha(T_m-T_d)^\beta
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta, \lambda >0$,
 and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasOptionalParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}
@@ -509,7 +509,7 @@ The hazard rate satisfies a exponential law as a function of time:
 	\lambda(T_m) = \exp\left(\alpha+\beta(T_m-T_d)\right)
 \end{equation}
 where $T_m\geq T_d$, $T_d, \alpha, \beta >0$, and $T_d$ is the location parameter.
-This model accepts the following additional sub-nodes:
+This model accepts the following additional subnodes:
 \begin{itemize}
 	\item \aliasOptionalParameterDescription{alpha}
 	\item \aliasOptionalParameterDescription{beta}

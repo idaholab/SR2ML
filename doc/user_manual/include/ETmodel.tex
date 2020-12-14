@@ -1,12 +1,12 @@
-\section{ET Model}
+\section{Event Tree Model}
 \label{sec:ETModel}
 
-This model is designed to read from file the structure of the event tree (ET) and to
-import such Boolean logic structure as a RAVEN~\cite{RAVEN,RAVENtheoryMan} model.
+This model is designed to read the structure of the event tree (ET) from the file and to
+import such Boolean logic structure as a RAVEN model~\cite{RAVEN,RAVENtheoryMan}.
 The ET must be specified in: the OpenPSA format (\href{<url>}{https://github.com/open-psa}).
-As an example, the ET of Fig.~\ref{fig:ET} is translated in the OpenPSA format as shown below:
+As an example, the ET of Figure~\ref{fig:ET} is translated in the OpenPSA format as shown in Listing~\ref{lst:ETModel} below:
 
-\begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=ET of Fig.~\ref{fig:ET} in OpenPSA format., label=lst:ETModel]
+\begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=ET of Figure~\ref{fig:ET} in the OpenPSA format., label=lst:ETModel]
 <define-event-tree name="eventTree">
     <define-functional-event name="ACC"/>
     <define-functional-event name="LPI"/>
@@ -45,11 +45,11 @@ As an example, the ET of Fig.~\ref{fig:ET} is translated in the OpenPSA format a
 \begin{figure}
     \centering
     \centerline{\includegraphics[scale=0.5]{ET.pdf}}
-    \caption{Folder tree of Logos repository}
+    \caption{Example of event tree.}
     \label{fig:ET}
 \end{figure}
 
-The ET of Fig.~\ref{fig:ET} described in Listing~\ref{lst:ETModel} can be defined in the RAVEN input file as follows:
+The ET of Figure~\ref{fig:ET} described in Listing~\ref{lst:ETModel} can be defined in the RAVEN input file as follows:
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=ET model input example., label=lst:ET_InputExample]
   <Models>
     ...
@@ -72,21 +72,21 @@ Inside the \xmlNode{ExternalModel} block, the XML
 nodes that belong to this models are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
-  \item  \xmlNode{sequenceID}, \xmlDesc{string, required parameter}, the name of the alias variable that indicate the branch ID
+  \item  \xmlNode{sequenceID}, \xmlDesc{string, required parameter}, the name of the alias variable that indicates the branch ID
   \item  \xmlNode{map}, \xmlDesc{string, required parameter}, the name ID of the ET branching variable
 	  \begin{itemize}
 	    \item \xmlAttr{var}, \xmlDesc{required string attribute}, the ALIAS name ID of the ET branching variable.
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition and the ET model of Fig.~\ref{fig:ET} and described in Listing~\ref{lst:ETModel},
+Provided this definition and the ET model of Figure~\ref{fig:ET} and described in Listing~\ref{lst:ETModel},
 the resulting model in RAVEN is characterized by these variables:
 \begin{itemize}
 	\item Input variables: statusACC, statusLPI, statusLPR
 	\item Output variable: sequence
 \end{itemize}
 
-\subsection{ET model reference tests}
+\subsection{ET Model Reference Tests}
 \begin{itemize}
 	\item SR2ML/tests/test\_ETmodel.xml
 	\item SR2ML/tests/test\_ETmodel\_TD.xml
