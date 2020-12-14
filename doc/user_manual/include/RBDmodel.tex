@@ -1,9 +1,10 @@
-\section{RBD Model}
+\section{Reliability Block Diagram Model}
 \label{sec:RBDmodel}
 
-This model is designed to read from file the structure of the reliability block diagram (RBD) and import such Boolean logic structure as a RAVEN model.
-The RBD must be specified in a specific format. 
-As an example, the RBD of Fig.~\ref{fig:RBD} is translated in the RAVEN format as shown below:
+This model is designed to read the structure of the reliability block diagram (RBD) from
+the file and import such Boolean logic structures as a RAVEN model.
+The RBD must be specified in a specific format.
+As an example, the RBD of Figure~\ref{fig:RBD} is translated in the RAVEN format as shown below:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=RBD input file., label=lst:RBDmodel]
 <Graph name="testGraph">
@@ -50,7 +51,8 @@ As an example, the RBD of Fig.~\ref{fig:RBD} is translated in the RAVEN format a
     \label{fig:RBD}
 \end{figure}
 
-The FT of RBD illustrated in Fig.~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel} can be defined in the RAVEN input file as follows:
+The FT of RBD illustrated in Figure~\ref{fig:RBD} and defined in Listing~\ref{lst:RBDmodel}
+can be defined in the RAVEN input file as follows:
 
 \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=RBD model input example., label=lst:RBD_InputExample]
   <Models>
@@ -90,14 +92,14 @@ nodes that belong to this model are:
 	  \end{itemize}
 \end{itemize}
 
-Provided this definition, the RBD model of Fig.~\ref{fig:RBD} described in Listing~\ref{lst:RBDmodel},
+Provided this definition, the RBD model of Figure~\ref{fig:RBD} described in Listing~\ref{lst:RBDmodel},
 is the resulting model in RAVEN characterized by these variables:
 \begin{itemize}
 	\item Input variables: status2, status3, status4, status5
 	\item Output variable: statusSG1, statusSG2, statusSG3.
 \end{itemize}
 
-\subsection{RBD model reference tests}
+\subsection{RBD Model Reference Tests}
 \begin{itemize}
 	\item SR2ML/tests/test\_graphModel.xml
 	\item SR2ML/tests/test\_graphModel\_TD.xml.
