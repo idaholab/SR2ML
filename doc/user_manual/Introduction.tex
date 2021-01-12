@@ -1,0 +1,93 @@
+\section{Introduction}
+\label{sec:Introduction}
+
+SR2ML is a software package that contains a set of safety and reliability models
+designed to be interfaced with the INL's RAVEN code. These models can be
+employed to perform both static and dynamic system risk analyses and to determine
+the risk importance of specific elements of the considered system.
+
+Two classes of reliability models have been developed; the first class includes
+all classical reliability models (fault trees, event trees, Markov models and
+reliability block diagrams) which have been extended to not only deal with
+Boolean logic values but also time-dependent values. The second class includes
+several component aging and maintenance models. Models of these two classes are designed to
+be included in a RAVEN ensemble model to perform a time-dependent system reliability
+analysis (dynamic analysis). Similarly, these models can be interfaced with system
+analysis codes  to determine the failure time of systems and evaluate the accident progression
+(static analysis).
+
+\subsection{Acquiring and Installing SR2ML}
+SR2ML is supported on three separate computing platforms: Linux, OSX (Apple Macintosh), and Microsoft
+Windows. Currently, SR2ML is downloadable from the SR2ML GitLab repository:
+\url{https://hpcgitlab.hpc.inl.gov/RAVEN_PLUGINS/SR2ML.git}. New users should contact SR2ML developers to
+get started. This typically involves the following steps:
+
+\begin{itemize}
+  \item \textit{Download SR2ML}
+    \\ You can download the source code from \url{https://github.com/idaholab/SR2ML.git}.
+	\item \textit{Use as a RAVEN Plugin},
+    \\RAVEN must first be downloaded from \url{https://github.com/idaholab/raven.git}.
+		\\ Detailed instructions are available from \url{https://github.com/idaholab/raven/wiki}.
+    To register a plugin with RAVEN and make its components accessible, run the script:
+\begin{lstlisting}[language=bash]
+raven/scripts/install_plugins.py -s /abs/path/to/SR2ML
+\end{lstlisting}
+    After the plugin registration, follow the installation instructions at
+    \url{https://github.com/idaholab/raven/wiki/installationMain} to install the
+    required dependencies.
+\end{itemize}
+
+\subsection{Accessing SR2ML from within RAVEN}
+The SR2ML can be accessed as a special subtype of the External model.
+The syntax is given in Listing \ref{lst:SR2MLfromRAVEN}.
+
+\begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Call SR2ML.FTModel from RAVEN input., label=lst:SR2MLfromRAVEN]
+<ExternalModel name="FaultTree" subType="SR2ML.FTModel">
+  <variables> Input and output variables needed by SR2ML </variables>
+  ...
+</ExternalModel>
+\end{lstlisting}
+
+\subsection{User Manual Formats}
+In this manual, we employ the following formats to highlight certain parts with
+particular meanings (i.e., input structure, examples, and terminal commands):
+
+\begin{itemize}
+\item \textbf{\textit{Python Coding:}}
+\begin{lstlisting}[language=python]
+class AClass():
+  def aMethodImplementation(self):
+    pass
+\end{lstlisting}
+\item \textbf{\textit{SR2ML XML input example:}}
+\begin{lstlisting}[style=XML,morekeywords={anAttribute}]
+<MainXMLBlock>
+  ...
+  <aXMLnode anAttribute='aValue'>
+     <aSubNode>body</aSubNode>
+  </aXMLnode>
+  <!-- This is  commented block -->
+  ...
+</MainXMLBlock>
+\end{lstlisting}
+\item \textbf{\textit{Bash Commands:}}
+\begin{lstlisting}[language=bash]
+cd path/to/SR2ML/
+cd ../../
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Capabilities of SR2ML}
+This document provides a detailed description of the SR2ML plugin for the RAVEN code~\cite{RAVEN,RAVENtheoryMan}.
+The features included in this plugin are:
+\begin{itemize}
+	\item Event Tree (ET) Model (see Section~\ref{sec:ETModel})
+	\item Fault Tree (FT) Model (see Section~\ref{sec:FTModel})
+	\item Markov Model (see Section~\ref{sec:MarkovModel})
+	\item Reliability Block Diagram (RBD) Model (see Section~\ref{sec:RBDmodel})
+	\item Data Classifier (see Section~\ref{sec:dataClassifier})
+	\item ET Data Importer (see Section~\ref{sec:ETdataImporter})
+	\item FT Data Importer (see Section~\ref{sec:FTdataImporter})
+	\item Reliability Models (see Section~\ref{sec:ReliabilityModels})
+  \item Maintenance Models (see Section~\ref{sec:MaintenanceModels})
+\end{itemize}

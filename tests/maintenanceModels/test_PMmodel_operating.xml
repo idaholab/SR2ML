@@ -1,0 +1,75 @@
+<Simulation verbosity="debug">
+  <RunInfo>
+    <WorkingDir>PMoperating</WorkingDir>
+    <Sequence>MCRun,print</Sequence>
+  </RunInfo>
+  <Models>
+    <ExternalModel name="PMmodelOperating" subType="SR2ML.MaintenanceModel">
+      <variables>Lambda,Tm,avail,unavail</variables>
+      <MaintenanceModel type="PMModel">
+        <type>operating</type>
+        <Tr>24</Tr>
+        <Tpm>10</Tpm>
+        <Lambda>Lambda</Lambda>
+        <Tm>Tm</Tm>
+      </MaintenanceModel>
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name="Lambda_dist">
+        <lowerBound>1.E-5</lowerBound>
+        <upperBound>1.E-4</upperBound>
+    </Uniform>
+    <Uniform name="Tm_dist">
+        <lowerBound>8.E2</lowerBound>
+        <upperBound>16.E2</upperBound>
+    </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="MC">
+      <samplerInit>
+        <limit>4</limit>
+      </samplerInit>
+      <variable name="Lambda">
+          <distribution>Lambda_dist</distribution>
+      </variable>
+      <variable name="Tm">
+          <distribution>Tm_dist</distribution>
+      </variable>
+    </MonteCarlo>
+  </Samplers>
+
+  <DataObjects>
+    <PointSet name="Input">
+      <Input>Lambda,Tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="Output">
+      <Input>Lambda,Tm</Input>
+      <Output>avail,unavail</Output>
+    </PointSet>
+  </DataObjects>
+
+  <Steps>
+    <MultiRun name="MCRun">
+      <Input          class="DataObjects"   type="PointSet">Input</Input>
+      <Model          class="Models"        type="ExternalModel">PMmodelOperating</Model>
+      <Sampler        class="Samplers"      type="MonteCarlo">MC</Sampler>
+      <Output         class="DataObjects"   type="PointSet">Output</Output>
+    </MultiRun>
+    <IOStep name="print">
+     <Input          class="DataObjects"   type="PointSet">Output</Input>
+     <Output         class="OutStreams"    type="Print">Out</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Out">
+      <type>csv</type>
+      <source>Output</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+</Simulation>
