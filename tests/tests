@@ -1,47 +1,47 @@
 [Tests]
- 
+
  [./TestGraphModel]
   type  = 'RavenFramework'
   input = 'test_graphModel.xml'
   UnorderedCsv   = 'graphModel/Print_sim_PS.csv'
  [../]
- 
+
  [./TestMarkovModel_2states]
   type  = 'RavenFramework'
   input = 'test_markovModel_2states.xml'
   UnorderedCsv   = 'markovModel_2states/Print_sim_PS.csv'
  [../]
- 
+
  [./TestMarkovModel_3states]
   type  = 'RavenFramework'
   input = 'test_markovModel_3states.xml'
   UnorderedCsv   = 'markovModel_3states/Print_sim_PS.csv'
- [../] 
- 
+ [../]
+
  [./TestMarkovModel_3states_complexTrans]
   type  = 'RavenFramework'
   input = 'test_markovModel_3states_complexTrans.xml'
   UnorderedCsv   = 'markovModel_3states_complexTrans/Print_sim_PS.csv'
- [../] 
- 
+ [../]
+
  [./TestMarkovModel_3states_instantTrans]
   type  = 'RavenFramework'
   input = 'test_markovModel_3states_instantTrans.xml'
   UnorderedCsv   = 'markovModel_3states_instantTrans/Print_sim_PS.csv'
- [../] 
- 
+ [../]
+
  [./TestMarkovModel_2states_tau]
   type  = 'RavenFramework'
   input = 'test_markovModel_2states_tau.xml'
   UnorderedCsv   = 'markovModel_2states_tau/Print_sim_PS.csv'
  [../]
- 
+
  [./TestETModel]
   type  = 'RavenFramework'
   input = 'test_ETmodel.xml'
   UnorderedCsv   = 'ETmodel/Print_sim_PS.csv'
  [../]
- 
+
  [./TestFTModel]
   type  = 'RavenFramework'
   input = 'test_FTmodel.xml'
@@ -76,5 +76,17 @@
   type  = 'RavenFramework'
   input = 'test_ensemblePRAModel_mixed.xml'
   UnorderedCsv   = 'ensembleMixed/Print_sim_PS.csv'
+ [../]
+
+ [./TestMCSSolver]
+  type  = 'RavenFramework'
+  input = 'test_MCSSolver.xml'
+  UnorderedCsv   = 'MCSSolver/Print_sim_PS.csv'
+ [../]
+
+ [./TestMCSSolverMcCormick]
+  type  = 'RavenFramework'
+  input = 'test_MCSSolverMcCormick.xml'
+  UnorderedCsv   = 'MCSSolverMcCormick/Print_sim_PS1.csv MCSSolverMcCormick/Print_sim_PS2.csv MCSSolverMcCormick/Print_sim_PS3.csv MCSSolverMcCormick/Print_sim_PS4.csv MCSSolverMcCormick/Print_sim_PS5.csv'
  [../]
 []
