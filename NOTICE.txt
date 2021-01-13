@@ -34,8 +34,6 @@ OWNED RIGHTS.
 Authors:
 Diego Mandelli (email: Diego.Mandelli@inl.gov)
 Congjian Wang (Congjian.Wang@inl.gov)
-
-Contributors:
 Andrea Alfonsi (email: Andrea.Alfonsi@inl.gov)
 Joshua Cogliati (email: Joshua.Cogliati@inl.gov)
 Paul Talbot (email: Paul.Talbot@inl.gov)
