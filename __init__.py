@@ -7,3 +7,4 @@ from SR2ML.src import MarkovModel
 # from SR2ML.src import TDFailureRateReliabilityModel
 from SR2ML.src import ReliabilityModel
 from SR2ML.src import MaintenanceModel
+from SR2ML.src import MCSSolver
