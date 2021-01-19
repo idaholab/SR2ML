@@ -1,0 +1,105 @@
+<Simulation verbosity="debug">
+  <!--
+  This is a test for the system: TopEvent = BE1 or BE3 or (BE2 or BE4)
+  MCS = BE1, BE3, BE2 BE4
+  Hence: P(TopEvent) = P(BE1) + P(BE3) + P(BE2)*P(BE4) 
+                     - P(BE1)*P(BE3) - P(BE1)*P(BE2)*P(BE4) - P(BE2)*P(BE3)*P(BE4)
+                     + P(BE1)*P(BE2)*P(BE3)*P(BE4)
+  -->
+  <TestInfo>
+    <name>PRAplugin/MCSSolverTD_PS</name>
+    <author>mandd</author>
+    <created>2021-01-06</created>
+    <classesTested>PRAplugin/MCSSolver</classesTested>
+    <description>
+      This model is designed to read from file a list of Minimal Cut Sets (MCSs) and 
+      to import such Boolean logic structure as a RAVEN model. Provided the sampled 
+      values of Basic Events (BEs) probabilities, the MCSSolver determines the 
+      probability of Top Event (TE), i.e., the union of the MCSs.
+      This test performs a time-dependent calculation provided a PointSet which contains 
+      the actual status of the basic events. Each basic event is represented by the 
+      initial and final time where basic event is set to True (i.e., with probability=1.0)
+    </description>
+  </TestInfo>
+  
+  <RunInfo>
+    <WorkingDir>MCSSolverTDfromPS</WorkingDir>
+    <Sequence>importSchedule,simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile"         type="MCSlist"             >MCSlist.csv</Input>
+    <Input name="maintenanceSchedule" type="maintenanceSchedule" >maintenanceSchedule.csv</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+      <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
+      <solverOrder>3</solverOrder>
+      <BE_ID>BE</BE_ID>
+      <tInitial>tIn</tInitial>
+      <tEnd>tEnd</tEnd>
+      <topEventID>TOP</topEventID>
+      <timeID>time</timeID>
+      <map var='pBE1'>BE1</map>
+      <map var='pBE2'>BE2</map>
+      <map var='pBE3'>BE3</map>
+      <map var='pBE4'>BE4</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <constant name="pBE1">0.1</constant>
+      <constant name="pBE2">0.2</constant>
+      <constant name="pBE3">0.3</constant>
+      <constant name="pBE4">0.4</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <IOStep name="importSchedule">
+      <Input   class="Files"       type=""                 >maintenanceSchedule</Input>
+      <Output  class="DataObjects" type="PointSet"         >maintenanceSchedule_PointSet</Output>
+    </IOStep>
+    <MultiRun name="simRun">
+      <Input   class="DataObjects"  type="PointSet"        >maintenanceSchedule_PointSet</Input>
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="HistorySet"      >sim_HS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_HS</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_HS">
+      <type>csv</type>
+      <source>sim_HS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="maintenanceSchedule_PointSet">
+      <Input>BE</Input>
+      <Output>tIn,tEnd</Output>
+    </PointSet>
+    <PointSet name="inputPlaceHolder">
+      <Input>pBE1,pBE2,pBE3,pBE4</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <HistorySet name="sim_HS">
+      <Input>pBE1,pBE2,pBE3,pBE4</Input>
+      <Output>BE1,BE2,BE3,BE4,TOP</Output>
+      <options>
+          <pivotParameter>time</pivotParameter>
+      </options>
+    </HistorySet>
+  </DataObjects>
+
+</Simulation>

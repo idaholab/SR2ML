@@ -52,25 +52,94 @@ An example of RAVEN input file is the following:
         <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP</variables>
         <solverOrder>3</solverOrder>
         <topEventID>TOP</topEventID>>
-        <map var='statusBE1'>BE1</map>
-        <map var='statusBE2'>BE2</map>
-        <map var='statusBE3'>BE3</map>
-        <map var='statusBE4'>BE4</map>
+        <map var='pBE1'>BE1</map>
+        <map var='pBE2'>BE2</map>
+        <map var='pBE3'>BE3</map>
+        <map var='pBE4'>BE4</map>
       </ExternalModel>
     </Models>
     ...
   </Models>
 \end{lstlisting}
 
+In this case, the MCSs are written in terms of the variables BE1, BE2, BE3, and BE4.
+The values of the variables pBE1, pBE2, pBE3, and pBE4 (i.e., the probability values associated to each basic event) are 
+generated outside the MCSSolver model (e.g., by a sampler) and passed to the MCSSolver model in order to calculate the 
+probability value of the top event (e.g., the variable TOP in the example above).
+The \xmlNode{map} blocks allow the user to link the sampled probability value to the correspoding basic event.
+
 If $solverOrder=1$ then: $P(TE) = P(MCS1)+P(MCS2)+P(MCS3)$.  
 If $solverOrder=2$ then: $P(TE) = P(MCS1)+P(MCS2)+P(MCS3) - P(MCS1 MCS2) - P(MCS1 MCS3) - P(MCS2 MCS3)$.  
 If $solverOrder=3$ then: $P(TE) = P(MCS1)+P(MCS2)+P(MCS3) - P(MCS1 MCS2) - P(MCS1 MCS3) - P(MCS2 MCS3) + P(MCS1 MCS2 MCS3)$
 
+\subsection{Time dependent calculation}
+
+The MCSSolver can also perform time dependent calculation by providing in the MultiRun step a dataObject which
+contains the logic status of the Basic Events.
+This dataObject contains the logical status of the the Basic Event: 0 (Basic event set to False: probability=p(BE)) 
+or 1 (Basic event set to True: probability=1.0).
+The format of the dataObject can be:
+\begin{itemize}
+  \item HistorySet: it contains the temporal profile of each basic event (e.g., BE1, BE2, BE3, and BE4) as a time 
+                    series (see test\_MCSSolver_TD.xml). In this case it is needed to specify the ID of the time variable 
+                    contained in the HistorySet in the \xmlNode{timeID} node.
+  
+   \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from HistorySet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
+     <Models>
+      <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+        <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP,time</variables>
+        <solverOrder>3</solverOrder>
+        <topEventID>TOP</topEventID>
+        <timeID>time</timeID>
+        <map var='statusBE1'>BE1</map>
+        <map var='statusBE2'>BE2</map>
+        <map var='statusBE3'>BE3</map>
+        <map var='statusBE4'>BE4</map>
+      </ExternalModel>
+    </Models>
+  \end{lstlisting}
+  
+  \item PointSet: it contains the interval time (initial and final time) under which each basic event is set to 
+                  True (see test\_MCSSolver_TD_fromPS.xml). As an example, the PointSet contains the IDs of the basic events
+                  in the and the initial and final time as shown below:
+                  
+   \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption= Example of PointSet for time dependent MCSSolver calculation., label=lst:MCSSolver_InputExample]
+    <PointSet name="maintenanceSchedule_PointSet">
+      <Input>BE</Input>
+      <Output>tIn,tFin</Output>
+    </PointSet>
+    \end{lstlisting}
+    
+                  In this case, the MCSSolver requires the specification of the DataObject variables that contain the list of basic events
+                  (\xmlNode{BE_ID} node) and the initial and final time values (\xmlNode{tInitial} and \xmlNode{tEnd} nodes).
+                  
+   \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from PointSet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
+    <Models>
+      <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+        <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
+        <solverOrder>3</solverOrder>
+        <BE_ID>BE</BE_ID>
+        <tInitial>tIn</tInitial>
+        <tEnd>tFin</tEnd>
+        <topEventID>TOP</topEventID>
+        <timeID>time</timeID>
+        <map var='pBE1'>BE1</map>
+        <map var='pBE2'>BE2</map>
+        <map var='pBE3'>BE3</map>
+        <map var='pBE4'>BE4</map>
+      </ExternalModel>
+    </Models>
+  \end{lstlisting}
+\end{itemize}
+
 \subsection{MCSSolver model reference tests}
 The following is the provided analytic test:
 \begin{itemize}
-	\item test\_MCSSolver.xml
+  \item test\_MCSSolver.xml
+  \item test\_MCSSolver_TD.xml
+  \item test\_MCSSolver_TD_fromPS.xml
 \end{itemize}
+
 
 
 

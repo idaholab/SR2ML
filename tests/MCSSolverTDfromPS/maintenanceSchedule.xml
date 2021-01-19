@@ -1,0 +1,9 @@
+<DataObjectMetadata name="sim_PS">
+  <DataSet type="Static">
+    <general>
+      <inputs>BE</inputs>
+      <outputs>tIn,tEnd</outputs>
+      <sampleTag>RAVEN_sample_ID</sampleTag>
+    </general>
+  </DataSet>
+</DataObjectMetadata>
