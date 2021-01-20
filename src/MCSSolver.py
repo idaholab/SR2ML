@@ -41,7 +41,9 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     ExternalModelPluginBase.__init__(self)
-    self.TimeDependentMode= True
+    
+    self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
+    self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -59,15 +61,17 @@ class MCSSolver(ExternalModelPluginBase):
       @ In, xmlNode, xml.etree.ElementTree.Element, XML node that needs to be read
       @ Out, None
     """
-    container.filename   = None
-    container.topEventID = None
-    container.timeID     = None
-    container.mapping    = {}
-    container.invMapping = {}
-    container.tInitial   = None
-    container.tEnd       = None 
-    container.beId       = None 
-    container.tdFromPS   = False
+    container.filename   = None # ID of the file containing the list of MCSs
+    container.topEventID = None # ID of the Top Event (which is the union of the MCSs)
+    container.timeID     = None # ID of the temporal variable
+    container.mapping    = {}   # mapping between RAVEN variables and BEs contained in the MCSs
+    container.invMapping = {}   # mapping between BEs contained in the MCSss and RAVEN variable
+    
+    # variables required for the TD calculation from PS
+    container.tInitial   = None  # ID of the variable containing the initial time of the BEs
+    container.tEnd       = None  # ID of the variable containing the final time of the BEs
+    container.beId       = None  # ID of the variable containing the IDs of the BEs
+    container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
     for child in xmlNode:
       if child.tag == 'topEventID':
@@ -107,7 +111,6 @@ class MCSSolver(ExternalModelPluginBase):
     if len(inputs) > 2:
       raise IOError("MCSSolver: More than one file has been passed to the MCS solver")
     
-    self.timeDepData = None
     for input in inputs:
       if input.type == 'HistorySet':
         self.timeDepData = input.asDataset()
@@ -116,8 +119,6 @@ class MCSSolver(ExternalModelPluginBase):
         container.tdFromPS = True
       else:
         mcsIDs, probability, mcsList, self.beList = mcsReader(input)
-
-    self.topEventTerms = {}
 
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
@@ -165,7 +166,7 @@ class MCSSolver(ExternalModelPluginBase):
     for key in container.invMapping.keys():
       inputForSolver[key] = inputs[container.invMapping[key]]
       
-    teProbability = self.McsSolver(inputForSolver)
+    teProbability = self.mcsSolver(inputForSolver)
 
     container.__dict__[container.topEventID] = np.asarray(float(teProbability))
 
@@ -187,7 +188,7 @@ class MCSSolver(ExternalModelPluginBase):
           inputForSolver[key] = 1.0
         else:
           inputForSolver[key] = inputs[container.invMapping[key]]
-      teProbability[index] = self.McsSolver(inputForSolver)
+      teProbability[index] = self.mcsSolver(inputForSolver)
       
     if container.tdFromPS:
       for key in container.invMapping.keys():
@@ -196,7 +197,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = teProbability
     
-  def McsSolver(self, inputDict):
+  def mcsSolver(self, inputDict):
     """
       This method determines the status of the TopEvent of the FT provided the status of its Basic Events
       for a time dependent calculation

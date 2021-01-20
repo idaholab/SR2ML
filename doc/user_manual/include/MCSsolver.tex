@@ -48,7 +48,7 @@ An example of RAVEN input file is the following:
   <Models> 
     ...
     <Models>
-      <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+      <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
         <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP</variables>
         <solverOrder>3</solverOrder>
         <topEventID>TOP</topEventID>>
@@ -86,7 +86,7 @@ The format of the dataObject can be:
   
    \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from HistorySet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
      <Models>
-      <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+      <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
         <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP,time</variables>
         <solverOrder>3</solverOrder>
         <topEventID>TOP</topEventID>
@@ -100,7 +100,7 @@ The format of the dataObject can be:
   \end{lstlisting}
   
   \item PointSet: it contains the interval time (initial and final time) under which each basic event is set to 
-                  True (see test\_MCSSolver_TD_fromPS.xml). As an example, the PointSet contains the IDs of the basic events
+                  True (see test\_MCSSolver\_TD\_fromPS.xml). As an example, the PointSet contains the IDs of the basic events
                   in the and the initial and final time as shown below:
                   
    \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption= Example of PointSet for time dependent MCSSolver calculation., label=lst:MCSSolver_InputExample]
@@ -111,11 +111,11 @@ The format of the dataObject can be:
     \end{lstlisting}
     
                   In this case, the MCSSolver requires the specification of the DataObject variables that contain the list of basic events
-                  (\xmlNode{BE_ID} node) and the initial and final time values (\xmlNode{tInitial} and \xmlNode{tEnd} nodes).
+                  (\xmlNode{BE\_ID} node) and the initial and final time values (\xmlNode{tInitial} and \xmlNode{tEnd} nodes).
                   
    \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from PointSet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
     <Models>
-      <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+      <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
         <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
         <solverOrder>3</solverOrder>
         <BE_ID>BE</BE_ID>
@@ -136,8 +136,8 @@ The format of the dataObject can be:
 The following is the provided analytic test:
 \begin{itemize}
   \item test\_MCSSolver.xml
-  \item test\_MCSSolver_TD.xml
-  \item test\_MCSSolver_TD_fromPS.xml
+  \item test\_MCSSolver\_TD.xml
+  \item test\_MCSSolver\_TD\_fromPS.xml
 \end{itemize}
 
 

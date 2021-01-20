@@ -7,10 +7,10 @@
                      + P(BE1)*P(BE2)*P(BE3)*P(BE4)
   -->
   <TestInfo>
-    <name>PRAplugin/MCSSolverTD_PS</name>
+    <name>SR2ML/MCSSolverTD_PS</name>
     <author>mandd</author>
     <created>2021-01-06</created>
-    <classesTested>PRAplugin/MCSSolver</classesTested>
+    <classesTested>SR2ML/MCSSolver</classesTested>
     <description>
       This model is designed to read from file a list of Minimal Cut Sets (MCSs) and 
       to import such Boolean logic structure as a RAVEN model. Provided the sampled 
@@ -34,7 +34,7 @@
   </Files>
 
   <Models>
-    <ExternalModel name="MCSmodel" subType="PRAplugin.MCSSolver">
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
       <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
       <solverOrder>3</solverOrder>
       <BE_ID>BE</BE_ID>
