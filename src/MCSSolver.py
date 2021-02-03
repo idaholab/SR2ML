@@ -41,7 +41,7 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     ExternalModelPluginBase.__init__(self)
-    
+
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
 
@@ -66,7 +66,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.timeID     = None # ID of the temporal variable
     container.mapping    = {}   # mapping between RAVEN variables and BEs contained in the MCSs
     container.invMapping = {}   # mapping between BEs contained in the MCSss and RAVEN variable
-    
+
     # variables required for the TD calculation from PS
     container.tInitial   = None  # ID of the variable containing the initial time of the BEs
     container.tEnd       = None  # ID of the variable containing the final time of the BEs
@@ -77,11 +77,11 @@ class MCSSolver(ExternalModelPluginBase):
       if child.tag == 'topEventID':
         container.topEventID = child.text.strip()
       elif child.tag == 'timeID':
-        container.timeID = child.text.strip()  
+        container.timeID = child.text.strip()
       elif child.tag == 'tInitial':
         container.tInitial = child.text.strip()
       elif child.tag == 'tEnd':
-        container.tEnd = child.text.strip()     
+        container.tEnd = child.text.strip()
       elif child.tag == 'BE_ID':
         container.beId = child.text.strip()
       elif child.tag == 'solverOrder':
@@ -110,7 +110,7 @@ class MCSSolver(ExternalModelPluginBase):
     """
     if len(inputs) > 2:
       raise IOError("MCSSolver: More than one file has been passed to the MCS solver")
-    
+
     for input in inputs:
       if input.type == 'HistorySet':
         self.timeDepData = input.asDataset()
@@ -140,7 +140,7 @@ class MCSSolver(ExternalModelPluginBase):
       self.topEventTerms[order]=basicEventCombined
 
     return kwargs
-  
+
   def run(self, container, inputs):
     """
       This method performs the calculation of the TopEvent of the FT provided the status of its Basic Events.
@@ -165,7 +165,7 @@ class MCSSolver(ExternalModelPluginBase):
     inputForSolver = {}
     for key in container.invMapping.keys():
       inputForSolver[key] = inputs[container.invMapping[key]]
-      
+
     teProbability = self.mcsSolver(inputForSolver)
 
     container.__dict__[container.topEventID] = np.asarray(float(teProbability))
@@ -180,7 +180,7 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     teProbability = np.zeros([self.timeDepData[container.timeID].shape[0]])
-    
+
     for index,t in enumerate(self.timeDepData[container.timeID]):
       inputForSolver = {}
       for key in container.invMapping.keys():
@@ -189,21 +189,21 @@ class MCSSolver(ExternalModelPluginBase):
         else:
           inputForSolver[key] = inputs[container.invMapping[key]]
       teProbability[index] = self.mcsSolver(inputForSolver)
-      
+
     if container.tdFromPS:
       for key in container.invMapping.keys():
         container.__dict__[key] = self.timeDepData[key][0].values
-    
+
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = teProbability
-    
+
   def mcsSolver(self, inputDict):
     """
       This method determines the status of the TopEvent of the FT provided the status of its Basic Events
       for a time dependent calculation
-      @ In, inputs, inputDict, dictionary containing the probability value of all basic events 
+      @ In, inputs, inputDict, dictionary containing the probability value of all basic events
       @ Out, teProbability, float, probability value of the top event
-    """ 
+    """
     teProbability = 0.0
     multiplier = 1.0
 
@@ -215,10 +215,10 @@ class MCSSolver(ExternalModelPluginBase):
         termValues = list(map(inputDict.get,term))
         orderProbability = orderProbability + np.prod(termValues)
       teProbability = teProbability + multiplier * orderProbability
-      multiplier = -1.0 * multiplier   
-      
-    return float(teProbability) 
-  
+      multiplier = -1.0 * multiplier
+
+    return float(teProbability)
+
   def generateHistorySetFromSchedule(self, container, inputDataset):
     """
       This method generate an historySet from the a pointSet which contains initial and final time of the
@@ -226,11 +226,11 @@ class MCSSolver(ExternalModelPluginBase):
       @ In, inputDataset, dict, dictionary of inputs from RAVEN
       @ In, container, object, self-like object where all the variables can be stored
       @ Out, basicEventHistorySet, Dataset, xarray dataset which contains time series for each basic event
-    """         
+    """
     timeArray = np.concatenate([inputDataset[container.tInitial],inputDataset[container.tEnd]])
     timeArraySorted = np.sort(timeArray,axis=0)
     timeArrayCleaned = np.unique(timeArraySorted)
-    
+
     keys = list(container.invMapping.keys())
     dataVars={}
     for key in keys:
@@ -239,11 +239,11 @@ class MCSSolver(ExternalModelPluginBase):
     basicEventHistorySet = xr.Dataset(data_vars = dataVars,
                                       coords    = dict(time=timeArrayCleaned,
                                                        RAVEN_sample_ID=np.zeros(1)))
-  
+
     for index,key in enumerate(inputDataset[container.beId].values):
       tin  = inputDataset[container.tInitial][index].values
       tend = inputDataset[container.tEnd][index].values
       indexes = np.where(np.logical_and(timeArrayCleaned>tin,timeArrayCleaned<=tend))
       basicEventHistorySet[key][0][indexes] = 1.0
-    
+
     return basicEventHistorySet
