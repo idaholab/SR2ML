@@ -10,7 +10,7 @@ SCRIPT_DIR=`(cd $SCRIPT_DIRNAME; pwd)`
 
 set -o errexit
 
-#user manual
+#building user manual
 cd $SCRIPT_DIR/user_manual/
 make
 
