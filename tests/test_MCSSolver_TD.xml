@@ -1,0 +1,103 @@
+<Simulation verbosity="debug">
+  <!--
+  This is a test for the system: TopEvent = BE1 or BE3 or (BE2 or BE4)
+  MCS = BE1, BE3, BE2 BE4
+  Hence: P(TopEvent) = P(BE1) + P(BE3) + P(BE2)*P(BE4) 
+                     - P(BE1)*P(BE3) - P(BE1)*P(BE2)*P(BE4) - P(BE2)*P(BE3)*P(BE4)
+                     + P(BE1)*P(BE2)*P(BE3)*P(BE4)
+  -->
+  <TestInfo>
+    <name>SR2ML/MCSSolverTD</name>
+    <author>mandd</author>
+    <created>2020-12-20</created>
+    <classesTested>SR2ML/MCSSolver</classesTested>
+    <description>
+      This model is designed to read from file a list of Minimal Cut Sets (MCSs) and 
+      to import such Boolean logic structure as a RAVEN model. Provided the sampled 
+      values of Basic Events (BEs) probabilities, the MCSSolver determines the 
+      probability of Top Event (TE), i.e., the union of the MCSs.
+      This test performs such calculation on a historySet which contains the actual
+      status of the basic events. The status is represented as a Boolean variable:
+      0 (Basic event set to False: probability=p(BE)) or 1 (Basic event set to True: 
+      probability=1.0).
+    </description>
+  </TestInfo>
+  
+  <RunInfo>
+    <WorkingDir>MCSSolverTD</WorkingDir>
+    <Sequence>importSchedule,simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile"         type="MCSlist"             >MCSlist.csv</Input>
+    <Input name="maintenanceSchedule" type="maintenanceSchedule" >maintenanceSchedule.csv</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
+      <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP,time</variables>
+      <solverOrder>3</solverOrder>
+      <topEventID>TOP</topEventID>
+      <timeID>time</timeID>
+      <map var='statusBE1'>BE1</map>
+      <map var='statusBE2'>BE2</map>
+      <map var='statusBE3'>BE3</map>
+      <map var='statusBE4'>BE4</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <constant name="statusBE1">0.1</constant>
+      <constant name="statusBE2">0.2</constant>
+      <constant name="statusBE3">0.3</constant>
+      <constant name="statusBE4">0.4</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <IOStep name="importSchedule">
+      <Input   class="Files"       type=""                 >maintenanceSchedule</Input>
+      <Output  class="DataObjects" type="HistorySet"       >maintenanceSchedule_historySet</Output>
+    </IOStep>
+    <MultiRun name="simRun">
+      <Input   class="DataObjects"  type="HistorySet"      >maintenanceSchedule_historySet</Input>
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="HistorySet"      >sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_PS">
+      <type>csv</type>
+      <source>sim_PS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <HistorySet name="maintenanceSchedule_historySet">
+      <Input>var1,var2</Input>
+      <Output>time,BE1,BE2,BE3,BE4</Output>
+    </HistorySet>
+    <PointSet name="inputPlaceHolder">
+      <Input>statusBE1,statusBE2,statusBE3,statusBE4</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <HistorySet name="sim_PS">
+      <Input>statusBE1,statusBE2,statusBE3,statusBE4</Input>
+      <Output>TOP</Output>
+      <options>
+          <pivotParameter>time</pivotParameter>
+      </options>
+    </HistorySet>
+  </DataObjects>
+
+</Simulation>
