@@ -16,7 +16,7 @@ import numpy as np
 
 #Internal Modules---------------------------------------------------------------
 from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from PostProcessors.FTStructure import FTStructure
+from Models.PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 

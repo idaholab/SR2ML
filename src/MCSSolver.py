@@ -25,7 +25,7 @@ import math
 
 #Internal Modules---------------------------------------------------------------
 from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from PostProcessors.MCSimporter import mcsReader
+from Models.PostProcessors.MCSimporter import mcsReader
 #Internal Modules End-----------------------------------------------------------
 
 class MCSSolver(ExternalModelPluginBase):
@@ -141,5 +141,3 @@ class MCSSolver(ExternalModelPluginBase):
       multiplier = -1.0 * multiplier
 
     container.__dict__[container.topEventID] = np.asarray(float(teProbability))
-
-
