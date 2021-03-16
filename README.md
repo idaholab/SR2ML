@@ -15,7 +15,6 @@ dependent system reliability analysis (dynamic analysis). Similarly, these model
 can be interfaced with system analysis codes to determine failure time of systems
 and evaluate accident progression (static analysis).
 
-
 ## Available Safety Risk and Reliability Models
 - Event Tree (ET) Model
 - Fault Tree (FT) Model
@@ -40,7 +39,6 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 [Raw Experiment Open Source Software](https://github.com/IdahoLabResearch)
 
 [Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
-
 
 ### Licensing
 -----
