@@ -1,4 +1,4 @@
-![SR2ML Logo](.doc/logos/SR2ML.png)
+![SR2ML Logo](./doc/logos/SR2ML.png)
 
 # SR2ML: Safety Risk and Reliability Model Library
 
