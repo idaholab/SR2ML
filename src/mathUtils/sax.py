@@ -7,20 +7,17 @@ Created on Mar 17, 2021
 """
 # External Imports
 import numpy as np
-import math
-import copy
 import pandas as pd
 from scipy.stats import norm
-from scipy import stats
 import string
 # Internal Imports
 
-def piecewiseAggregateApproximation(data,w,timeID):
+def piecewiseAggregateApproximation(data,w):
   """
-    This method ...
-    @ In, data, pandas DataFrame, 
-    @ In, w, int, []
-    @ Out, c, pandas DataFrame, 
+    This method performs Piecewise Aggregate Approximation of the given time series
+    @ In, data, pandas DataFrame, time series to be discretized
+    @ In, w, int, number of discretization points
+    @ Out, paa, pandas DataFrame, discretized time series
 
     Reference: J. Lin, E. Keogh, L. Wei, and S. Lonardi 
                Experiencing SAX: a Novel Symbolic Representation of Time Series. 
@@ -49,11 +46,17 @@ def piecewiseAggregateApproximation(data,w,timeID):
       paaData[var] = res / nTimeVals
   
   paa = pd.DataFrame(paaData, index=newDate)
-  print(paa)
+
   return paa
 
 
-def timeSeriesNormalization(data, timeID):
+def timeSeriesNormalization(data):
+  """
+    This method performs the Z-normalization of a given time series
+    @ In, data, pandas DataFrame, time series to be normalized
+    @ Out, data, pandas DataFrame, normalized time series
+    @ Out, normalizationData, dict, dictionary containing mean and std-dev of each dimension of the time series
+  """
   normalizationData = {}
   for var in data:
     normalizationData[var] = [np.mean(data[var].values),np.std(data[var].values)]
@@ -61,7 +64,13 @@ def timeSeriesNormalization(data, timeID):
   return data, normalizationData
 
 
-def ndTS2String(paaTimeSeries, alphabetSizeDict, timeID):  
+def ndTS2String(paaTimeSeries, alphabetSizeDict):  
+  """
+    This method performs the symbolic conversion of a given time series
+    @ In, data, pandas DataFrame, multi-variate time series to be converted into string
+    @ Out, paaTimeSeries, pandas DataFrame, symbolic converted time series
+    @ Out, varCutPoints, dict, dictionary containing cuts data for each dimension
+  """
   varCutPoints = {}
   
   for var in paaTimeSeries:
@@ -71,36 +80,42 @@ def ndTS2String(paaTimeSeries, alphabetSizeDict, timeID):
   return paaTimeSeries, varCutPoints
       
 def ts2String(series, cuts): 
+  """
+    This method performs the symbolic conversion of a single time series
+    @ In, data, pandas DataFrame, univariate time series to be converted into string
+    @ In, cuts, dict, dictionary containing cuts data for the considered time series
+    @ Out, sax, np.array, symbolic converted time series
+  """
   alphabetString = string.ascii_uppercase
   alphabetList = list(alphabetString) 
   
   series = np.array(series)
-  a_size = len(cuts)
-  sax = list()
+  cutSize = len(cuts)
+  sax = np.chararray(series.shape[0]) #list()
 
   for i in range(series.shape[0]):
-      num = series[i]
-      if num >= 0:
-          j = a_size - 1
-          while j > 0 and cuts[j] >= num:
-              j = j - 1
-          sax.append(alphabetList[j])
-      else:
-          j = 1
-          while j < a_size and cuts[j] <= num:
-              j = j + 1
-          sax.append(alphabetList[j-1])
+    num = series[i]
+    if num>=0:
+      j = cutSize - 1
+      while j>0 and cuts[j]>=num:
+        j = j - 1
+      sax[i] = alphabetList[j] #sax.append(alphabetList[j])
+    else:
+      j = 1
+      while j<cutSize and cuts[j]<=num:
+        j = j + 1
+      sax[i] = alphabetList[j-1] #sax.append(alphabetList[j-1])
 
   return sax
 
 
-def SAXtimePoints(data, timeID, alphabetSizeDict, symbolicSeriesLength, normalization=True):
+def SAXtimePoints(data, alphabetSizeDict, symbolicSeriesLength, normalization=True):
   """
-    This method ...
+    This method perform symbolic conversion of time series using the SAX algorithm
     @ In, data, pandas DataFrame, 
-    @ In, alphabetSize, dict, discretization parameters for each dimensions
-    @ In, timeSeriesLength, int,
-    @ Out, symbolicTS, pandas DataFrame, 
+    @ In, alphabetSize, dict, discretization size for each dimensions
+    @ In, timeSeriesLength, int, discretization of the time axis
+    @ Out, symbolicTS, pandas DataFrame, symbolic conversion of provided time series
 
     Reference: Lin, J., Keogh, E., Wei, L. and Lonardi, S. (2007). 
                Experiencing SAX: a Novel Symbolic Representation of Time Series. 
@@ -111,18 +126,14 @@ def SAXtimePoints(data, timeID, alphabetSizeDict, symbolicSeriesLength, normaliz
   
   # Normalize data
   if normalization:  
-    normalizedData, normalizationData = timeSeriesNormalization(data, timeID)
+    normalizedData, normalizationData = timeSeriesNormalization(data)
   
   # PAA process
-  paaData = piecewiseAggregateApproximation(normalizedData,symbolicSeriesLength,timeID)
+  paaData = piecewiseAggregateApproximation(normalizedData,symbolicSeriesLength)
   
-  symbolicData,varCutPoints = ndTS2String(paaData, alphabetSizeDict, timeID)
+  symbolicData,varCutPoints = ndTS2String(paaData, alphabetSizeDict)
   
   return symbolicData,varCutPoints,normalizationData
-  
-    
-def SAXtimeInterval(data, alphabetSize, timeSeriesLength):
-  pass 
 
 
 ''' testing '''
@@ -139,8 +150,8 @@ df = df.cumsum()
 df.plot()
 
 alphabetSizeDict={}
-alphabetSizeDict['var1']=6
-sax,cuts,normData = SAXtimePoints(df, 'date', alphabetSizeDict, 20, normalization=True)
+alphabetSizeDict['var1']=10
+sax,cuts,normData = SAXtimePoints(df, alphabetSizeDict, 20, normalization=True)
 print(sax)
 
 for val in cuts['var1']:
