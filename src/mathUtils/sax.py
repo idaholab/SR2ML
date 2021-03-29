@@ -91,7 +91,7 @@ def ts2String(series, cuts):
   
   series = np.array(series)
   cutSize = len(cuts)
-  sax = np.chararray(series.shape[0]) #list()
+  sax = np.chararray(series.shape[0]) 
 
   for i in range(series.shape[0]):
     num = series[i]
@@ -99,12 +99,12 @@ def ts2String(series, cuts):
       j = cutSize - 1
       while j>0 and cuts[j]>=num:
         j = j - 1
-      sax[i] = alphabetList[j] #sax.append(alphabetList[j])
+      sax[i] = alphabetList[j] 
     else:
       j = 1
       while j<cutSize and cuts[j]<=num:
         j = j + 1
-      sax[i] = alphabetList[j-1] #sax.append(alphabetList[j-1])
+      sax[i] = alphabetList[j-1] 
 
   return sax
 
