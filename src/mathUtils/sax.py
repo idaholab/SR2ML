@@ -82,31 +82,23 @@ def ndTS2String(paaTimeSeries, alphabetSizeDict):
 def ts2String(series, cuts): 
   """
     This method performs the symbolic conversion of a single time series
-    @ In, data, pandas DataFrame, univariate time series to be converted into string
+    @ In, data, pandas DataFrame, uni-variate time series to be converted into string
     @ In, cuts, dict, dictionary containing cuts data for the considered time series
-    @ Out, sax, np.array, symbolic converted time series
+    @ Out, charArray, np.array, symbolic converted time series
   """
   alphabetString = string.ascii_uppercase
   alphabetList = list(alphabetString) 
-  
+
   series = np.array(series)
-  cutSize = len(cuts)
-  sax = np.chararray(series.shape[0]) 
-
+  charArray = np.chararray(series.shape[0],unicode=True) 
+  
   for i in range(series.shape[0]):
-    num = series[i]
-    if num>=0:
-      j = cutSize - 1
-      while j>0 and cuts[j]>=num:
-        j = j - 1
-      sax[i] = alphabetList[j] 
-    else:
-      j = 1
-      while j<cutSize and cuts[j]<=num:
-        j = j + 1
-      sax[i] = alphabetList[j-1] 
+    j=0
+    while cuts[j]<series[i]:
+      j=j+1
+    charArray[i] = alphabetList[j-1]
 
-  return sax
+  return charArray
 
 
 def SAXtimePoints(data, alphabetSizeDict, symbolicSeriesLength, normalization=True):
@@ -123,7 +115,6 @@ def SAXtimePoints(data, alphabetSizeDict, symbolicSeriesLength, normalization=Tr
     
     Link: https://www.cs.ucr.edu/~eamonn/SAX.htm
   """
-  
   # Normalize data
   if normalization:  
     normalizedData, normalizationData = timeSeriesNormalization(data)
@@ -137,7 +128,6 @@ def SAXtimePoints(data, alphabetSizeDict, symbolicSeriesLength, normalization=Tr
 
 
 ''' testing '''
-from datetime import datetime
 import matplotlib.pyplot as plt
 
 data = {}
@@ -157,9 +147,9 @@ print(sax)
 for val in cuts['var1']:
   if val not in ['-inf','inf']:
     val = val*normData['var1'][1]+normData['var1'][0]
-    plt.axhline(y=val,color='red')
+    plt.axhline(y=val,color='red', linewidth=0.2)
 for timeVal in sax.index.to_numpy():
-  plt.axvline(x=timeVal,color='red')
+  plt.axvline(x=timeVal,color='red', linewidth=0.2)
 
 print(cuts)
 plt.show()
