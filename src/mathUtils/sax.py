@@ -40,7 +40,6 @@ class SAX():
       @ In, normalization, bool, parameter that set if time series normalization is required (True) or not (False)
       @ Out, symbolicTS, pandas DataFrame, symbolic conversion of provided time series
       @ Out, varCutPoints, dict, dictionary containing the discretization points for each dimension
-      @ Out, symbolicTS, normalizationData, dictionary containing the parameters used to performe normalization of each dimension
     """
     # Normalize data
     if normalization:  
@@ -51,7 +50,10 @@ class SAX():
     
     symbolicData,varCutPoints = self.ndTS2String(paaData)
     
-    return symbolicData, varCutPoints, normalizationData
+    for var in varCutPoints:
+      varCutPoints[var] = varCutPoints[var]*normalizationData[var][1]+normalizationData[var][0]
+  
+    return symbolicData, varCutPoints
     
 
   def piecewiseAggregateApproximation(self, data):
@@ -152,14 +154,13 @@ df = df.cumsum()
 df.plot()
 
 alphabetSizeDict={}
-alphabetSizeDict['var1']=10
+alphabetSizeDict['var1']=5
 saxConverter = SAX(20,alphabetSizeDict)
-sax,cuts,normData = saxConverter.fit(df, normalization=True)
+sax,cuts = saxConverter.fit(df, normalization=True)
 print(sax)
 
 for val in cuts['var1']:
   if val not in ['-inf','inf']:
-    val = val*normData['var1'][1]+normData['var1'][0]
     plt.axhline(y=val,color='red', linewidth=0.2)
 for timeVal in sax.index.to_numpy():
   plt.axvline(x=timeVal,color='red', linewidth=0.2)
