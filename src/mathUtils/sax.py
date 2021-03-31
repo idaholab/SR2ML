@@ -28,7 +28,6 @@ class SAX():
       This method initializes the SAX class
       @ In, alphabetSizeDict, dict, discretization size for each dimensions
       @ In, timeWindows, int, discretization of the time axis
-      @ Out, symbolicTS, pandas DataFrame, symbolic conversion of provided time series
     """
     self.timeWindows = timeWindows
     self.alphabetSizeDict = alphabetSizeDict
@@ -36,7 +35,7 @@ class SAX():
   def fit(self, data, normalization=True):
     """
       This method performs symbolic conversion of time series using the SAX algorithm
-      @ In, data, pandas DataFrame, 
+      @ In, data, pandas DataFrame, time series that needs to be converted
       @ In, normalization, bool, parameter that set if time series normalization is required (True) or not (False)
       @ Out, symbolicTS, pandas DataFrame, symbolic conversion of provided time series
       @ Out, varCutPoints, dict, dictionary containing the discretization points for each dimension
