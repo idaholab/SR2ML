@@ -1,3 +1,5 @@
+![SR2ML Logo](./doc/logos/SR2ML.png)
+
 # SR2ML: Safety Risk and Reliability Model Library
 
 SR2ML is a software package which contains a set of safety and reliability models
@@ -12,7 +14,6 @@ two classes are designed to be included in a RAVEN ensemble model to perform tim
 dependent system reliability analysis (dynamic analysis). Similarly, these models
 can be interfaced with system analysis codes to determine failure time of systems
 and evaluate accident progression (static analysis).
-
 
 ## Available Safety Risk and Reliability Models
 - Event Tree (ET) Model
@@ -38,7 +39,6 @@ Idaho National Laboratory is a cutting edge research facility which is a constan
 [Raw Experiment Open Source Software](https://github.com/IdahoLabResearch)
 
 [Unsupported Open Source Software](https://github.com/IdahoLabCuttingBoard)
-
 
 ### Licensing
 -----
