@@ -1,0 +1,6 @@
+<dependencies>
+  <main>
+    <spacy source="forge" />
+    <nltk source="forge" />
+  </main>
+</dependencies>
