@@ -42,6 +42,7 @@ class MCSSolver(ExternalModelPluginBase):
     """
     ExternalModelPluginBase.__init__(self)
     
+    self.solver = {}
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
 
@@ -84,11 +85,16 @@ class MCSSolver(ExternalModelPluginBase):
         container.tEnd = child.text.strip()     
       elif child.tag == 'BE_ID':
         container.beId = child.text.strip()
-      elif child.tag == 'solverOrder':
-        try:
-          self.solverOrder = int(child.text.strip())
-        except:
-          raise IOError("MCSSolver: xml node solverOrder must contain an integer value")
+      elif child.tag == 'solver':
+        self.solver['type'] = child.get('type')
+        for childChild in child:
+          if childChild.tag == 'solverOrder':
+            try:
+              self.solver['solverOrder'] = int(childChild.text.strip())
+            except:
+              raise IOError("MCSSolver: xml node solverOrder must contain an integer value")
+          elif childChild.tag == 'metric':
+            self.solver['metric'] = int(childChild.text.strip())        
       elif child.tag == 'variables':
         variables = [str(var.strip()) for var in child.text.split(",")]
       elif child.tag == 'map':
@@ -128,7 +134,7 @@ class MCSSolver(ExternalModelPluginBase):
     #                      - ABCD - ABCE - ACDE
     #                      + ABCDE
 
-    for order in range(1,self.solverOrder+1):
+    for order in range(1,self.solver['solverOrder']+1):
       self.topEventTerms[order]=[]
       terms = list(itertools.combinations(mcsList,order))
       # terms is a list of tuples
@@ -208,7 +214,7 @@ class MCSSolver(ExternalModelPluginBase):
     multiplier = 1.0
 
     # perform probability calculation for each order level
-    for order in range(1,self.solverOrder+1):
+    for order in range(1,self.solver['solverOrder']+1):
       orderProbability=0
       for term in self.topEventTerms[order]:
         # map the sampled values of the basic event probabilities to the MCS basic events ID
