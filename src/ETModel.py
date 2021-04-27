@@ -15,7 +15,7 @@ warnings.simplefilter('default', DeprecationWarning)
 
 #Internal Modules---------------------------------------------------------------
 from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from PostProcessors.ETStructure import ETStructure
+from Models.PostProcessors.ETStructure import ETStructure
 #Internal Modules End-----------------------------------------------------------
 
 

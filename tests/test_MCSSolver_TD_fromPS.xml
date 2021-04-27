@@ -36,7 +36,9 @@
   <Models>
     <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
       <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
-      <solverOrder>3</solverOrder>
+      <solver type='probability'> 
+        <solverOrder>3</solverOrder>
+      </solver> 
       <BE_ID>BE</BE_ID>
       <tInitial>tIn</tInitial>
       <tEnd>tEnd</tEnd>
