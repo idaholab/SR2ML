@@ -172,7 +172,7 @@ class MCSSolver(ExternalModelPluginBase):
     for key in container.invMapping.keys():
       inputForSolver[key] = inputs[container.invMapping[key]]
       
-    teProbability = self.mcsSolver(inputForSolver)
+    teProbability = self.mcsSolverProbability(inputForSolver)
 
     container.__dict__[container.topEventID] = np.asarray(float(teProbability))
 
@@ -194,7 +194,7 @@ class MCSSolver(ExternalModelPluginBase):
           inputForSolver[key] = 1.0
         else:
           inputForSolver[key] = inputs[container.invMapping[key]]
-      teProbability[index] = self.mcsSolver(inputForSolver)
+      teProbability[index] = self.mcsSolverProbability(inputForSolver)
       
     if container.tdFromPS:
       for key in container.invMapping.keys():
@@ -203,7 +203,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = teProbability
     
-  def mcsSolver(self, inputDict):
+  def mcsSolverProbability(self, inputDict):
     """
       This method determines the status of the TopEvent of the FT provided the status of its Basic Events
       for a time dependent calculation
