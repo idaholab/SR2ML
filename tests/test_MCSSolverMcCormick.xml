@@ -37,8 +37,10 @@
   <Models>
     <ExternalModel name="MCSmodel1" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solverOrder>1</solverOrder>
-      <topEventID>TOP</topEventID>>
+      <solver type='probability'> 
+        <solverOrder>1</solverOrder>
+      </solver> 
+      <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
       <map var='statusC'>C</map>
@@ -47,8 +49,10 @@
     </ExternalModel>
     <ExternalModel name="MCSmodel2" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solverOrder>2</solverOrder>
-      <topEventID>TOP</topEventID>>
+      <solver type='probability'> 
+        <solverOrder>2</solverOrder>
+      </solver> 
+      <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
       <map var='statusC'>C</map>
@@ -57,8 +61,10 @@
     </ExternalModel>
     <ExternalModel name="MCSmodel3" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solverOrder>3</solverOrder>
-      <topEventID>TOP</topEventID>>
+      <solver type='probability'> 
+        <solverOrder>3</solverOrder>
+      </solver> 
+      <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
       <map var='statusC'>C</map>
@@ -67,8 +73,10 @@
     </ExternalModel>
     <ExternalModel name="MCSmodel4" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solverOrder>4</solverOrder>
-      <topEventID>TOP</topEventID>>
+      <solver type='probability'> 
+        <solverOrder>4</solverOrder>
+      </solver> 
+      <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
       <map var='statusC'>C</map>
@@ -77,8 +85,10 @@
     </ExternalModel>
     <ExternalModel name="MCSmodel5" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solverOrder>5</solverOrder>
-      <topEventID>TOP</topEventID>>
+      <solver type='probability'> 
+        <solverOrder>5</solverOrder>
+      </solver> 
+      <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
       <map var='statusC'>C</map>

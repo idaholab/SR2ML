@@ -41,9 +41,10 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     ExternalModelPluginBase.__init__(self)
-
+    self.solver = {}
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
+    self.mcsList = None        # List containing all the MCSs; each MCS is a list of basic events
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -73,6 +74,8 @@ class MCSSolver(ExternalModelPluginBase):
     container.beId       = None  # ID of the variable containing the IDs of the BEs
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
+    metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
+
     for child in xmlNode:
       if child.tag == 'topEventID':
         container.topEventID = child.text.strip()
@@ -84,11 +87,19 @@ class MCSSolver(ExternalModelPluginBase):
         container.tEnd = child.text.strip()
       elif child.tag == 'BE_ID':
         container.beId = child.text.strip()
-      elif child.tag == 'solverOrder':
-        try:
-          self.solverOrder = int(child.text.strip())
-        except:
-          raise IOError("MCSSolver: xml node solverOrder must contain an integer value")
+      elif child.tag == 'solver':
+        self.solver['type'] = child.get('type')
+        for childChild in child:
+          if childChild.tag == 'solverOrder':
+            try:
+              self.solver['solverOrder'] = int(childChild.text.strip())
+            except:
+              raise IOError("MCSSolver: xml node solverOrder must contain an integer value")
+          elif childChild.tag == 'metric':
+            metricValue = childChild.text.strip()
+            if metricValue not in metricOrder.keys():
+              raise IOError("MCSSolver: value in xml node metric is not allowed (0,1,2,inf)")
+            self.solver['metric'] = metricOrder[metricValue]
       elif child.tag == 'variables':
         variables = [str(var.strip()) for var in child.text.split(",")]
       elif child.tag == 'map':
@@ -118,7 +129,7 @@ class MCSSolver(ExternalModelPluginBase):
         self.timeDepData = self.generateHistorySetFromSchedule(container,input.asDataset())
         container.tdFromPS = True
       else:
-        mcsIDs, probability, mcsList, self.beList = mcsReader(input)
+        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input)
 
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
@@ -128,16 +139,17 @@ class MCSSolver(ExternalModelPluginBase):
     #                      - ABCD - ABCE - ACDE
     #                      + ABCDE
 
-    for order in range(1,self.solverOrder+1):
-      self.topEventTerms[order]=[]
-      terms = list(itertools.combinations(mcsList,order))
-      # terms is a list of tuples
-      # E.g., for order=2: [ (['A', 'B', 'C'], ['D', 'C']),
-      #                      (['A', 'B', 'C'], ['A', 'E']),
-      #                      (['D', 'C'], ['A', 'E']) ]
+    if self.solver['type'] == 'probability':
+      for order in range(1,self.solver['solverOrder']+1):
+        self.topEventTerms[order]=[]
+        terms = list(itertools.combinations(self.mcsList,order))
+        # terms is a list of tuples
+        # E.g., for order=2: [ (['A', 'B', 'C'], ['D', 'C']),
+        #                      (['A', 'B', 'C'], ['A', 'E']),
+        #                      (['D', 'C'], ['A', 'E']) ]
 
-      basicEventCombined = list(set(itertools.chain.from_iterable(term)) for term in terms)
-      self.topEventTerms[order]=basicEventCombined
+        basicEventCombined = list(set(itertools.chain.from_iterable(term)) for term in terms)
+        self.topEventTerms[order]=basicEventCombined
 
     return kwargs
 
@@ -156,8 +168,8 @@ class MCSSolver(ExternalModelPluginBase):
 
   def runStatic(self, container, inputs):
     """
-      This method determines the status of the TopEvent of the FT provided the status of its Basic Events
-      for a static calculation
+      This method determines the probability or margin of the TopEvent of the FT provided the
+      status of its Basic Events for a static calculation
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputs, dict, dictionary of inputs from RAVEN
       @ Out, None
@@ -166,20 +178,23 @@ class MCSSolver(ExternalModelPluginBase):
     for key in container.invMapping.keys():
       inputForSolver[key] = inputs[container.invMapping[key]]
 
-    teProbability = self.mcsSolver(inputForSolver)
+    if self.solver['type'] == 'probability':
+      topEventValue = self.mcsSolverProbability(inputForSolver)
+    else:
+      topEventValue = self.mcsSolverMargin(inputForSolver)
 
-    container.__dict__[container.topEventID] = np.asarray(float(teProbability))
+    container.__dict__[container.topEventID] = np.asarray(float(topEventValue))
 
 
   def runDynamic(self, container, inputs):
     """
-      This method determines the status of the TopEvent of the FT provided the status of its Basic Events
-      for a time dependent calculation
+      This method determines the probability or margin of the TopEvent of the FT provided the
+      status of its Basic Events for a time dependent calculation
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputs, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
-    teProbability = np.zeros([self.timeDepData[container.timeID].shape[0]])
+    topEventValue = np.zeros([self.timeDepData[container.timeID].shape[0]])
 
     for index,t in enumerate(self.timeDepData[container.timeID]):
       inputForSolver = {}
@@ -188,27 +203,31 @@ class MCSSolver(ExternalModelPluginBase):
           inputForSolver[key] = 1.0
         else:
           inputForSolver[key] = inputs[container.invMapping[key]]
-      teProbability[index] = self.mcsSolver(inputForSolver)
+
+      if self.solver['type'] == 'probability':
+        topEventValue[index] = self.mcsSolverProbability(inputForSolver)
+      else:
+        topEventValue[index] = self.mcsSolverMargin(inputForSolver)
 
     if container.tdFromPS:
       for key in container.invMapping.keys():
         container.__dict__[key] = self.timeDepData[key][0].values
 
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
-    container.__dict__[container.topEventID] = teProbability
+    container.__dict__[container.topEventID] = topEventValue
 
-  def mcsSolver(self, inputDict):
+
+  def mcsSolverProbability(self, inputDict):
     """
-      This method determines the status of the TopEvent of the FT provided the status of its Basic Events
-      for a time dependent calculation
-      @ In, inputs, inputDict, dictionary containing the probability value of all basic events
+      This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
+      @ In, inputs, inputDict, dictionary containing the probability  value of all basic events
       @ Out, teProbability, float, probability value of the top event
     """
     teProbability = 0.0
     multiplier = 1.0
 
     # perform probability calculation for each order level
-    for order in range(1,self.solverOrder+1):
+    for order in range(1,self.solver['solverOrder']+1):
       orderProbability=0
       for term in self.topEventTerms[order]:
         # map the sampled values of the basic event probabilities to the MCS basic events ID
@@ -218,6 +237,23 @@ class MCSSolver(ExternalModelPluginBase):
       multiplier = -1.0 * multiplier
 
     return float(teProbability)
+
+  def mcsSolverMargin(self, inputDict):
+    """
+      This method determines the margin of the TopEvent of the FT provided the margin of its Basic Events
+      for a time dependent calculation
+      @ In, inputs, inputDict, dictionary containing the margin value of all basic events
+      @ Out, teMargin, float, margin value of the top event
+    """
+    mcsMargins = np.zeros(len(self.mcsList))
+
+    for index,mcs in enumerate(self.mcsList):
+      termValues = list(map(inputDict.get,mcs))
+      mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
+
+    teMargin = np.amin(mcsMargins)
+
+    return teMargin
 
   def generateHistorySetFromSchedule(self, container, inputDataset):
     """

@@ -37,7 +37,9 @@
   <Models>
     <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
       <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP,time</variables>
-      <solverOrder>3</solverOrder>
+      <solver type='probability'> 
+        <solverOrder>3</solverOrder>
+      </solver> 
       <topEventID>TOP</topEventID>
       <timeID>time</timeID>
       <map var='statusBE1'>BE1</map>

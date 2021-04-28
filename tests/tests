@@ -101,4 +101,10 @@
   input = 'test_MCSSolver_TD_fromPS.xml'
   UnorderedCsv   = 'MCSSolverTDfromPS/Print_sim_HS_0.csv'
  [../]
+ 
+ [./TestMCSSolver_margin]
+  type  = 'RavenFramework'
+  input = 'test_MCSSolver_margin.xml'
+  UnorderedCsv   = 'MCSSolverMargin/Print_sim_PS.csv'
+ [../]
 []
