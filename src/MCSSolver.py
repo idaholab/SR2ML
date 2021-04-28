@@ -73,7 +73,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.tEnd       = None  # ID of the variable containing the final time of the BEs
     container.beId       = None  # ID of the variable containing the IDs of the BEs
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
-    
+
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
 
     for child in xmlNode:
@@ -99,7 +99,7 @@ class MCSSolver(ExternalModelPluginBase):
             metricValue = childChild.text.strip()
             if metricValue not in metricOrder.keys():
               raise IOError("MCSSolver: value in xml node metric is not allowed (0,1,2,inf)")
-            self.solver['metric'] = metricOrder[metricValue]     
+            self.solver['metric'] = metricOrder[metricValue]
       elif child.tag == 'variables':
         variables = [str(var.strip()) for var in child.text.split(",")]
       elif child.tag == 'map':
@@ -138,7 +138,7 @@ class MCSSolver(ExternalModelPluginBase):
     # Top event should be:   ABC + CD + AE +
     #                      - ABCD - ABCE - ACDE
     #                      + ABCDE
-    
+
     if self.solver['type'] == 'probability':
       for order in range(1,self.solver['solverOrder']+1):
         self.topEventTerms[order]=[]
@@ -147,7 +147,7 @@ class MCSSolver(ExternalModelPluginBase):
         # E.g., for order=2: [ (['A', 'B', 'C'], ['D', 'C']),
         #                      (['A', 'B', 'C'], ['A', 'E']),
         #                      (['D', 'C'], ['A', 'E']) ]
-  
+
         basicEventCombined = list(set(itertools.chain.from_iterable(term)) for term in terms)
         self.topEventTerms[order]=basicEventCombined
 
@@ -168,7 +168,7 @@ class MCSSolver(ExternalModelPluginBase):
 
   def runStatic(self, container, inputs):
     """
-      This method determines the probability or margin of the TopEvent of the FT provided the 
+      This method determines the probability or margin of the TopEvent of the FT provided the
       status of its Basic Events for a static calculation
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputs, dict, dictionary of inputs from RAVEN
@@ -177,8 +177,8 @@ class MCSSolver(ExternalModelPluginBase):
     inputForSolver = {}
     for key in container.invMapping.keys():
       inputForSolver[key] = inputs[container.invMapping[key]]
-    
-    if self.solver['type'] == 'probability':  
+
+    if self.solver['type'] == 'probability':
       topEventValue = self.mcsSolverProbability(inputForSolver)
     else:
       topEventValue = self.mcsSolverMargin(inputForSolver)
@@ -188,7 +188,7 @@ class MCSSolver(ExternalModelPluginBase):
 
   def runDynamic(self, container, inputs):
     """
-      This method determines the probability or margin of the TopEvent of the FT provided the 
+      This method determines the probability or margin of the TopEvent of the FT provided the
       status of its Basic Events for a time dependent calculation
       @ In, container, object, self-like object where all the variables can be stored
       @ In, inputs, dict, dictionary of inputs from RAVEN
@@ -203,8 +203,8 @@ class MCSSolver(ExternalModelPluginBase):
           inputForSolver[key] = 1.0
         else:
           inputForSolver[key] = inputs[container.invMapping[key]]
-      
-      if self.solver['type'] == 'probability':  
+
+      if self.solver['type'] == 'probability':
         topEventValue[index] = self.mcsSolverProbability(inputForSolver)
       else:
         topEventValue[index] = self.mcsSolverMargin(inputForSolver)
@@ -216,7 +216,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = topEventValue
 
-    
+
   def mcsSolverProbability(self, inputDict):
     """
       This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
@@ -237,7 +237,7 @@ class MCSSolver(ExternalModelPluginBase):
       multiplier = -1.0 * multiplier
 
     return float(teProbability)
-  
+
   def mcsSolverMargin(self, inputDict):
     """
       This method determines the margin of the TopEvent of the FT provided the margin of its Basic Events
@@ -246,13 +246,13 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, teMargin, float, margin value of the top event
     """
     mcsMargins = np.zeros(len(self.mcsList))
-    
+
     for index,mcs in enumerate(self.mcsList):
       termValues = list(map(inputDict.get,mcs))
-      mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])  
-    
+      mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
+
     teMargin = np.amin(mcsMargins)
-    
+
     return teMargin
 
   def generateHistorySetFromSchedule(self, container, inputDataset):
