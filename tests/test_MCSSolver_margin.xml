@@ -1,21 +1,33 @@
 <Simulation verbosity="debug">
   <!--
-  This is a test for the system: TopEvent = BE1 or BE3 or (BE2 or BE4)
-  MCS = BE1, BE3, BE2 BE4
-  Hence: P(TopEvent) = P(BE1) + P(BE3) + P(BE2)*P(BE4)
-                     - P(BE1)*P(BE3) - P(BE1)*P(BE2)*P(BE4) - P(BE2)*P(BE3)*P(BE4)
-                     + P(BE1)*P(BE2)*P(BE3)*P(BE4)
+  This is a test for the system: TopEvent = A or B D or B E or C D or CE
+  Basic event margin values: A=0.35
+                             B=0.2
+                             C=0.1
+                             D=0.3
+                             E=0.4 
+  Hence: Margin of top event is: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
+  where:
+                MCS   Margin
+               -----------------
+                A    0.35
+                BD   0.360555128
+                BE   0.447213595
+                CD   0.316227766
+                CE   0.412310563
+  Hence:
+         M(TopEvent) = 0.316227766
   -->
   <TestInfo>
     <name>SR2ML/tests.MCSSolver</name>
     <author>mandd</author>
-    <created>2020-06-25</created>
+    <created>2021-04-27</created>
     <classesTested>SR2ML.MCSSolver</classesTested>
     <description>
       This model is designed to read from file a list of Minimal Cut Sets (MCSs) and
       to import such Boolean logic structure as a RAVEN model. Provided the sampled
-      values of Basic Events (BEs) probabilities, the MCSSolver determines the
-      probability of Top Event (TE), i.e., the union of the MCSs.
+      values of Basic Events (BEs) margin values, the MCSSolver determines the
+      margin of Top Event (TE) using the euclidean metrics 
     </description>
   </TestInfo>
 
