@@ -6,7 +6,7 @@
                              C=0.1
                              D=0.3
                              E=0.4 
-  Hence: Margin of top event is: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
+  Margin of top event is calculated as: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
   where:
                 MCS   Margin
                -----------------
@@ -15,8 +15,8 @@
                 BE   0.447213595
                 CD   0.316227766
                 CE   0.412310563
-  Hence:
-         M(TopEvent) = 0.316227766
+  
+  Given these values, M(TopEvent) = 0.316227766
   -->
   <TestInfo>
     <name>SR2ML/tests.MCSSolver</name>
