@@ -18,7 +18,7 @@ from SR2ML.src import MaintenanceModels
 from utils import mathUtils as utils
 from utils import InputData
 from utils import InputTypes
-from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 ## option to use logging
