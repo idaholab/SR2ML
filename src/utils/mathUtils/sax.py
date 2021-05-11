@@ -158,7 +158,7 @@ alphabetSizeDict={}
 alphabetSizeDict['var1']=5
 saxConverter = SAX(20,alphabetSizeDict)
 sax,cuts = saxConverter.fit(df, normalization=True)
-print(sax)
+print(sax['var1'].values)
 
 for val in cuts['var1']:
   if val not in ['-inf','inf']:
