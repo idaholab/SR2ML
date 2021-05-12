@@ -5,10 +5,6 @@ Created on Jan. 30 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
-
 #External Modules------------------------------------------------------------------------------------
 import abc
 import sys
@@ -21,7 +17,7 @@ from SR2ML.src import Reliabilities
 from utils import mathUtils as utils
 from utils import InputData
 from utils import InputTypes
-from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 ## option to use logging

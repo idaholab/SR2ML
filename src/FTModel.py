@@ -6,16 +6,12 @@ Created on April 30, 2018
 @author: mandd
 """
 
-from __future__ import division, print_function , unicode_literals, absolute_import
-import warnings
-warnings.simplefilter('default', DeprecationWarning)
-
 #External Modules---------------------------------------------------------------
 import numpy as np
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 from Models.PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
