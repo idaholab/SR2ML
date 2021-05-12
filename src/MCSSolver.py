@@ -26,7 +26,7 @@ import copy
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 from Models.PostProcessors.MCSimporter import mcsReader
 #Internal Modules End-----------------------------------------------------------
 
@@ -247,4 +247,3 @@ class MCSSolver(ExternalModelPluginBase):
       basicEventHistorySet[key][0][indexes] = 1.0
 
     return basicEventHistorySet
-
