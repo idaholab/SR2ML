@@ -5,17 +5,17 @@
                              B=0.2
                              C=0.1
                              D=0.3
-                             E=0.4 
+                             E=0.4
   Margin of top event is calculated as: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
   where:
                 MCS   Margin
-               -----------------
+               *****************
                 A    0.35
                 BD   0.360555128
                 BE   0.447213595
                 CD   0.316227766
                 CE   0.412310563
-  
+
   Given these values, M(TopEvent) = 0.316227766
   -->
   <TestInfo>
@@ -27,7 +27,7 @@
       This model is designed to read from file a list of Minimal Cut Sets (MCSs) and
       to import such Boolean logic structure as a RAVEN model. Provided the sampled
       values of Basic Events (BEs) margin values, the MCSSolver determines the
-      margin of Top Event (TE) using the euclidean metrics 
+      margin of Top Event (TE) using the euclidean metrics
     </description>
   </TestInfo>
 
@@ -44,9 +44,9 @@
   <Models>
     <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
-      <solver type='margin'> 
+      <solver type='margin'>
         <metric>2</metric>
-      </solver> 
+      </solver>
       <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
       <map var='statusB'>B</map>
