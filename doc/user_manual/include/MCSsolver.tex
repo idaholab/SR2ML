@@ -2,7 +2,8 @@
 \label{sec:MCSSolver}
 
 This model is designed to read from file a list of Minimal Cut Sets (MCSs) and to import such Boolean logic structure as a RAVEN model.
-Provided the sampled values of Basic Events (BEs) probabilities, the MCSSolver determines the probability of Top Event (TE), i.e., the union of the MCSs.
+Provided the sampled Basic Events (BEs) margin or probability values, the MCSSolver determines the margin or the probability 
+of Top Event (TE).
 The list of MCS must be provided through a CSV file with the following format:
 
 \begin{table}
@@ -23,7 +24,6 @@ In this example:
 \begin{itemize}
   \item three MCSs are defined: MCS1 = BE1, MCS2 = BE3 and MCS3 = BE2 and BE4 
   \item four BEs are defined: BE1, BE2, BE3 and BE4
-  \item probability of TE, i.e. P(TE), is equal to: $P(TE) = P(MCS1 \cup MCS2 \cup MCS3)$
 \end{itemize}
 
 Note that the MCSSolver considers only the list of MCSs and it discards the rest of data contained in the csv file.
@@ -32,9 +32,17 @@ All the specifications of the MCSSolver model are given in the \xmlNode{External
 Inside the \xmlNode{ExternalModel} block, the XML nodes that belong to this models are:
 \begin{itemize}
   \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
-  \item  \xmlNode{solverOrder},\xmlDesc{integer, required parameter}, solver order for $P(TE)$: it specifies the maximum calculation envelope 
-                                                                      for $P(TE)$, i.e., the maximum number of MCSs to be considered when evaluating the 
-                                                                      probability of their union
+  \item  \xmlNode{solver}
+	  \begin{itemize}
+	    \item \xmlAttr{type}, \xmlDesc{required string attribute}, type of calculation to be performed: probability or margin
+	  
+        \item \xmlNode{solverOrder},\xmlDesc{integer, required parameter}, solver order of $P(TE)$ for probability calculations: it specifies the 
+                                                                           maximum calculation envelope for $P(TE)$, i.e., the maximum number of MCSs 
+                                                                           to be considered when evaluating the probability of their union
+         \item \xmlNode{metric},\xmlDesc{string, required parameter}, metric used for margin calculations of the top event of $M(TE)$; it specifies the
+                                                                      desired distance metric in terms of p values for the $L_p$ norm (allowed values 
+                                                                      are: 0, 1, 2, inf).
+      \end{itemize}
   \item  \xmlNode{topEventID},\xmlDesc{string, required parameter}, the name of the alias variable for the Top Event
   \item  \xmlNode{map},\xmlDesc{string, required parameter}, the name ID of the ET branching variable
 	  \begin{itemize}
@@ -50,7 +58,9 @@ An example of RAVEN input file is the following:
     <Models>
       <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
         <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP</variables>
-        <solverOrder>3</solverOrder>
+        <solver type='probability'> 
+          <solverOrder>3</solverOrder>
+        </solver> 
         <topEventID>TOP</topEventID>>
         <map var='pBE1'>BE1</map>
         <map var='pBE2'>BE2</map>
