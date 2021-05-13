@@ -9,7 +9,7 @@
       the FT structure into a PointSet. Note that the FT needs to be in an OpenPSA format.
     </description>
   </TestInfo>
-  
+
   <RunInfo>
     <WorkingDir>FTimporter_multipleFTs</WorkingDir>
     <Sequence>import,printOnFile</Sequence>
@@ -21,12 +21,12 @@
     <Input name="trans_one" type="">trans_one.xml</Input>
     <Input name="trans_two" type="">trans_two.xml</Input>
   </Files>
-  
+
   <Models>
-    <PostProcessor name="FTimporter" subType="FTImporter">
+    <PostProcessor name="FTimporter" subType="SR2ML.FTImporter">
       <fileFormat>OpenPSA</fileFormat>
       <topEventID>TransOne</topEventID>
-    </PostProcessor>   
+    </PostProcessor>
   </Models>
 
   <Steps>
@@ -49,12 +49,12 @@
       <source>FT_PS</source>
     </Print>
   </OutStreams>
-  
+
   <DataObjects>
     <PointSet name="FT_PS">
       <Input>A,B</Input>
       <Output>TransOne</Output>
     </PointSet>
   </DataObjects>
-  
+
 </Simulation>

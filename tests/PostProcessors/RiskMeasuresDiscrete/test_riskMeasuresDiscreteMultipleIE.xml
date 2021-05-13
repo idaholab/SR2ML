@@ -30,7 +30,7 @@
     <ExternalModel name='model2' subType='' ModuleToLoad='model2'>
       <variables>Bstatus,Cstatus,Dstatus,outcome</variables>
     </ExternalModel>
-    <PostProcessor name="riskMeasuresDiscrete" subType="RiskMeasuresDiscrete">
+    <PostProcessor name="riskMeasuresDiscrete" subType="SR2ML.RiskMeasuresDiscrete">
       <measures>B,FV,RAW,RRW</measures>
       <variable R1values='-0.1,0.1' R0values='0.9,1.1'>Astatus</variable>
       <variable R1values='-0.1,0.1' R0values='0.9,1.1'>Bstatus</variable>

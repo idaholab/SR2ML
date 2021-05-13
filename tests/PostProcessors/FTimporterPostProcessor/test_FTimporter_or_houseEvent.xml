@@ -9,7 +9,7 @@
       the FT structure into a PointSet. Note that the FT needs to be in an OpenPSA format.
     </description>
   </TestInfo>
-  
+
   <RunInfo>
     <WorkingDir>FTimporter_or_houseEvent</WorkingDir>
     <Sequence>import,printOnFile</Sequence>
@@ -19,12 +19,12 @@
   <Files>
     <Input name="faultTreeTest" type="">FT_or_houseEvent.xml</Input>
   </Files>
-  
+
   <Models>
-    <PostProcessor name="FTimporter" subType="FTImporter">
+    <PostProcessor name="FTimporter" subType="SR2ML.FTImporter">
       <fileFormat>OpenPSA</fileFormat>
       <topEventID>TOP</topEventID>
-    </PostProcessor>   
+    </PostProcessor>
   </Models>
 
   <Steps>
@@ -45,12 +45,12 @@
       <source>FT_PS</source>
     </Print>
   </OutStreams>
-  
+
   <DataObjects>
     <PointSet name="FT_PS">
       <Input>BE1,BE2</Input>
       <Output>TOP</Output>
     </PointSet>
   </DataObjects>
-  
+
 </Simulation>

@@ -5,11 +5,11 @@
     <created>2019-11-01</created>
     <classesTested>MCSImporter</classesTested>
     <description>
-      Tests of the MCSImporter post-processor: it reads a list of MCSs generated from Saphire and it imports it as a PointSet. 
+      Tests of the MCSImporter post-processor: it reads a list of MCSs generated from Saphire and it imports it as a PointSet.
       We specifically test the capability to expand the list of Basic Events from an external file.
     </description>
   </TestInfo>
-  
+
   <RunInfo>
     <WorkingDir>MCSimporter</WorkingDir>
     <Sequence>import,printOnFile</Sequence>
@@ -20,12 +20,12 @@
     <Input name="MCSlistFile" type="MCSlist">MCSlist.csv</Input>
     <Input name="BElistFile"  type="BElist" >BElist.csv</Input>
   </Files>
-  
+
   <Models>
-    <PostProcessor name="MCSImporter" subType="MCSImporter">
+    <PostProcessor name="MCSImporter" subType="SR2ML.MCSImporter">
       <expand>True</expand>
       <BElistColumn>Description</BElistColumn>
-    </PostProcessor>   
+    </PostProcessor>
   </Models>
 
   <Steps>
@@ -47,7 +47,7 @@
       <source>MCS_PS</source>
     </Print>
   </OutStreams>
-  
+
   <DataObjects>
     <PointSet name="MCS_PS">
       <Input> ACCUMLATOR 1 DISCHARGE CKV 001 FAILS TO OPEN,ACCUMLATOR 2 DISCHARGE CKV 002 FAILS TO OPEN,ACCUMLATOR 3 DISCHARGE CKV 003 FAILS TO OPEN,
@@ -60,5 +60,5 @@
       <Output> MCS_ID,probability,out </Output>
     </PointSet>
   </DataObjects>
-  
+
 </Simulation>

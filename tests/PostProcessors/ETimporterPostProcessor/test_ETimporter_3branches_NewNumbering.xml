@@ -9,7 +9,7 @@
       the ET structure into a PointSet. Note that the ET needs to be in an OpenPSA format.
     </description>
   </TestInfo>
-  
+
   <RunInfo>
     <WorkingDir>ETimporter_3branches_NewNumbering</WorkingDir>
     <Sequence>import,printOnFile</Sequence>
@@ -19,12 +19,12 @@
   <Files>
     <Input name="eventTreeTest" type="">eventTree.xml</Input>
   </Files>
-  
+
   <Models>
-    <PostProcessor name="ETimporter" subType="ETImporter">
+    <PostProcessor name="ETimporter" subType="SR2ML.ETImporter">
       <fileFormat>OpenPSA</fileFormat>
       <expand>False</expand>
-    </PostProcessor>   
+    </PostProcessor>
   </Models>
 
   <Steps>
@@ -45,12 +45,12 @@
       <source>ET_PS</source>
     </Print>
   </OutStreams>
-  
+
   <DataObjects>
     <PointSet name="ET_PS">
       <Input>ACC,LPI,LPR</Input>
       <Output>sequence</Output>
     </PointSet>
   </DataObjects>
-  
+
 </Simulation>

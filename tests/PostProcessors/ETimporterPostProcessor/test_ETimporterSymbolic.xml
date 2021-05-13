@@ -11,7 +11,7 @@
       in this configuration, a mapping file is generated
     </description>
   </TestInfo>
-  
+
   <RunInfo>
     <WorkingDir>ETimporterSymbolicSequence</WorkingDir>
     <Sequence>import,printOnFile</Sequence>
@@ -21,12 +21,12 @@
   <Files>
     <Input name="eventTreeTest" type="">eventTreeSymbolic.xml</Input>
   </Files>
-  
+
   <Models>
-    <PostProcessor name="ETimporter" subType="ETImporter">
+    <PostProcessor name="ETimporter" subType="SR2ML.ETImporter">
       <fileFormat>OpenPSA</fileFormat>
       <expand>False</expand>
-    </PostProcessor>   
+    </PostProcessor>
   </Models>
 
   <Steps>
@@ -47,12 +47,12 @@
       <source>ET_PS</source>
     </Print>
   </OutStreams>
-  
+
   <DataObjects>
     <PointSet name="ET_PS">
       <Input>ACC,LPI,LPR</Input>
       <Output>sequence</Output>
     </PointSet>
   </DataObjects>
-  
+
 </Simulation>
