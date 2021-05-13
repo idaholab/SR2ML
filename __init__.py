@@ -8,3 +8,8 @@ from SR2ML.src import MarkovModel
 from SR2ML.src import ReliabilityModel
 from SR2ML.src import MaintenanceModel
 from SR2ML.src import MCSSolver
+from SR2ML.src.PostProcessors import DataClassifier
+from SR2ML.src.PostProcessors import ETImporter
+from SR2ML.src.PostProcessors import FTImporter
+from SR2ML.src.PostProcessors import MCSimporter
+from SR2ML.src.PostProcessors import RiskMeasuresDiscrete

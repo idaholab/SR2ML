@@ -27,7 +27,7 @@ import copy
 
 #Internal Modules---------------------------------------------------------------
 from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from Models.PostProcessors.MCSimporter import mcsReader
+from .PostProcessors.MCSimporter import mcsReader
 #Internal Modules End-----------------------------------------------------------
 
 class MCSSolver(ExternalModelPluginBase):
