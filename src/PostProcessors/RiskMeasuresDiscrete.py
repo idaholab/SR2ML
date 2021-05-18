@@ -208,8 +208,9 @@ class RiskMeasuresDiscrete(PostProcessorPluginBase):
 
     # replicate metadata
     # add meta variables back
-    for key in inputDic[-1][-1]['metaKeys']:
-      outputDic['data'][key] = np.asanyarray(1.0)
+    for inp in inputDic:
+      for key in inp[-1]['metaKeys']:
+        outputDic['data'][key] = np.asanyarray(1.0)
 
     return outputDic
 
