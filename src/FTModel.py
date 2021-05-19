@@ -12,7 +12,7 @@ import numpy as np
 
 #Internal Modules---------------------------------------------------------------
 from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from Models.PostProcessors.FTStructure import FTStructure
+from .PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 
