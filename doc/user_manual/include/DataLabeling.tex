@@ -1,25 +1,25 @@
-\section{Data Classifier}
-\label{sec:dataClassifier}
+\section{Data Labeling}
+\label{sec:DataLabeling}
 
-The \textbf{DataClassifier} post-processor is specifically used to classify the data stored in the DataObjects. It
-accepts two DataObjects, one is used as the classifier which must be a \textbf{PointSet}, the other one,
-i.e. \textbf{PointSet} or \textbf{HistorySet}, is used as the input DataObject to be classified.
+The \textbf{DataLabeling} post-processor is specifically used to label the data stored in the DataObjects. It
+accepts two DataObjects, one DataObject (i.e., reference DataObject) with type \textbf{PointSet} is used to label the
+other target DataObjects (type can be either \textbf{PointSet} or \textbf{HistorySet}).
+
 %
-\ppType{DataClassifier}{DataClassifier}
+\ppType{DataLabeling}{DataLabeling}
 %
 \begin{itemize}
-  \item \xmlNode{label}, \xmlDesc{string, required field}, the name of the label that are used for the classifier. This
-    label must exist in the DataObject that is used as the classifer. This name will also be used as
-    the label name for the DataObject that is classified.
+  \item \xmlNode{label}, \xmlDesc{string, required field}, the label variable name in the reference DataObject.
+    This variable will be used to label the target DataObject.
   \item \xmlNode{variable}, \xmlDesc{required, xml node}. In this node, the following attribute should be specified:
     \begin{itemize}
       \item \xmlAttr{name}, \xmlDesc{required, string attribute}, the variable name, which should be exist in
-        the DataObject that is used as classifier.
+        the reference DataObject.
     \end{itemize}
     and the following sub-node should also be specified:
     \begin{itemize}
-      \item \xmlNode{Function}, \xmlDesc{string, required field}, this function creates the mapping from input DataObject
-        to the Classifier.
+      \item \xmlNode{Function}, \xmlDesc{string, required field}, this function creates the mapping from
+        target DataObject to the reference DataObject.
         \begin{itemize}
           \item \xmlAttr{class}, \xmlDesc{string, required field}, the class of this function (e.g. Functions)
           \item \xmlAttr{type}, \xmlDesc{string, required field}, the type of this function (e.g. external)
@@ -55,8 +55,8 @@ the output data object with the same label ``sequence''. Since these two data ob
   </Functions>
 \end{lstlisting}
 
-The inputs to these functions are the inputs of the data object that will be classified, and the outputs of these functions
-are the inputs of data object that is used as the classifier.
+The inputs to these functions are the data from the target DataObject, and the outputs of these functions
+are the data from the reference DataObject.
 
 \textbf{Example Python Function for ``func\_ACC.py''}
 \begin{lstlisting}[language=python]
@@ -72,13 +72,9 @@ def evaluate(self):
 
 \nb All the functions that are used to create the maps should be include the ``evaluate'' method.
 
-The \textbf{DataClassifier} post-processor is specifically used to classify the data stored in the DataObjects. It
-accepts two DataObjects, one is used as the classifier which should be always \textbf{PointSet}, the other one, i.e.
-either \textbf{PointSet} or \textbf{HistorySet} is used as the input DataObject to be classified.
-
-The \textbf{DataClassifier} is provided below:
+The example of \textbf{DataLabeling} post processor is provided below:
 \begin{lstlisting}[style=XML]
-    <PostProcessor name="ET_Classifier" subType="SR2ML.DataClassifier">
+    <PostProcessor name="ET_Classifier" subType="SR2ML.DataLabeling">
       <label>sequence</label>
       <variable name='ACC'>
         <Function class="Functions" type="External">func_ACC</Function>
@@ -89,10 +85,10 @@ The \textbf{DataClassifier} is provided below:
     </PostProcessor>
 \end{lstlisting}
 The definitions for the XML nodes can be found in the RAVEN user manual. The label ``sequence''
-and the variables ``ACC, LPI'' should be exist in the data object that is used as the classifier,
-while the functions ``func\_ACC, func\_LPI'' are used to map relationships between the input data objects.
+and the variables ``ACC, LPI'' should be exist in the reference data object,
+while the functions ``func\_ACC, func\_LPI'' are used to map relationships between the reference and target data objects.
 
-The classification can be achieved via the \xmlNode{Steps} as shown below:
+The labeling process can be achieved via the \xmlNode{Steps} as shown below:
 \begin{lstlisting}[style=XML]
 <Simulation>
  ...
@@ -108,8 +104,8 @@ The classification can be achieved via the \xmlNode{Steps} as shown below:
 </Simulation>
 \end{lstlisting}
 
-\subsection{Data Classifier Reference Tests}
+\subsection{Data Labeling Reference Tests}
 \begin{itemize}
-	\item test\_dataClassifier\_postprocessor.xml
-  \item test\_dataClassifier\_postprocessor\_HS.xml.
+	\item test\_DataLabeling\_postprocessor.xml
+  \item test\_DataLabeling\_postprocessor\_HS.xml.
 \end{itemize}
