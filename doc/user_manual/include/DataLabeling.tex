@@ -1,11 +1,11 @@
-\section{Data Classifier}
-\label{sec:dataClassifier}
+\section{Data Labeling}
+\label{sec:DataLabeling}
 
-The \textbf{DataClassifier} post-processor is specifically used to classify the data stored in the DataObjects. It
+The \textbf{DataLabeling} post-processor is specifically used to classify the data stored in the DataObjects. It
 accepts two DataObjects, one is used as the classifier which must be a \textbf{PointSet}, the other one,
 i.e. \textbf{PointSet} or \textbf{HistorySet}, is used as the input DataObject to be classified.
 %
-\ppType{DataClassifier}{DataClassifier}
+\ppType{DataLabeling}{DataLabeling}
 %
 \begin{itemize}
   \item \xmlNode{label}, \xmlDesc{string, required field}, the name of the label that are used for the classifier. This
@@ -72,13 +72,13 @@ def evaluate(self):
 
 \nb All the functions that are used to create the maps should be include the ``evaluate'' method.
 
-The \textbf{DataClassifier} post-processor is specifically used to classify the data stored in the DataObjects. It
+The \textbf{DataLabeling} post-processor is specifically used to classify the data stored in the DataObjects. It
 accepts two DataObjects, one is used as the classifier which should be always \textbf{PointSet}, the other one, i.e.
 either \textbf{PointSet} or \textbf{HistorySet} is used as the input DataObject to be classified.
 
-The \textbf{DataClassifier} is provided below:
+The \textbf{DataLabeling} is provided below:
 \begin{lstlisting}[style=XML]
-    <PostProcessor name="ET_Classifier" subType="SR2ML.DataClassifier">
+    <PostProcessor name="ET_Classifier" subType="SR2ML.DataLabeling">
       <label>sequence</label>
       <variable name='ACC'>
         <Function class="Functions" type="External">func_ACC</Function>
@@ -110,6 +110,6 @@ The classification can be achieved via the \xmlNode{Steps} as shown below:
 
 \subsection{Data Classifier Reference Tests}
 \begin{itemize}
-	\item test\_dataClassifier\_postprocessor.xml
-  \item test\_dataClassifier\_postprocessor\_HS.xml.
+	\item test\_DataLabeling\_postprocessor.xml
+  \item test\_DataLabeling\_postprocessor\_HS.xml.
 \end{itemize}

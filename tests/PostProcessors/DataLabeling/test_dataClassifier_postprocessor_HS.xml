@@ -1,20 +1,23 @@
 <Simulation verbosity="debug">
   <TestInfo>
-    <name>framework/PostProcessors/DataClassifier/Clustering/</name>
+    <name>framework/PostProcessors/DataLabeling/Clustering/</name>
     <author>wangc</author>
     <created>2018-10-18</created>
-    <classesTested>DataClassifier</classesTested>
+    <classesTested>DataLabeling</classesTested>
     <description>
-      Test DataClassifier PostProcessor with HistorySet input
+      Test DataLabeling PostProcessor with HistorySet input
     </description>
     <revisions>
       <revision author="wangc" date="2019-04-26">
-        Move the test from PRAPlugin to RAVEN tests/framework/PostProcessors/DataClassifier, this is because
-        the DataClassifier PostProcessor is currently in RAVEN main repository.
+        Move the test from PRAPlugin to RAVEN tests/framework/PostProcessors/DataLabeling, this is because
+        the DataLabeling PostProcessor is currently in RAVEN main repository.
       </revision>
       <revision author="wangc" date="2019-05-02">
         As reported in issue #805, RAVEN will not allow input DataObject of PostProcessor to be output DataObject,
         the output data object will be renamed, and the variable name of labels will be explicitly defined.
+      </revision>
+      <revision author="wangc" date="2021-05-20">
+        Change DataClassifier to DataLabeling
       </revision>
     </revisions>
   </TestInfo>
@@ -81,7 +84,7 @@
       <fileFormat>OpenPSA</fileFormat>
       <expand>True</expand>
     </PostProcessor>
-    <PostProcessor name="ET_Classifier" subType="SR2ML.DataClassifier">
+    <PostProcessor name="ET_Classifier" subType="SR2ML.DataLabeling">
       <label>sequence</label>
       <variable name='ACC'>
         <Function class="Functions" type="External">func_ACC</Function>

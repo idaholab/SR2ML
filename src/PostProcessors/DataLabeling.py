@@ -22,7 +22,7 @@ import numpy as np
 from utils import InputData, InputTypes, utils
 from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
 
-class DataClassifier(PostProcessorPluginBase):
+class DataLabeling(PostProcessorPluginBase):
   """
     This Post-Processor performs data classification based on given classifier.
     In order to use this interface post-processor, the users need to provide
@@ -60,7 +60,7 @@ class DataClassifier(PostProcessorPluginBase):
       @ Out, None
     """
     super().__init__()
-    self.printTag   = 'POSTPROCESSOR DataClassifier'
+    self.printTag   = 'POSTPROCESSOR DataLabeling'
     self.mapping    = {}  # dictionary for mapping input space between different DataObjects {'variableName':'externalFunctionName'}
     self.funcDict   = {}  # Contains the function to be used {'variableName':externalFunctionInstance}
     self.label      = None # ID of the variable which containf the label values
@@ -71,7 +71,7 @@ class DataClassifier(PostProcessorPluginBase):
 
   def initialize(self, runInfo, inputs, initDict=None):
     """
-      Method to initialize the DataClassifier post-processor.
+      Method to initialize the DataLabeling post-processor.
       @ In, runInfo, dict, dictionary of run info (e.g. working dir, etc)
       @ In, inputs, list, list of inputs
       @ In, initDict, dict, optional, dictionary with initialization options
