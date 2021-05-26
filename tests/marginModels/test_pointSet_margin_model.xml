@@ -15,7 +15,7 @@
   </Models>
 
   <Distributions>
-    <Uniform name="actualTime">
+    <Uniform name="actualTimeDist">
         <lowerBound>2.</lowerBound>
         <upperBound>3.</upperBound>
     </Uniform>
@@ -26,33 +26,27 @@
       <samplerInit>
         <limit>4</limit>
       </samplerInit>
-      <variable name="Lambda">
-          <distribution>Lambda_dist</distribution>
-      </variable>
-      <variable name="Ti">
-          <distribution>Ti_dist</distribution>
-      </variable>
-        <variable name="Tm">
-          <distribution>Tm_dist</distribution>
+      <variable name="actualTime">
+          <distribution>actualTimeDist</distribution>
       </variable>
     </MonteCarlo>
   </Samplers>
 
   <DataObjects>
     <PointSet name="Input">
-      <Input>Lambda,Ti,Tm</Input>
+      <Input>actualTime</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <PointSet name="Output">
-      <Input>Lambda,Ti,Tm</Input>
-      <Output>avail,unavail</Output>
+      <Input>actualTime</Input>
+      <Output>marginPS1</Output>
     </PointSet>
   </DataObjects>
 
   <Steps>
     <MultiRun name="MCRun">
       <Input          class="DataObjects"   type="PointSet">Input</Input>
-      <Model          class="Models"        type="ExternalModel">PMmodelStandby</Model>
+      <Model          class="Models"        type="ExternalModel">PointSetMargin</Model>
       <Sampler        class="Samplers"      type="MonteCarlo">MC</Sampler>
       <Output         class="DataObjects"   type="PointSet">Output</Output>
     </MultiRun>
