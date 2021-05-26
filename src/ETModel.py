@@ -8,7 +8,7 @@ Created on April 30, 2018
 
 #Internal Modules---------------------------------------------------------------
 from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from Models.PostProcessors.ETStructure import ETStructure
+from .PostProcessors.ETStructure import ETStructure
 #Internal Modules End-----------------------------------------------------------
 
 
