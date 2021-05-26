@@ -1,0 +1,72 @@
+<Simulation verbosity="debug">
+  <RunInfo>
+    <WorkingDir>PointSetModel</WorkingDir>
+    <Sequence>MCRun,print</Sequence>
+  </RunInfo>
+  
+  <Models>
+    <ExternalModel name="PointSetMargin" subType="SR2ML.PointSetMarginModel">
+      <variables>actualTime,marginPS1</variables>
+      <failedDataFileID>failureData.csv</failedDataFileID>
+      <columnID>time</columnID>
+      <marginID>marginPS1</marginID>
+      <actualDataID>actualTime</actualDataID>
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name="actualTime">
+        <lowerBound>2.</lowerBound>
+        <upperBound>3.</upperBound>
+    </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="MC">
+      <samplerInit>
+        <limit>4</limit>
+      </samplerInit>
+      <variable name="Lambda">
+          <distribution>Lambda_dist</distribution>
+      </variable>
+      <variable name="Ti">
+          <distribution>Ti_dist</distribution>
+      </variable>
+        <variable name="Tm">
+          <distribution>Tm_dist</distribution>
+      </variable>
+    </MonteCarlo>
+  </Samplers>
+
+  <DataObjects>
+    <PointSet name="Input">
+      <Input>Lambda,Ti,Tm</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="Output">
+      <Input>Lambda,Ti,Tm</Input>
+      <Output>avail,unavail</Output>
+    </PointSet>
+  </DataObjects>
+
+  <Steps>
+    <MultiRun name="MCRun">
+      <Input          class="DataObjects"   type="PointSet">Input</Input>
+      <Model          class="Models"        type="ExternalModel">PMmodelStandby</Model>
+      <Sampler        class="Samplers"      type="MonteCarlo">MC</Sampler>
+      <Output         class="DataObjects"   type="PointSet">Output</Output>
+    </MultiRun>
+    <IOStep name="print">
+     <Input          class="DataObjects"   type="PointSet">Output</Input>
+     <Output         class="OutStreams"    type="Print">Out</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Out">
+      <type>csv</type>
+      <source>Output</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+</Simulation>
