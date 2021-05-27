@@ -5,12 +5,14 @@
   </RunInfo>
   
   <Models>
-    <ExternalModel name="PointSetMargin" subType="SR2ML.PointSetMarginModel">
+    <ExternalModel name="PointSetMargin" subType="SR2ML.MarginModel">
       <variables>actualTime,marginPS1</variables>
-      <failedDataFileID>failureData.csv</failedDataFileID>
-      <columnID>time</columnID>
-      <marginID>marginPS1</marginID>
-      <actualDataID>actualTime</actualDataID>
+      <MarginModel type="PointSetMarginModel">
+        <failedDataFileID>failureData.csv</failedDataFileID>
+        <columnID>time</columnID>
+        <marginID>marginPS1</marginID>
+        <actualDataID>actualTime</actualDataID>
+      </MarginModel>
     </ExternalModel>
   </Models>
 
