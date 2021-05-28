@@ -5,14 +5,8 @@ Created on Feb. 7, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 import numpy as np
 import numpy.ma as ma
 from scipy.integrate import quad
@@ -59,7 +53,7 @@ class PowerLawModel(ReliabilityBase):
       @ In, None
       @ Out, None
     """
-    ReliabilityBase.__init__(self)
+    super().__init__()
     # Scale parameter
     self._alpha = 1.
     # Shape parameter
@@ -67,14 +61,14 @@ class PowerLawModel(ReliabilityBase):
     # Initial failure rate
     self._lambda = 1.
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ReliabilityBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
@@ -95,7 +89,7 @@ class PowerLawModel(ReliabilityBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ReliabilityBase.initialize(self, inputDict)
+    super().initialize(inputDict)
 
   def _probabilityFunction(self):
     """

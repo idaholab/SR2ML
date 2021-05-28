@@ -5,14 +5,7 @@ Created on Feb. 7, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
-
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 import numpy as np
 import numpy.ma as ma
 from scipy.stats import exponweib
@@ -55,7 +48,7 @@ class ExponWeibullModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
+    super().__init__()
     # Shape parameter of exponentiation
     self._alpha = None
     # Scale parameter
@@ -65,14 +58,14 @@ class ExponWeibullModel(ScipyStatsModelBase):
     # class of exponweib
     self._modelClass = exponweib
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
@@ -93,5 +86,5 @@ class ExponWeibullModel(ScipyStatsModelBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self, inputDict)
+    super().initialize(inputDict)
     self._model = self._modelClass(self._gamma, self._alpha, loc=self._loc, scale=self._beta)

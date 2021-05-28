@@ -5,14 +5,8 @@ Created on Feb. 7, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 import numpy as np
 import numpy.ma as ma
 #External Modules End--------------------------------------------------------------------------------
@@ -60,7 +54,7 @@ class BathtubModel(ReliabilityBase):
       @ In, None
       @ Out, None
     """
-    ReliabilityBase.__init__(self)
+    super().__init__()
     # shape parameter
     self._alpha = None
     # scale parameter
@@ -72,14 +66,14 @@ class BathtubModel(ReliabilityBase):
     # shape parameter
     self._rho = 1.
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ReliabilityBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
@@ -106,7 +100,7 @@ class BathtubModel(ReliabilityBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ReliabilityBase.initialize(self, inputDict)
+    super().initialize(inputDict)
 
   def _checkInputParams(self, needDict):
     """
@@ -114,7 +108,7 @@ class BathtubModel(ReliabilityBase):
       @ In, needDict, dict, dictionary of required parameters
       @ Out, None
     """
-    ReliabilityBase._checkInputParams(self, needDict)
+    super()._checkInputParams(needDict)
     if '_c' in needDict:
       if np.any(needDict['_c']<0) or np.any(needDict['_c']>1):
         raise IOError('Variable "{}" should be between [0,1], but "{}" is provided!'.format('_c',needDict['_c']))

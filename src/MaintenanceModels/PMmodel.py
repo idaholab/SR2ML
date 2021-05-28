@@ -7,9 +7,6 @@ Created on May 1 2020
 """
 
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 import numpy as np
 import numpy.ma as ma
 #External Modules End--------------------------------------------------------------------------------
@@ -57,7 +54,7 @@ class PMModel(MaintenanceBase):
       @ In, None
       @ Out, None
     """
-    MaintenanceBase.__init__(self)
+    super().__init__()
     # Component type
     self.type = None
     self.rho  = None
@@ -68,14 +65,14 @@ class PMModel(MaintenanceBase):
     self.Tm   = None
     self.Ti   = None
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    MaintenanceBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'type':
         self.type = child.value
@@ -107,7 +104,7 @@ class PMModel(MaintenanceBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    MaintenanceBase.initialize(self, inputDict)
+    super().initialize(inputDict)
 
   def _availabilityFunction(self, inputDict):
     """
