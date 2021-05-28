@@ -47,15 +47,14 @@ class PointSetMarginModel(MarginBase):
     self.actualDataID = None
 
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    MarginBase._localHandleInput(self, paramInput)
-
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'failedDataFileID':
         self.failedDataFileID = child.value
@@ -72,7 +71,7 @@ class PointSetMarginModel(MarginBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    MarginBase.initialize(self, inputDict)
+    super().initialize(inputDict)
 
 
   def _marginFunction(self, inputDict):

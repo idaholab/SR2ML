@@ -21,14 +21,6 @@ from utils import InputTypes
 from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
-## option to use logging
-# logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
-# logger = logging.getLogger()
-# fh = logging.FileHandler(filename='logos.log', mode='w')
-# fh.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
-# fh.setFormatter(formatter)
-# logger.addHandler(fh)
 
 class MaintenanceModel(ExternalModelPluginBase):
   """
