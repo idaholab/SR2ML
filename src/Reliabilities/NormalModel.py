@@ -5,14 +5,8 @@ Created on Feb. 10, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 from scipy.stats import norm
 #External Modules End--------------------------------------------------------------------------------
 
@@ -48,20 +42,20 @@ class NormalModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
+    super().__init__()
     # Shape parameter
     self._sigma = 1
     # class of norm from scipy.stats
     self._modelClass = norm
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'sigma':
         self._sigma = self.setVariable(child.value)
@@ -76,5 +70,5 @@ class NormalModel(ScipyStatsModelBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self, inputDict)
+    super().initialize(inputDict)
     self._model = self._modelClass(loc=self._loc, scale=self._sigma)

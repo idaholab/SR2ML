@@ -5,14 +5,8 @@ Created on Feb. 10, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
 
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 from scipy.stats import fatiguelife
 #External Modules End--------------------------------------------------------------------------------
 
@@ -50,7 +44,7 @@ class FatigueLifeModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
+    super().__init__()
     # Shape parameter
     self._alpha = None
     # Scale parameter
@@ -58,14 +52,14 @@ class FatigueLifeModel(ScipyStatsModelBase):
     # class of fatiguelife from scipy.stats
     self._modelClass = fatiguelife
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
@@ -83,5 +77,5 @@ class FatigueLifeModel(ScipyStatsModelBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self, inputDict)
+    super().initialize(inputDict)
     self._model = self._modelClass(self._alpha, loc=self._loc, scale=self._beta)

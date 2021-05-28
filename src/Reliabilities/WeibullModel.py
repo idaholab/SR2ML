@@ -5,14 +5,7 @@ Created on Feb. 7, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
-
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 import numpy as np
 import numpy.ma as ma
 from scipy.stats import weibull_min as weibull
@@ -52,19 +45,19 @@ class WeibullModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
+    super().__init__()
     self._alpha = None # shape parameter
     self._beta = 1 # scale parameter
     self._modelClass = weibull # instance of weibull model from scipy.stats
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
         self._alpha = self.setVariable(child.value)
@@ -82,7 +75,7 @@ class WeibullModel(ScipyStatsModelBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self, inputDict)
+    super().initialize(inputDict)
     self._model = self._modelClass(self._alpha, loc=self._loc, scale=self._beta)
 
   def _failureRateFunction(self):

@@ -5,14 +5,7 @@ Created on Feb. 6, 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
-
 #External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
 from scipy.stats import erlang
 #External Modules End--------------------------------------------------------------------------------
 
@@ -50,7 +43,7 @@ class ErlangianModel(ScipyStatsModelBase):
       @ In, None
       @ Out, None
     """
-    ScipyStatsModelBase.__init__(self)
+    super().__init__()
     # Mean failure rate for each event
     self._lambda = None
     # Shape parameter, integer but not enforced
@@ -58,14 +51,14 @@ class ErlangianModel(ScipyStatsModelBase):
     # class of reliability model from scipy.stats
     self._modelClass = erlang
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ScipyStatsModelBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'lambda':
         self._lambda = self.setVariable(child.value)
@@ -83,5 +76,5 @@ class ErlangianModel(ScipyStatsModelBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, None
     """
-    ScipyStatsModelBase.initialize(self, inputDict)
+    super().initialize(inputDict)
     self._model = self._modelClass(self._k, loc=self._loc, scale=1./self._lambda)

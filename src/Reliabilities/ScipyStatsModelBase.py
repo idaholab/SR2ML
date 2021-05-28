@@ -5,15 +5,6 @@ Created on Jan. 30 2020
 
 @author: wangc, mandd
 """
-#for future compatibility with Python 3--------------------------------------------------------------
-from __future__ import division, print_function, unicode_literals, absolute_import
-#End compatibility block for Python 3----------------------------------------------------------------
-
-#External Modules------------------------------------------------------------------------------------
-import abc
-import sys
-import os
-#External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
 from utils import mathUtils as utils
@@ -44,18 +35,18 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ In, None
       @ Out, None
     """
-    ReliabilityBase.__init__(self)
+    super().__init__()
     # variable to store mission time
     self._tm = None
 
-  def _localHandleInput(self, paramInput):
+  def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
       and initialize some stuff based on the inputs got
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
-    ReliabilityBase._localHandleInput(self, paramInput)
+    super()._handleInput(paramInput)
 
   def _checkInputParams(self, needDict):
     """
@@ -63,7 +54,7 @@ class ScipyStatsModelBase(ReliabilityBase):
       @ In, needDict, dict, dictionary of required parameters
       @ Out, None
     """
-    ReliabilityBase._checkInputParams(self, needDict)
+    super()._checkInputParams(needDict)
 
   def _probabilityFunction(self):
     """
