@@ -32,6 +32,7 @@ class PointSetMarginModel(MarginBase):
     inputSpecs = super(PointSetMarginModel, cls).getInputSpecification()
     inputSpecs.description = """ PointSet Margin Model """
     inputSpecs.addSub(InputData.parameterInputFactory('failedDataFile',    contentType=InputTypes.InterpretedListType, descr='failed data file'))
+    return inputSpecs
 
 
   def __init__(self):

@@ -38,15 +38,7 @@ class MarginBase(ModelBase):
       @ In, None
       @ Out, None
     """
-    self.type = self.__class__.__name__
-    self.name = self.__class__.__name__
-    # dictionary: keys all required input parameters, and values either user provided values or
-    # variables determined by raven
-    self._variableDict = {}
-    # instance of margin model
-    self._model = None
-    # class of model
-    self._modelClass = None
+    super().__init__()
     # variable stores margin value
     self._margin = None
 
@@ -57,7 +49,7 @@ class MarginBase(ModelBase):
       @ Out, None
     """
     super()._checkInputParams(needDict)
-  
+
   def run(self,inputDict):
     """
       Method to calculate margin values
