@@ -63,6 +63,7 @@ class ReliabilityModel(ExternalModelPluginBase):
     if self._modelType is None:
       raise IOError("Required attribute 'type' for node 'ReliabilityModel' is not provided!")
     self._model = Reliabilities.returnInstance(self._modelType)
+    self._model.handleInput(self._modelXMLInput)
 
   def isDynamic(self):
     """
@@ -90,7 +91,6 @@ class ReliabilityModel(ExternalModelPluginBase):
       @ In, inputDict, dict, dictionary of inputs from RAVEN
       @ Out,
     """
-    self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
     self._model.run()
     outputDict = {}
