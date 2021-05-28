@@ -7,9 +7,7 @@ Created on May 13 2021
 """
 
 #External Modules------------------------------------------------------------------------------------
-import os
 import abc
-import sys
 import numpy as np
 #External Modules End--------------------------------------------------------------------------------
 
@@ -31,8 +29,7 @@ class MarginBase(ModelBase):
       @ In, cls, class instance
       @ Out, inputSpecs, InputData, specs
     """
-    inputSpecs = InputData.parameterInputFactory('MarginModel')
-    inputSpecs.addParam('type', param_type=InputTypes.StringType, descr='The margin model object identifier')
+    inputSpecs = super().getInputSpecification()
     return inputSpecs
 
   def __init__(self):
