@@ -9,17 +9,15 @@
       <variables>actualTime,marginPS1</variables>
       <MarginModel type="PointSetMarginModel">
         <failedDataFileID>failureData.csv</failedDataFileID>
-        <columnID>time</columnID>
-        <marginID>marginPS1</marginID>
-        <actualDataID>actualTime</actualDataID>
+	      <map var='time'>actualTime</map>
       </MarginModel>
     </ExternalModel>
   </Models>
 
   <Distributions>
     <Uniform name="actualTimeDist">
-        <lowerBound>2.</lowerBound>
-        <upperBound>3.</upperBound>
+      <lowerBound>2.</lowerBound>
+      <upperBound>3.</upperBound>
     </Uniform>
   </Distributions>
 
@@ -29,7 +27,7 @@
         <limit>4</limit>
       </samplerInit>
       <variable name="actualTime">
-          <distribution>actualTimeDist</distribution>
+        <distribution>actualTimeDist</distribution>
       </variable>
     </MonteCarlo>
   </Samplers>

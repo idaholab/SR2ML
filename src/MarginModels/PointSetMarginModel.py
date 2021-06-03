@@ -12,10 +12,8 @@ import pandas as pd
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
 from utils import InputData, InputTypes
 from .MarginBase import MarginBase
-from scipy.stats import wasserstein_distance
 from sklearn.metrics import pairwise_distances
 #Internal Modules End--------------------------------------------------------------------------------
 
@@ -31,7 +29,8 @@ class PointSetMarginModel(MarginBase):
     """
     inputSpecs = super(PointSetMarginModel, cls).getInputSpecification()
     inputSpecs.description = """ PointSet Margin Model """
-    inputSpecs.addSub(InputData.parameterInputFactory('failedDataFile',    contentType=InputTypes.InterpretedListType, descr='failed data file'))
+    inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.InterpretedListType, descr='failed data file'))
+    inputSpecs.addSub(InputData.parameterInputFactory('map'             , contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data'))
     return inputSpecs
 
 
@@ -43,9 +42,9 @@ class PointSetMarginModel(MarginBase):
     """
     MarginBase.__init__(self)
 
-    self.failedDataFileID = None
-    self.columnID = None
-    self.actualDataID = None
+    self.failedDataFileID = None  # name of the file containing the failed data 
+    self.mapping = {}             # dictionary containing mapping between actual and failed data
+    self.InvMapping = {}          # dictionary containing mapping between failed and actual data
 
 
   def _handleInput(self, paramInput):
@@ -57,13 +56,12 @@ class PointSetMarginModel(MarginBase):
     """
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
-      if child.getName().lower() == 'failedDataFileID':
-        self.failedDataFileID = child.value
-      if child.getName().lower() == 'columnID':
-        self.columnID = child.value
-      if child.getName().lower() == 'actualDataID':
-        self.actualDataID = child.value
-
+      if child.getName() == 'failedDataFileID':
+        self.failedDataFileID = self.setVariable(child.value)
+      elif child.tag == 'map':
+        self.mapping[child.get('var')]      = child.text.strip()
+        self.InvMapping[child.text.strip()] = child.get('var')
+    
     self.failedData = pd.read_csv(self.failedDataFileID)[self.columnID]
 
   def initialize(self, inputDict):
@@ -98,6 +96,13 @@ class PointSetMarginModel(MarginBase):
     return normalizedMargin
 
 def customDist(a,b):
-  return a-b
+  """
+    Method to calculate distance between two vectors
+    @ In, a, np array, first numpy array
+    @ In, b, np array, second numpy array
+    @ Out, distance, float, distance between vector a and b
+  """
+  distance = np.linalg.norm(a - b, axis=1)
+  return distance
 
 

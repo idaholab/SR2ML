@@ -8,8 +8,6 @@ Created on March 23 2020
 
 #External Modules------------------------------------------------------------------------------------
 import abc
-import sys
-import os
 # import logging
 #External Modules End--------------------------------------------------------------------------------
 
@@ -36,7 +34,7 @@ class MarginModel(ExternalModelPluginBase):
     ExternalModelPluginBase.__init__(self)
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
-    self._dynamicHandling    = False
+    self._dynamicHandling = False
     self._model = None
     self._modelType = None
     self._modelXMLInput = None
