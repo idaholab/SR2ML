@@ -30,7 +30,13 @@ class PointSetMarginModel(MarginBase):
     inputSpecs = super(PointSetMarginModel, cls).getInputSpecification()
     inputSpecs.description = """ PointSet Margin Model """
     inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.InterpretedListType, descr='failed data file'))
-    inputSpecs.addSub(InputData.parameterInputFactory('map'             , contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data'))
+    
+    inputSpecs.addSub(InputData.parameterInputFactory('marginID'        , contentType=InputTypes.InterpretedListType, descr='ID of the margin variable'))
+
+    mapping = InputData.parameterInputFactory('map'             , contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data')
+    mapping.addParam("var", InputTypes.StringType)
+    inputSpecs.addSub(mapping)   
+    
     return inputSpecs
 
 
@@ -45,6 +51,7 @@ class PointSetMarginModel(MarginBase):
     self.failedDataFileID = None  # name of the file containing the failed data 
     self.mapping = {}             # dictionary containing mapping between actual and failed data
     self.InvMapping = {}          # dictionary containing mapping between failed and actual data
+    self.marginID = None          # ID of the calculated margin variable
 
 
   def _handleInput(self, paramInput):
@@ -58,11 +65,13 @@ class PointSetMarginModel(MarginBase):
     for child in paramInput.subparts:
       if child.getName() == 'failedDataFileID':
         self.failedDataFileID = self.setVariable(child.value)
-      elif child.tag == 'map':
-        self.mapping[child.get('var')]      = child.text.strip()
+      if child.getName() == 'marginID':
+        self.marginID = self.setVariable(child.value)
+      elif child.getName() == 'map':
+        self.mapping[child.get('var')]      = self.setVariable(child.value)
         self.InvMapping[child.text.strip()] = child.get('var')
     
-    self.failedData = pd.read_csv(self.failedDataFileID)[self.columnID]
+    self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
 
   def initialize(self, inputDict):
     """
