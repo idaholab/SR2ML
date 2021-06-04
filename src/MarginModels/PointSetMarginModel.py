@@ -52,7 +52,7 @@ class PointSetMarginModel(MarginBase):
     self.mapping = {}             # dictionary containing mapping between actual and failed data
     self.InvMapping = {}          # dictionary containing mapping between failed and actual data
     self.marginID = None          # ID of the calculated margin variable
-
+    self.dimensionality = None    # dimensionality of the point set
 
   def _handleInput(self, paramInput):
     """
@@ -72,6 +72,9 @@ class PointSetMarginModel(MarginBase):
         self.InvMapping[child.text.strip()] = child.get('var')
     
     self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
+    
+    self.dimensionality = len(self.mapping.keys())
+    
 
   def initialize(self, inputDict):
     """
@@ -104,14 +107,14 @@ class PointSetMarginModel(MarginBase):
 
     return normalizedMargin
 
-def customDist(a,b):
+def customDist(pointSet,refPoint):
   """
     Method to calculate distance between two vectors
-    @ In, a, np array, first numpy array
-    @ In, b, np array, second numpy array
+    @ In, pointSet, np array, first numpy array
+    @ In, refPoint, np array, second numpy array
     @ Out, distance, float, distance between vector a and b
   """
-  distance = np.linalg.norm(a - b, axis=1)
+  distance = np.linalg.norm(pointSet - refPoint, axis=1)
   return distance
 
 
