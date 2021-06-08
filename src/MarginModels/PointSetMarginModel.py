@@ -71,7 +71,7 @@ class PointSetMarginModel(MarginBase):
       elif child.getName() == 'map':
         self.mapping[child.parameterValues.get('var')]      = self.setVariable(child.value)
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
-
+        
     self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
 
     self.dimensionality = len(self.mapping.keys())
@@ -90,7 +90,7 @@ class PointSetMarginModel(MarginBase):
     """
       Method to calculate margin value
       @ In, inputDict, dict, dictionary of inputs
-      @ Out, margin, float, value of margin for the considered model
+      @ Out, outputDict, dict, dictionary containing margin value
     """
     actualData = pd.DataFrame(inputDict)
     actualData = actualData.rename(columns=self.InvMapping)
