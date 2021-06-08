@@ -76,6 +76,6 @@ class MarginModel(ExternalModelPluginBase):
     self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
     outputDict = self._model.run(inputDict)
-    
+
     for key, val in outputDict.items():
       setattr(container, key, val)

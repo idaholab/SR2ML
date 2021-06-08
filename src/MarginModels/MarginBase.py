@@ -39,7 +39,7 @@ class MarginBase(ModelBase):
     """
     super().__init__()
     self._margin = None           # variable stores margin value
-    
+
 
   def _checkInputParams(self, needDict):
     """

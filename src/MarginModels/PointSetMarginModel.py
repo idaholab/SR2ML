@@ -31,13 +31,13 @@ class PointSetMarginModel(MarginBase):
     inputSpecs = super(PointSetMarginModel, cls).getInputSpecification()
     inputSpecs.description = """ PointSet Margin Model """
     inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.InterpretedListType, descr='failed data file'))
-    
+
     inputSpecs.addSub(InputData.parameterInputFactory('marginID', contentType=InputTypes.InterpretedListType, descr='ID of the margin variable'))
 
     mapping = InputData.parameterInputFactory('map', contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data')
     mapping.addParam("var", InputTypes.StringType)
-    inputSpecs.addSub(mapping)   
-    
+    inputSpecs.addSub(mapping)
+
     return inputSpecs
 
 
@@ -49,7 +49,7 @@ class PointSetMarginModel(MarginBase):
     """
     MarginBase.__init__(self)
 
-    self.failedDataFileID = None  # name of the file containing the failed data 
+    self.failedDataFileID = None  # name of the file containing the failed data
     self.mapping = {}             # dictionary containing mapping between actual and failed data
     self.InvMapping = {}          # dictionary containing mapping between failed and actual data
     self.marginID = None          # ID of the calculated margin variable
@@ -73,9 +73,9 @@ class PointSetMarginModel(MarginBase):
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
 
     self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
-    
+
     self.dimensionality = len(self.mapping.keys())
-    
+
 
   def initialize(self, inputDict):
     """
@@ -98,7 +98,7 @@ class PointSetMarginModel(MarginBase):
     distMatrix = pairwise_distances(self.failedData.values, actualData.values, metric=customDist)
     distMatrix[distMatrix<0] = 0
     margin = np.mean(distMatrix)
-    
+
     zeroPoint = copy.deepcopy(actualData)
     zeroPoint[:] = 0.0
 
