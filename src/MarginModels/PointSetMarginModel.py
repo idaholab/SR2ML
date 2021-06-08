@@ -9,6 +9,7 @@ Created on May 13 2021
 #External Modules------------------------------------------------------------------------------------
 import numpy as np
 import pandas as pd
+import copy
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
@@ -31,9 +32,9 @@ class PointSetMarginModel(MarginBase):
     inputSpecs.description = """ PointSet Margin Model """
     inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.InterpretedListType, descr='failed data file'))
     
-    inputSpecs.addSub(InputData.parameterInputFactory('marginID'        , contentType=InputTypes.InterpretedListType, descr='ID of the margin variable'))
+    inputSpecs.addSub(InputData.parameterInputFactory('marginID', contentType=InputTypes.InterpretedListType, descr='ID of the margin variable'))
 
-    mapping = InputData.parameterInputFactory('map'             , contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data')
+    mapping = InputData.parameterInputFactory('map', contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data')
     mapping.addParam("var", InputTypes.StringType)
     inputSpecs.addSub(mapping)   
     
@@ -68,10 +69,10 @@ class PointSetMarginModel(MarginBase):
       if child.getName() == 'marginID':
         self.marginID = self.setVariable(child.value)
       elif child.getName() == 'map':
-        self.mapping[child.get('var')]      = self.setVariable(child.value)
-        self.InvMapping[child.text.strip()] = child.get('var')
-    
-    #self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
+        self.mapping[child.parameterValues.get('var')]      = self.setVariable(child.value)
+        self.InvMapping[child.value[0]] = child.parameterValues.get('var')
+
+    self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
     
     self.dimensionality = len(self.mapping.keys())
     
@@ -91,21 +92,24 @@ class PointSetMarginModel(MarginBase):
       @ In, inputDict, dict, dictionary of inputs
       @ Out, margin, float, value of margin for the considered model
     """
-    actualData = inputDict[self.actualDataID]
+    actualData = pd.DataFrame(inputDict)
+    actualData = actualData.rename(columns=self.InvMapping)
 
-    zeroPoint = np.zeros(1)
-
-    distMatrix = pairwise_distances(self.failedData.reshape(-1,1), actualData.reshape(-1,1), metric=customDist)
+    distMatrix = pairwise_distances(self.failedData.values, actualData.values, metric=customDist)
     distMatrix[distMatrix<0] = 0
     margin = np.mean(distMatrix)
+    
+    zeroPoint = copy.deepcopy(actualData)
+    zeroPoint[:] = 0.0
 
-    distMatrix2 = pairwise_distances(self.failedData.reshape(-1,1), zeroPoint.reshape(-1,1), metric=customDist)
+    distMatrix2 = pairwise_distances(self.failedData.values, zeroPoint.values, metric=customDist)
     distMatrix2[distMatrix2<0] = 0
     margin2 = np.mean(distMatrix2)
 
-    normalizedMargin = margin/margin2
+    outputDict = {}
+    outputDict[self.marginID] = margin/margin2
 
-    return normalizedMargin
+    return outputDict
 
 def customDist(pointSet,refPoint):
   """
@@ -114,7 +118,7 @@ def customDist(pointSet,refPoint):
     @ In, refPoint, np array, second numpy array
     @ Out, distance, float, distance between vector a and b
   """
-  distance = np.linalg.norm(pointSet - refPoint, axis=1)
+  distance = np.linalg.norm(pointSet - refPoint)
   return distance
 
 

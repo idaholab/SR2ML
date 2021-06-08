@@ -38,8 +38,8 @@ class MarginBase(ModelBase):
       @ Out, None
     """
     super().__init__()
-    # variable stores margin value
-    self._margin = None
+    self._margin = None           # variable stores margin value
+    
 
   def _checkInputParams(self, needDict):
     """
@@ -55,7 +55,7 @@ class MarginBase(ModelBase):
       @ In, None
       @ Out, None
     """
-    self._margin = self._marginFunction(inputDict)
+    return self._marginFunction(inputDict)
 
   @abc.abstractmethod
   def _marginFunction(self, inputDict):

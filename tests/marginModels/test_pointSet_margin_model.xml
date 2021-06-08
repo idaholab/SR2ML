@@ -1,4 +1,17 @@
 <Simulation verbosity="debug">
+  <TestInfo>
+    <name>plugins/SR2ML.marginModel.PointSetMarginModel</name>
+    <author>mandd</author>
+    <created>2021-06-07</created>
+    <classesTested>Models.ExternalModel</classesTested>
+    <description>
+      This input tests the PointSetMarginModel model 1D data.
+      The failure data was generated from a uniform distribution [9,10] (i.e., =9.0+RAND() ).
+      Given actualTime between 2 and 3, the normalize margin should be distributed between. 
+    </description>
+
+  </TestInfo>
+  
   <RunInfo>
     <WorkingDir>PointSetModel</WorkingDir>
     <Sequence>MCRun,print</Sequence>
@@ -17,15 +30,15 @@
 
   <Distributions>
     <Uniform name="actualTimeDist">
-      <lowerBound>2.</lowerBound>
-      <upperBound>3.</upperBound>
+      <lowerBound>1.999999</lowerBound>
+      <upperBound>2.000001</upperBound>
     </Uniform>
   </Distributions>
 
   <Samplers>
     <MonteCarlo name="MC">
       <samplerInit>
-        <limit>4</limit>
+        <limit>1000</limit>
       </samplerInit>
       <variable name="actualTime">
         <distribution>actualTimeDist</distribution>

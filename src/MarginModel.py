@@ -38,6 +38,7 @@ class MarginModel(ExternalModelPluginBase):
     self._model = None
     self._modelType = None
     self._modelXMLInput = None
+    self.marginID = None          # ID of the calculated margin variable
 
   def _readMoreXML(self, container, xmlNode):
     """
@@ -74,8 +75,7 @@ class MarginModel(ExternalModelPluginBase):
     """
     self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
-    self._model.run(inputDict)
-    outputDict = {}
-    outputDict['margin']   = self._model.getMargin()
+    outputDict = self._model.run(inputDict)
+    
     for key, val in outputDict.items():
       setattr(container, key, val)
