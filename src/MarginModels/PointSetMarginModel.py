@@ -71,7 +71,7 @@ class PointSetMarginModel(MarginBase):
       elif child.getName() == 'map':
         self.mapping[child.parameterValues.get('var')]      = self.setVariable(child.value)
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
-        
+
     self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
 
     self.dimensionality = len(self.mapping.keys())
