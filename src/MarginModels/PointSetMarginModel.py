@@ -55,6 +55,7 @@ class PointSetMarginModel(MarginBase):
     self.marginID = None          # ID of the calculated margin variable
     self.dimensionality = None    # dimensionality of the point set
 
+
   def _handleInput(self, paramInput):
     """
       Function to read the portion of the parsed xml input that belongs to this specialized class
@@ -69,7 +70,7 @@ class PointSetMarginModel(MarginBase):
       if child.getName() == 'marginID':
         self.marginID = child.value
       elif child.getName() == 'map':
-        self.InvMapping[child.value[0]] = child.parameterValues.get('var')
+        self.InvMapping[child.value] = child.parameterValues.get('var')
 
     self.dimensionality = len(self.InvMapping.values())
 
@@ -100,7 +101,6 @@ class PointSetMarginModel(MarginBase):
 
     zeroPoint = copy.deepcopy(actualData)
     zeroPoint[:] = 0.0
-
     distMatrix2 = pairwise_distances(self.failedData.values, zeroPoint.values, metric=customDist)
     distMatrix2[distMatrix2<0] = 0
     margin2 = np.mean(distMatrix2)
@@ -109,6 +109,7 @@ class PointSetMarginModel(MarginBase):
     outputDict[self.marginID] = margin/margin2
 
     return outputDict
+
 
 def customDist(pointSet,refPoint):
   """
