@@ -65,8 +65,7 @@ class MarginModel(ExternalModelPluginBase):
       @ In, inputFiles, list, list of input files (if any)
       @ Out, None
     """
-    pass
-
+    self._model.setWorkingDir(runInfoDict['WorkingDir'])
 
   def run(self, container, inputDict):
     """
