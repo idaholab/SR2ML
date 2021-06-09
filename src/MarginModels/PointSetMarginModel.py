@@ -10,6 +10,7 @@ Created on May 13 2021
 import numpy as np
 import pandas as pd
 import copy
+import os
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
@@ -69,8 +70,6 @@ class PointSetMarginModel(MarginBase):
         self.marginID = child.value
       elif child.getName() == 'map':
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
-    
-    self.failedData = pd.read_csv(self.failedDataFileID)[self.InvMapping.values()]
 
     self.dimensionality = len(self.InvMapping.values())
 
@@ -82,6 +81,8 @@ class PointSetMarginModel(MarginBase):
       @ Out, None
     """
     super().initialize(inputDict)
+    self.failedDataFileID = os.path.join(self.workingDir, self.failedDataFileID)
+    self.failedData = pd.read_csv(self.failedDataFileID)[self.InvMapping.values()]
 
 
   def _marginFunction(self, inputDict):
