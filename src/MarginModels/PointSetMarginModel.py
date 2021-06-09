@@ -66,15 +66,16 @@ class PointSetMarginModel(MarginBase):
     for child in paramInput.subparts:
       if child.getName() == 'failedDataFileID':
         self.failedDataFileID = self.setVariable(child.value)
+        #self._variableDict['failedDataFileID'] = self.failedDataFileID
       if child.getName() == 'marginID':
         self.marginID = self.setVariable(child.value)
+        #self._variableDict['marginID'] = self.marginID
       elif child.getName() == 'map':
-        self.mapping[child.parameterValues.get('var')]      = self.setVariable(child.value)
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
 
-    self.failedData = pd.read_csv(self.failedDataFileID)[self.mapping.keys()]
+    self.failedData = pd.read_csv(self.failedDataFileID)[self.InvMapping.values()]
 
-    self.dimensionality = len(self.mapping.keys())
+    self.dimensionality = len(self.InvMapping.values())
 
 
   def initialize(self, inputDict):

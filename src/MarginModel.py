@@ -22,7 +22,7 @@ from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 
 class MarginModel(ExternalModelPluginBase):
   """
-     RAVEN ExternalModel for Maintenance Models
+     RAVEN ExternalModel for Margin Models
   """
 
   def __init__(self):
@@ -54,17 +54,19 @@ class MarginModel(ExternalModelPluginBase):
     self._modelType = self._modelXMLInput.get('type')
     if self._modelType is None:
       raise IOError("Required attribute 'type' for node 'MarginModel' is not provided!")
-    self._model = MarginModels.returnInstance(self._modelType)
+    self._model = MarginModels.returnInstance(self._modelType) 
+    
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
-      Method to initialize the Maintenance Model
+      Method to initialize the Margin Model
       @ In, container, object, self-like object where all the variables can be stored
       @ In, runInfoDict, dict, dictionary containing all the RunInfo parameters (XML node <RunInfo>)
       @ In, inputFiles, list, list of input files (if any)
       @ Out, None
     """
-    pass
+    self._model.handleInput(self._modelXMLInput)
+
 
   def run(self, container, inputDict):
     """
@@ -73,7 +75,6 @@ class MarginModel(ExternalModelPluginBase):
       @ In, inputDict, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
-    self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
     outputDict = self._model.run(inputDict)
 
