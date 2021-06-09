@@ -30,11 +30,11 @@ class PointSetMarginModel(MarginBase):
     """
     inputSpecs = super(PointSetMarginModel, cls).getInputSpecification()
     inputSpecs.description = """ PointSet Margin Model """
-    inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.InterpretedListType, descr='failed data file'))
+    inputSpecs.addSub(InputData.parameterInputFactory('failedDataFileID', contentType=InputTypes.StringType, descr='failed data file'))
 
-    inputSpecs.addSub(InputData.parameterInputFactory('marginID', contentType=InputTypes.InterpretedListType, descr='ID of the margin variable'))
+    inputSpecs.addSub(InputData.parameterInputFactory('marginID', contentType=InputTypes.StringType, descr='ID of the margin variable'))
 
-    mapping = InputData.parameterInputFactory('map', contentType=InputTypes.InterpretedListType, descr='ID of the column of the csv containing failed data')
+    mapping = InputData.parameterInputFactory('map', contentType=InputTypes.StringType, descr='ID of the column of the csv containing failed data')
     mapping.addParam("var", InputTypes.StringType)
     inputSpecs.addSub(mapping)
 
@@ -50,7 +50,6 @@ class PointSetMarginModel(MarginBase):
     MarginBase.__init__(self)
 
     self.failedDataFileID = None  # name of the file containing the failed data
-    self.mapping = {}             # dictionary containing mapping between actual and failed data
     self.InvMapping = {}          # dictionary containing mapping between failed and actual data
     self.marginID = None          # ID of the calculated margin variable
     self.dimensionality = None    # dimensionality of the point set
@@ -65,14 +64,12 @@ class PointSetMarginModel(MarginBase):
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName() == 'failedDataFileID':
-        self.failedDataFileID = self.setVariable(child.value)
-        #self._variableDict['failedDataFileID'] = self.failedDataFileID
+        self.setVariable('failedDataFileID', child.value)
       if child.getName() == 'marginID':
-        self.marginID = self.setVariable(child.value)
-        #self._variableDict['marginID'] = self.marginID
+        self.setVariable('marginID', child.value)
       elif child.getName() == 'map':
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
-
+    
     self.failedData = pd.read_csv(self.failedDataFileID)[self.InvMapping.values()]
 
     self.dimensionality = len(self.InvMapping.values())

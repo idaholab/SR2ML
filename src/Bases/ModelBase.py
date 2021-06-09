@@ -108,7 +108,9 @@ class ModelBase(object):
     """
     ret = None
     # multi-entry or single-entry?
-    if len(value) == 1:
+    if isinstance(value, str):
+      ret = value.split()[0]
+    elif len(value) == 1:
       if not utils.isAFloatOrInt(value[0]):
         ret = value[0]
         ## add it to _variableDict, so the code can aware of this variable
