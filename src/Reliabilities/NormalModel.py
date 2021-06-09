@@ -58,11 +58,9 @@ class NormalModel(ScipyStatsModelBase):
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'sigma':
-        self._sigma = self.setVariable(child.value)
-        self._variableDict['_sigma'] = self._sigma
+        self.setVariable('_sigma', child.value)
       elif child.getName().lower() == 'tm':
-        self._tm = self.setVariable(child.value)
-        self._variableDict['_tm'] = self._tm
+        self.setVariable('_tm', child.value)
 
   def initialize(self, inputDict):
     """
