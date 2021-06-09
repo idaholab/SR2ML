@@ -65,14 +65,11 @@ class LogLinearModel(ReliabilityBase):
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'alpha':
-        self._alpha = self.setVariable(child.value)
-        self._variableDict['_alpha'] = self._alpha
+        self.setVariable('_alpha', child.value)
       elif child.getName().lower() == 'beta':
-        self._beta = self.setVariable(child.value)
-        self._variableDict['_beta'] = self._beta
+        self.setVariable('_beta', child.value)
       elif child.getName().lower() == 'tm':
-        self._tm = self.setVariable(child.value)
-        self._variableDict['_tm'] = self._tm
+        self.setVariable('_tm', child.value)
 
   def initialize(self, inputDict):
     """

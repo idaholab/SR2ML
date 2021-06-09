@@ -61,8 +61,7 @@ class ReliabilityBase(ModelBase):
     super()._handleInput(paramInput)
     td = paramInput.findFirst('Td')
     if td is not None:
-      self._loc = self.setVariable(td.value)
-      self._variableDict['_loc'] = self._loc
+      self.setVariable('_loc', td.value)
 
   def _checkInputParams(self, needDict):
     """

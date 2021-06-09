@@ -64,6 +64,7 @@ class MaintenanceModel(ExternalModelPluginBase):
     if self._modelType is None:
       raise IOError("Required attribute 'type' for node 'MaintenanceModel' is not provided!")
     self._model = MaintenanceModels.returnInstance(self._modelType)
+    self._model.handleInput(self._modelXMLInput)
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -82,7 +83,6 @@ class MaintenanceModel(ExternalModelPluginBase):
       @ In, inputDict, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
-    self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
     self._model.run(inputDict)
     outputDict = {}
