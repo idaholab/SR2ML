@@ -64,9 +64,9 @@ class PointSetMarginModel(MarginBase):
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName() == 'failedDataFileID':
-        self.setVariable('failedDataFileID', child.value)
+        self.failedDataFileID = child.value
       if child.getName() == 'marginID':
-        self.setVariable('marginID', child.value)
+        self.marginID = child.value
       elif child.getName() == 'map':
         self.InvMapping[child.value[0]] = child.parameterValues.get('var')
     
