@@ -54,8 +54,8 @@ class MarginModel(ExternalModelPluginBase):
     self._modelType = self._modelXMLInput.get('type')
     if self._modelType is None:
       raise IOError("Required attribute 'type' for node 'MarginModel' is not provided!")
-    self._model = MarginModels.returnInstance(self._modelType) 
-    
+    self._model = MarginModels.returnInstance(self._modelType)
+
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
