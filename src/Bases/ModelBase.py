@@ -51,6 +51,7 @@ class ModelBase(object):
     self._model = None
     # class of model
     self._modelClass = None
+    self.workingDir = None
 
   def handleInput(self, xmlNode):
     """
@@ -70,6 +71,14 @@ class ModelBase(object):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
+
+  def setWorkingDir(self, workingDir):
+    """
+      Set the path for working direcotry
+      @ In, workingDir, str, the path for working directory
+      @ Out, None
+    """
+    self.workingDir = workingDir
 
   def initialize(self, inputDict):
     """
