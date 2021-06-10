@@ -51,7 +51,7 @@ class PointSetMarginModel(MarginBase):
     MarginBase.__init__(self)
 
     self.failedDataFileID = None  # name of the file containing the failed data
-    self.InvMapping = {}          # dictionary containing mapping between failed and actual data
+    self.invMapping = {}          # dictionary containing mapping between failed and actual data
     self.marginID = None          # ID of the calculated margin variable
     self.dimensionality = None    # dimensionality of the point set
 
@@ -70,9 +70,9 @@ class PointSetMarginModel(MarginBase):
       if child.getName() == 'marginID':
         self.marginID = child.value
       elif child.getName() == 'map':
-        self.InvMapping[child.value] = child.parameterValues.get('var')
+        self.invMapping[child.value] = child.parameterValues.get('var')
 
-    self.dimensionality = len(self.InvMapping.values())
+    self.dimensionality = len(self.invMapping.values())
 
 
   def initialize(self, inputDict):
@@ -83,7 +83,7 @@ class PointSetMarginModel(MarginBase):
     """
     super().initialize(inputDict)
     self.failedDataFileID = os.path.join(self.workingDir, self.failedDataFileID)
-    self.failedData = pd.read_csv(self.failedDataFileID)[self.InvMapping.values()]
+    self.failedData = pd.read_csv(self.failedDataFileID)[self.invMapping.values()]
 
 
   def _marginFunction(self, inputDict):
@@ -93,7 +93,7 @@ class PointSetMarginModel(MarginBase):
       @ Out, outputDict, dict, dictionary containing margin value
     """
     actualData = pd.DataFrame(inputDict)
-    actualData = actualData.rename(columns=self.InvMapping)
+    actualData = actualData.rename(columns=self.invMapping)
 
     distMatrix = pairwise_distances(self.failedData.values, actualData.values, metric=customDist)
     distMatrix[distMatrix<0] = 0
