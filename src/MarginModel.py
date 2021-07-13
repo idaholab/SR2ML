@@ -8,13 +8,11 @@ Created on March 23 2020
 
 #External Modules------------------------------------------------------------------------------------
 import abc
-import sys
-import os
 # import logging
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from SR2ML.src import MaintenanceModels
+from SR2ML.src import MarginModels
 from utils import mathUtils as utils
 from utils import InputData
 from utils import InputTypes
@@ -22,9 +20,9 @@ from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 
-class MaintenanceModel(ExternalModelPluginBase):
+class MarginModel(ExternalModelPluginBase):
   """
-     RAVEN ExternalModel for Maintenance Models
+     RAVEN ExternalModel for Margin Models
   """
 
   def __init__(self):
@@ -36,10 +34,11 @@ class MaintenanceModel(ExternalModelPluginBase):
     ExternalModelPluginBase.__init__(self)
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
-    self._dynamicHandling    = False
+    self._dynamicHandling = False
     self._model = None
     self._modelType = None
     self._modelXMLInput = None
+    self.marginID = None          # ID of the calculated margin variable
 
   def _readMoreXML(self, container, xmlNode):
     """
@@ -51,22 +50,22 @@ class MaintenanceModel(ExternalModelPluginBase):
     variables = xmlNode.find('variables')
     delimiter = ',' if ',' in variables.text else None
     container.variables = [var.strip() for var in variables.text.split(delimiter)]
-    self._modelXMLInput = xmlNode.find('MaintenanceModel')
+    self._modelXMLInput = xmlNode.find('MarginModel')
     self._modelType = self._modelXMLInput.get('type')
     if self._modelType is None:
-      raise IOError("Required attribute 'type' for node 'MaintenanceModel' is not provided!")
-    self._model = MaintenanceModels.returnInstance(self._modelType)
+      raise IOError("Required attribute 'type' for node 'MarginModel' is not provided!")
+    self._model = MarginModels.returnInstance(self._modelType)
     self._model.handleInput(self._modelXMLInput)
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
-      Method to initialize the Maintenance Model
+      Method to initialize the Margin Model
       @ In, container, object, self-like object where all the variables can be stored
       @ In, runInfoDict, dict, dictionary containing all the RunInfo parameters (XML node <RunInfo>)
       @ In, inputFiles, list, list of input files (if any)
       @ Out, None
     """
-    pass
+    self._model.setWorkingDir(runInfoDict['WorkingDir'])
 
   def run(self, container, inputDict):
     """
@@ -76,9 +75,7 @@ class MaintenanceModel(ExternalModelPluginBase):
       @ Out, None
     """
     self._model.initialize(inputDict)
-    self._model.run(inputDict)
-    outputDict = {}
-    outputDict['avail']   = self._model.getAvail()
-    outputDict['unavail'] = self._model.getUnavail()
+    outputDict = self._model.run(inputDict)
+
     for key, val in outputDict.items():
       setattr(container, key, val)

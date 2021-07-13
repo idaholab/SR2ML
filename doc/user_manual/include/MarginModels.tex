@@ -1,0 +1,80 @@
+\section{Margin Models}
+\label{sec:MarginModels}
+
+\textbf{Margin Models} are models designed to calculate the margin of a component for margin-based reliability 
+calculations.
+
+The classes of models considered here are as follows:
+\begin{itemize}
+	\item PointSetMarginModel, i.e. model \xmlAttr{type} is \xmlString{PointSetMarginModel}
+\end{itemize}
+
+The specifications of these models must be defined within a RAVEN \xmlNode{ExternalModel}. This
+XML node accepts the following attributes:
+\begin{itemize}
+	\item \xmlAttr{name}, \xmlDesc{required string attribute}, user-defined identifier of this model.
+	\nb As with other objects, this identifier can be used to reference this specific entity from other
+	input blocks in the XML.
+	\item \xmlAttr{subType}, \xmlDesc{required string attribute}, defines which of the subtypes should
+	be used. For margin models, the user must use \xmlString{SR2ML.MarginModel} as subtype.
+\end{itemize}
+
+In the margin \xmlNode{ExternalModel} input block, the following XML subnodes are required:
+\begin{itemize}
+	\item \xmlNode{variable}, \xmlDesc{string, required parameter}. Comma-separated list of variable
+	names. Each variable name needs to match a variable used or defined in the matign model or variable
+	coming from other RAVEN entities (i.e., Samplers, DataObjects, and Models).
+	\item \xmlNode{MarginModel}, \xmlDesc{required parameter}. The node is used to define the maintenance
+	model, and it contains the following required XML attribute:
+	\begin{itemize}
+		\item \xmlAttr{type}, \xmlDesc{required string attribute}, user-defined identifier of the margin model.
+	\end{itemize}
+\end{itemize}
+
+In addition, if the user wants to use the \textbf{alias} system, the following XML block can be input:
+\begin{itemize}
+	\item \xmlNode{alias} \xmlDesc{string, optional field} specifies alias for
+	any variable of interest in the input or output space for the ExternalModel.
+	%
+	These aliases can be used anywhere in the RAVEN input to refer to the ExternalModel
+	variables.
+	%
+	In the body of this node, the user specifies the name of the variable that the ExternalModel is
+	going to use (during its execution).
+	%
+	The actual alias, usable throughout the RAVEN input, is instead defined in the
+	\xmlAttr{variable} attribute of this tag.
+	\\The user can specify aliases for both the input and the output space. As a sanity check, RAVEN
+	requires an additional required attribute \xmlAttr{type}. This attribute can be either ``input'' or ``output.''
+	%
+	\nb The user can specify as many aliases as needed.
+	%
+	\default{None}
+\end{itemize}
+
+\subsection{PointSetMarginModel Model}
+For the PointSetMarginModel model, in the margin \xmlNode{MarginModel} input block, the following XML subnodes 
+are required:
+\begin{itemize}
+	\item \xmlNode{failedDataFileID}, \xmlDesc{string, required parameter}. ID of the file containing the failure data
+	      to be used as reference data
+	\item \xmlNode{marginID}, \xmlDesc{required parameter}. ID of the variable where the margin needs to be stored
+	\item \xmlNode{map}, \xmlDesc{required parameter}. This node is used to map actual measured data dimension and the 
+	      failure data dimension. In here, the ID of the Raven variable representing a dimension of the actual data
+	\begin{itemize}
+		\item \xmlAttr{var}, \xmlDesc{required string attribute}, the ID of the corresponding dimension in the failure data.
+	\end{itemize}
+\end{itemize}
+
+Example XML:
+\begin{lstlisting}[style=XML]
+    <ExternalModel name="PointSetMargin" subType="SR2ML.MarginModel">
+      <variables>actualTime,actualTemp,marginPS1</variables>
+      <MarginModel type="PointSetMarginModel">
+        <failedDataFileID>failureData.csv</failedDataFileID>
+        <marginID>marginPS1</marginID>
+        <map var='time'>actualTime</map>
+        <map var='avgT'>actualTemp</map>
+      </MarginModel>
+    </ExternalModel>
+\end{lstlisting}
