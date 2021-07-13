@@ -57,7 +57,9 @@ An example of RAVEN input file is the following:
     ...
     <Models>
       <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
-        <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP</variables>
+        <variables>
+          statusBE1,statusBE2,statusBE3,statusBE4,TOP
+        </variables>
         <solver type='probability'> 
           <solverOrder>3</solverOrder>
         </solver> 
@@ -97,7 +99,9 @@ The format of the dataObject can be:
    \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from HistorySet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
      <Models>
       <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
-        <variables>statusBE1,statusBE2,statusBE3,statusBE4,TOP,time</variables>
+        <variables>
+          statusBE1,statusBE2,statusBE3,statusBE4,TOP,time
+        </variables>
         <solverOrder>3</solverOrder>
         <topEventID>TOP</topEventID>
         <timeID>time</timeID>
@@ -126,7 +130,9 @@ The format of the dataObject can be:
    \begin{lstlisting}[style=XML,morekeywords={anAttribute},caption=Time dependent (from PointSet) MCSSolver model input example., label=lst:MCSSolver_InputExample]
     <Models>
       <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
-        <variables>pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4</variables>
+        <variables>
+          pBE1,pBE2,pBE3,pBE4,TOP,time,BE1,BE2,BE3,BE4
+        </variables>
         <solverOrder>3</solverOrder>
         <BE_ID>BE</BE_ID>
         <tInitial>tIn</tInitial>
