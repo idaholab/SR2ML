@@ -1,0 +1,119 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>SR2ML/basicEventScheduler</name>
+    <author>mandd</author>
+    <created>2021-07-14</created>
+    <classesTested>SR2ML/basicEventScheduler</classesTested>
+    <description>
+      This model provided the schedule of a set of basic events create an history set containing 
+      basic event temporal profiles. Each basic event is represented by the initial and final time 
+      where basic event is set to True (i.e., with probability=1.0)
+    </description>
+  </TestInfo>
+  
+  <RunInfo>
+    <WorkingDir>basicEventScheduler</WorkingDir>
+    <Sequence>simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Models>
+    <ExternalModel name="basicEventScheduler" subType="SR2ML.basicEventScheduler">
+      <variables>BE1_tin, BE2_tin, BE3_tin,timeSpam,
+                 BE1_tfin,BE2_tfin,BE3_tfin</variables>
+      <BE tin='BE1_tin' tfin='BE1_tfin'>BE1</BE>
+      <BE tin='BE2_tin' tfin='BE2_tfin'>BE2</BE>
+      <BE tin='BE3_tin' tfin='BE3_tfin'>BE3</BE>
+      <timeSpamID>timeSpam</timeSpamID>
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name='BE1_tin_dist'>
+      <lowerBound>0.</lowerBound>
+      <upperBound>1.</upperBound>
+    </Uniform>
+    <Uniform name='BE2_tin_dist'>
+      <lowerBound>2.</lowerBound>
+      <upperBound>3.</upperBound>
+    </Uniform>
+    <Uniform name='BE3_tin_dist'>
+      <lowerBound>1.</lowerBound>
+      <upperBound>3.</upperBound>
+    </Uniform>
+    <Uniform name='BE1_tfin_dist'>
+      <lowerBound>2.</lowerBound>
+      <upperBound>3.</upperBound>
+    </Uniform>
+    <Uniform name='BE2_tfin_dist'>
+      <lowerBound>4.</lowerBound>
+      <upperBound>5.</upperBound>
+    </Uniform>
+    <Uniform name='BE3_tfin_dist'>
+      <lowerBound>3.</lowerBound>
+      <upperBound>5.</upperBound>
+    </Uniform>
+  </Distributions>
+  
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <variable name="BE1_tin">
+        <distribution>BE1_tin_dist</distribution>
+      </variable>
+      <variable name="BE2_tin">
+        <distribution>BE2_tin_dist</distribution>
+      </variable>
+      <variable name="BE3_tin">
+        <distribution>BE3_tin_dist</distribution>
+      </variable>
+      <variable name="BE1_tfin">
+        <distribution>BE1_tin_dist</distribution>
+      </variable>
+      <variable name="BE2_tfin">
+        <distribution>BE2_tin_dist</distribution>
+      </variable>
+      <variable name="BE3_tfin">
+        <distribution>BE3_tin_dist</distribution>
+      </variable>
+      <constant name="timeSpam">1.0</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <MultiRun name="simRun">
+      <Input   class="DataObjects"  type="PointSet"        >basicEventSchedule_PointSet</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="HistorySet"      >sim_HS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_HS</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_HS">
+      <type>csv</type>
+      <source>sim_HS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="inputPlaceHolder">
+      <Input>BE1_tin, BE2_tin, BE3_tin,timeSpam,
+             BE1_tfin,BE2_tfin,BE3_tfin</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <HistorySet name="sim_HS">
+      <Input>BE1_tin, BE2_tin, BE3_tin,timeSpam,
+             BE1_tfin,BE2_tfin,BE3_tfin</Input>
+      <Output>BE1,BE2,BE3,BE4,TOP</Output>
+      <options>
+          <pivotParameter>time</pivotParameter>
+      </options>
+    </HistorySet>
+  </DataObjects>
+
+</Simulation>
