@@ -47,7 +47,11 @@ class AAKR():
     residual = {}
     for var in timeSeries:
       if var in self.trainingData.keys():
-        distanceMatrix = pairwise_kernels(X=timeSeries[var].values.reshape(-1, 1), Y=self.trainingData[var].values.reshape(-1, 1), metric=self.metric, **Kwargs)
+        distanceMatrix = pairwise_kernels(X=timeSeries[var].values.reshape(-1, 1), 
+                                          Y=self.trainingData[var].values.reshape(-1, 1), 
+                                          metric=self.metric, 
+                                          **Kwargs)
+        
         numerator = np.dot(distanceMatrix,self.trainingData[var].values.reshape(-1, 1)).T[0]
         denominator = distanceMatrix.sum(axis=1)
         recData[var] = np.divide(numerator,denominator)
