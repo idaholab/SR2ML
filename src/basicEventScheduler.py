@@ -106,5 +106,3 @@ class basicEventScheduler(ExternalModelPluginBase):
 
     container.__dict__[container.timeID] = timeArrayCleaned
 
-    print(container.__dict__)
-
