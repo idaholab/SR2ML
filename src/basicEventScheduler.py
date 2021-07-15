@@ -38,7 +38,7 @@ class basicEventScheduler(ExternalModelPluginBase):
       @ Out, None
     """
     ExternalModelPluginBase.__init__(self)
-    
+
   def initialize(self, container, runInfoDict, inputFiles):
     """
       Method to initialize the Basic Event Scheduler model
@@ -56,7 +56,7 @@ class basicEventScheduler(ExternalModelPluginBase):
       @ Out, None
     """
     container.basicEvents = {}
-    
+
     for child in xmlNode:
       if child.tag == 'BE':
         container.basicEvents[child.text.strip()] = [child.get('tin'),child.get('tfin')]
@@ -66,7 +66,7 @@ class basicEventScheduler(ExternalModelPluginBase):
         variables = [str(var.strip()) for var in child.text.split(",")]
       else:
         raise IOError("basicEventScheduler: xml node " + str(child.tag) + " is not allowed")
-  
+
   def run(self, container, inputs):
     """
       This method generate an historySet from the a pointSet which contains initial and final time of the
@@ -74,19 +74,19 @@ class basicEventScheduler(ExternalModelPluginBase):
       @ In, inputDataset, dict, dictionary of inputs from RAVEN
       @ In, container, object, self-like object where all the variables can be stored
       @ Out, basicEventHistorySet, Dataset, xarray dataset which contains time series for each basic event
-    """     
+    """
     dataDict = {}
     for key in container.basicEvents.keys():
       dataDict[key] = []
       dataDict[key].append(inputs[container.basicEvents[key][0]][0])
-      dataDict[key].append(inputs[container.basicEvents[key][1]][0])     
-    
-    inputDataset = pd.DataFrame.from_dict(dataDict, orient='index',columns=['tin', 'tfin'])   
+      dataDict[key].append(inputs[container.basicEvents[key][1]][0])
+
+    inputDataset = pd.DataFrame.from_dict(dataDict, orient='index',columns=['tin', 'tfin'])
 
     timeArray = np.concatenate([inputDataset['tin'],inputDataset['tfin']])
     timeArraySorted = np.sort(timeArray,axis=0)
     timeArrayCleaned = np.unique(timeArraySorted)
-    
+
     keys = list(container.basicEvents.keys())
     dataVars={}
     for key in keys:
@@ -95,16 +95,16 @@ class basicEventScheduler(ExternalModelPluginBase):
     basicEventHistorySet = xr.Dataset(data_vars = dataVars,
                                       coords    = dict(time=timeArrayCleaned,
                                       RAVEN_sample_ID=np.zeros(1)))
-  
+
     for key in container.basicEvents.keys():
       tin  = inputs[container.basicEvents[key][0]][0]
       tend = inputs[container.basicEvents[key][1]][0]
       indexes = np.where(np.logical_and(timeArrayCleaned>tin,timeArrayCleaned<=tend))
       basicEventHistorySet[key][0][indexes] = 1.0
-      
+
       container.__dict__[key] = basicEventHistorySet[key].values[0]
-      
+
     container.__dict__[container.timeID] = timeArrayCleaned
-    
+
     print(container.__dict__)
 
