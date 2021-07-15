@@ -107,4 +107,10 @@
   input = 'test_MCSSolver_margin.xml'
   UnorderedCsv   = 'MCSSolverMargin/Print_sim_PS.csv'
  [../]
+ 
+ [./TestBasicEventScheduler]
+  type  = 'RavenFramework'
+  input = 'test_basicEventScheduler.xml'
+  OrderedCsv   = 'basicEventScheduler/Print_sim_HS_0.csv'
+ [../]
 []

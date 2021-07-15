@@ -19,12 +19,13 @@
 
   <Models>
     <ExternalModel name="basicEventScheduler" subType="SR2ML.basicEventScheduler">
-      <variables>BE1_tin, BE2_tin, BE3_tin,timeSpam,
-                 BE1_tfin,BE2_tfin,BE3_tfin</variables>
+      <variables>BE1_tin, BE2_tin, BE3_tin,
+                 BE1_tfin,BE2_tfin,BE3_tfin,
+                 BE1,BE2,BE3,time</variables>
       <BE tin='BE1_tin' tfin='BE1_tfin'>BE1</BE>
       <BE tin='BE2_tin' tfin='BE2_tfin'>BE2</BE>
       <BE tin='BE3_tin' tfin='BE3_tfin'>BE3</BE>
-      <timeSpamID>timeSpam</timeSpamID>
+      <timeID>time</timeID>
     </ExternalModel>
   </Models>
 
@@ -70,22 +71,21 @@
         <distribution>BE3_tin_dist</distribution>
       </variable>
       <variable name="BE1_tfin">
-        <distribution>BE1_tin_dist</distribution>
+        <distribution>BE1_tfin_dist</distribution>
       </variable>
       <variable name="BE2_tfin">
-        <distribution>BE2_tin_dist</distribution>
+        <distribution>BE2_tfin_dist</distribution>
       </variable>
       <variable name="BE3_tfin">
-        <distribution>BE3_tin_dist</distribution>
+        <distribution>BE3_tfin_dist</distribution>
       </variable>
-      <constant name="timeSpam">1.0</constant>
     </MonteCarlo>
   </Samplers>
 
   <Steps>
     <MultiRun name="simRun">
-      <Input   class="DataObjects"  type="PointSet"        >basicEventSchedule_PointSet</Input>
-      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Input   class="DataObjects"  type="PointSet"        >inputPlaceHolder</Input>
+      <Model   class="Models"       type="ExternalModel"   >basicEventScheduler</Model>
       <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
       <Output  class="DataObjects"  type="HistorySet"      >sim_HS</Output>
       <Output  class="OutStreams"   type="Print"           >Print_sim_HS</Output>
@@ -102,16 +102,16 @@
 
   <DataObjects>
     <PointSet name="inputPlaceHolder">
-      <Input>BE1_tin, BE2_tin, BE3_tin,timeSpam,
+      <Input>BE1_tin, BE2_tin, BE3_tin,
              BE1_tfin,BE2_tfin,BE3_tfin</Input>
       <Output>OutputPlaceHolder</Output>
     </PointSet>
     <HistorySet name="sim_HS">
-      <Input>BE1_tin, BE2_tin, BE3_tin,timeSpam,
+      <Input>BE1_tin, BE2_tin, BE3_tin,
              BE1_tfin,BE2_tfin,BE3_tfin</Input>
-      <Output>BE1,BE2,BE3,BE4,TOP</Output>
+      <Output>BE1,BE2,BE3</Output>
       <options>
-          <pivotParameter>time</pivotParameter>
+        <pivotParameter>time</pivotParameter>
       </options>
     </HistorySet>
   </DataObjects>

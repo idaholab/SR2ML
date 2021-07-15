@@ -1,0 +1,41 @@
+\section{Basic Event Scheduler Model}
+\label{sec:basicEventScheduler}
+
+This model is designed to read the initial and final time under which a set of basic events
+are set to True, and then it generates an HistorySet with the full temporal profile of all
+basic events.
+
+
+All the specifications of the Basic Event Scheduler model are given in the \xmlNode{ExternalModel} block.
+Inside the \xmlNode{ExternalModel} block, the XML
+nodes that belong to this models are:
+\begin{itemize}
+  \item  \xmlNode{variables}, \xmlDesc{string, required parameter}, a list containing the names of both the input and output variables of the model
+  \item  \xmlNode{BE}, \xmlDesc{string, required parameter}, the name ID of all basic events
+	  \begin{itemize}
+	    \item \xmlAttr{tin}, \xmlDesc{required string attribute}, name ID of the variable describing the initial time of the BE
+	    \item \xmlAttr{tin}, \xmlDesc{required string attribute}, name ID of the variable describing the final time of the BE
+	  \end{itemize}
+\end{itemize}
+
+The example of \textbf{basicEventScheduler} model is provided below:
+\begin{lstlisting}[style=XML]
+  <Models>
+    <ExternalModel name="basicEventScheduler" subType="SR2ML.basicEventScheduler">
+      <variables>BE1_tin, BE2_tin, BE3_tin,
+                 BE1_tfin,BE2_tfin,BE3_tfin,
+                 BE1,BE2,BE3,time</variables>
+      <BE tin='BE1_tin' tfin='BE1_tfin'>BE1</BE>
+      <BE tin='BE2_tin' tfin='BE2_tfin'>BE2</BE>
+      <BE tin='BE3_tin' tfin='BE3_tfin'>BE3</BE>
+      <timeID>time</timeID>
+    </ExternalModel>
+  </Models>
+\end{lstlisting}
+
+\subsection{basicEventScheduler Reference Tests}
+\begin{itemize}
+	\item SR2ML/tests/test\_basicEventScheduler.xml
+\end{itemize}
+
+

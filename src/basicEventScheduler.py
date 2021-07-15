@@ -24,7 +24,7 @@ import pandas as pd
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginsBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End-----------------------------------------------------------
 
 class basicEventScheduler(ExternalModelPluginBase):
@@ -56,13 +56,14 @@ class basicEventScheduler(ExternalModelPluginBase):
       @ Out, None
     """
     container.basicEvents = {}
-    container.timeSpamID = None
     
     for child in xmlNode:
       if child.tag == 'BE':
         container.basicEvents[child.text.strip()] = [child.get('tin'),child.get('tfin')]
-      elif child.tag == 'timeSpamID':
-        container.timeSpamID = child.text.strip()
+      elif child.tag == 'timeID':
+        container.timeID = child.text.strip()
+      elif child.tag == 'variables':
+        variables = [str(var.strip()) for var in child.text.split(",")]
       else:
         raise IOError("basicEventScheduler: xml node " + str(child.tag) + " is not allowed")
   
@@ -74,22 +75,19 @@ class basicEventScheduler(ExternalModelPluginBase):
       @ In, container, object, self-like object where all the variables can be stored
       @ Out, basicEventHistorySet, Dataset, xarray dataset which contains time series for each basic event
     """     
-    if len(inputs) > 2:
-      raise IOError("basicEventScheduler: More than one file has been passed to the MCS solver")
-    
     dataDict = {}
-    dataDict['tin']  = []
-    dataDict['tfin'] = []
     for key in container.basicEvents.keys():
-      dataDict['tin'].append(inputs[container.basicEvents[key][0]])
-      dataDict['tfin'].append(inputs[container.basicEvents[key][1]])     
-      
-    inputDataset = pd.DataFrame.from_dict(dataDict)   
-    timeArray = np.concatenate([inputDataset[container.tInitial],inputDataset[container.tEnd]])
+      dataDict[key] = []
+      dataDict[key].append(inputs[container.basicEvents[key][0]][0])
+      dataDict[key].append(inputs[container.basicEvents[key][1]][0])     
+    
+    inputDataset = pd.DataFrame.from_dict(dataDict, orient='index',columns=['tin', 'tfin'])   
+
+    timeArray = np.concatenate([inputDataset['tin'],inputDataset['tfin']])
     timeArraySorted = np.sort(timeArray,axis=0)
     timeArrayCleaned = np.unique(timeArraySorted)
     
-    keys = list(container.invMapping.keys())
+    keys = list(container.basicEvents.keys())
     dataVars={}
     for key in keys:
       dataVars[key]=(['RAVEN_sample_ID',container.timeID],np.zeros((1,timeArrayCleaned.shape[0])))
@@ -98,11 +96,15 @@ class basicEventScheduler(ExternalModelPluginBase):
                                       coords    = dict(time=timeArrayCleaned,
                                       RAVEN_sample_ID=np.zeros(1)))
   
-    for index,key in enumerate(inputDataset[container.beId].values):
-      tin  = inputDataset[container.tInitial][index].values
-      tend = inputDataset[container.tEnd][index].values
+    for key in container.basicEvents.keys():
+      tin  = inputs[container.basicEvents[key][0]][0]
+      tend = inputs[container.basicEvents[key][1]][0]
       indexes = np.where(np.logical_and(timeArrayCleaned>tin,timeArrayCleaned<=tend))
       basicEventHistorySet[key][0][indexes] = 1.0
+      
+      container.__dict__[key] = basicEventHistorySet[key].values[0]
+      
+    container.__dict__[container.timeID] = timeArrayCleaned
     
-    return basicEventHistorySet
+    print(container.__dict__)
 
