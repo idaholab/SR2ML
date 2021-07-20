@@ -111,6 +111,6 @@
  [./TestBasicEventScheduler]
   type  = 'RavenFramework'
   input = 'test_basicEventScheduler.xml'
-  OrderedCsv   = 'basicEventScheduler/Print_sim_HS_0.csv'
+  csv   = 'basicEventScheduler/Print_sim_HS_0.csv'
  [../]
 []

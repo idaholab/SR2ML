@@ -18,7 +18,7 @@
   </RunInfo>
 
   <Models>
-    <ExternalModel name="basicEventScheduler" subType="SR2ML.basicEventScheduler">
+    <ExternalModel name="basicEventScheduler" subType="SR2ML.BasicEventScheduler">
       <variables>BE1_tin, BE2_tin, BE3_tin,
                  BE1_tfin,BE2_tfin,BE3_tfin,
                  BE1,BE2,BE3,time</variables>

@@ -1,16 +1,6 @@
-# Copyright 2017 Battelle Energy Alliance, LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+
 """
 Created on June 24, 2020
 
@@ -27,7 +17,7 @@ import pandas as pd
 from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End-----------------------------------------------------------
 
-class basicEventScheduler(ExternalModelPluginBase):
+class BasicEventScheduler(ExternalModelPluginBase):
   """
     This class is designed to create a Maintenance Scheduler model
   """
@@ -70,8 +60,9 @@ class basicEventScheduler(ExternalModelPluginBase):
   def run(self, container, inputs):
     """
       This method generate an historySet from the a pointSet which contains initial and final time of the
-      basic events
-      @ In, inputDataset, dict, dictionary of inputs from RAVEN
+      basic events. This method is generating the time series variable basicEventHistorySet which is passed
+      to RAVEN through the container.__dict__ container
+      @ In, inputs, dict, dictionary of inputs from RAVEN
       @ In, container, object, self-like object where all the variables can be stored
       @ Out, basicEventHistorySet, Dataset, xarray dataset which contains time series for each basic event
     """
