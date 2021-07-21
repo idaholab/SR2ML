@@ -64,7 +64,6 @@ class BasicEventScheduler(ExternalModelPluginBase):
       to RAVEN through the container.__dict__ container
       @ In, inputs, dict, dictionary of inputs from RAVEN
       @ In, container, object, self-like object where all the variables can be stored
-      @ Out, basicEventHistorySet, Dataset, xarray dataset which contains time series for each basic event
     """
     dataDict = {}
     for key in container.basicEvents.keys():
