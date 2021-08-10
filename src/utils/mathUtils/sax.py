@@ -23,14 +23,15 @@ class SAX():
   Link: https://www.cs.ucr.edu/~eamonn/SAX.htm
   """
   
-  def __init__(self, timeWindows, alphabetSizeDict):
+  def __init__(self, freq, alphabetSizeDict, timeID=None):
     """
       This method initializes the SAX class
       @ In, alphabetSizeDict, dict, discretization size for each dimensions
       @ In, timeWindows, int, discretization of the time axis
     """
-    self.timeWindows = timeWindows
+    self.freq = freq
     self.alphabetSizeDict = alphabetSizeDict
+    self.timeID = timeID
   
   def fit(self, data, normalization=True):
     """
@@ -54,35 +55,36 @@ class SAX():
   
     return symbolicData, varCutPoints
     
-
   def piecewiseAggregateApproximation(self, data):
+    print(data)
+    paa = data.resample(self.freq, on='time').mean().reset_index()
+    return paa
+    
+  def piecewiseAggregateApproximationOLD(self, data):
     """
       This method performs Piecewise Aggregate Approximation of the given time series
       @ In, data, pandas DataFrame, time series to be discretized
       @ Out, paa, pandas DataFrame, discretized time series
     """
-    nTimeVals, nVars = data.shape
-    
-    newDate = pd.date_range(data.index.to_numpy()[0], data.index.to_numpy()[-1], periods=self.timeWindows)
-    
+    nTimeVals, nVars = data.shape   
     paaData = {}
-    for var in data:
+    for var in self.alphabetSizeDict.keys():
       res = np.zeros(self.timeWindows)
       if (nTimeVals % self.timeWindows == 0):
         inc = nTimeVals // self.timeWindows
         for i in range(0, nTimeVals):
           idx = i // inc
-          res[idx] = res[idx] + data[var][i]
+          res[idx] = res[idx] + data[var].to_numpy()[i]
         paaData[var] = res / inc
       else:
         for i in range(0, self.timeWindows * nTimeVals):
           idx = i // nTimeVals
           pos = i // self.timeWindows
-          res[idx] = res[idx] + data[var][pos]
+          res[idx] = res[idx] + data[var].to_numpy()[pos]
         paaData[var] = res / nTimeVals
     
-    paa = pd.DataFrame(paaData, index=newDate)
-  
+    paa = pd.DataFrame(paaData)
+
     return paa
   
   
@@ -94,12 +96,16 @@ class SAX():
       @ Out, normalizationData, dict, dictionary containing mean and std-dev of each dimension of the time series
     """
     normalizationData = {}
+    normalizedData = {}
     
-    for var in data:
-      normalizationData[var] = [np.mean(data[var].values),np.std(data[var].values)]
-      data[var] = (data[var]-normalizationData[var][0])/normalizationData[var][1]  
-    
-    return data, normalizationData
+    for var in self.alphabetSizeDict.keys():
+      if var!=self.timeID:
+        normalizationData[var] = [np.mean(data[var].values),np.std(data[var].values)]
+        normalizedData[var] = (data[var].values-normalizationData[var][0])/normalizationData[var][1]  
+        
+    normalizedData[self.timeID] = data[self.timeID].values
+    normalizedDataDF = pd.DataFrame(normalizedData)
+    return normalizedDataDF, normalizationData
   
   
   def ndTS2String(self, paaTimeSeries):  
@@ -112,8 +118,9 @@ class SAX():
     varCutPoints = {}
     
     for var in paaTimeSeries:
-      varCutPoints[var] = norm.ppf(np.linspace(0.0, 1.0, num=self.alphabetSizeDict[var]+1),loc=0., scale=1.)
-      paaTimeSeries[var] = self.ts2String(paaTimeSeries[var], varCutPoints[var])
+      if var!=self.timeID:
+        varCutPoints[var] = norm.ppf(np.linspace(0.0, 1.0, num=self.alphabetSizeDict[var]+1),loc=0., scale=1.)
+        paaTimeSeries[var] = self.ts2String(paaTimeSeries[var], varCutPoints[var])
     
     return paaTimeSeries, varCutPoints
         
@@ -138,40 +145,3 @@ class SAX():
   
     return charArray
 
-
-
-''' testing '''
-import matplotlib.pyplot as plt
-
-data = {}
-data['var1'] = np.random.randn(1000)
-data['date'] = pd.date_range('1/1/2000', periods=1000)
-df = pd.DataFrame({'var1':data['var1']}, index=data['date'])
-df.index.name = 'date'
-df = df.cumsum()
-
-df.to_csv('data.csv')
-
-df.plot()
-
-alphabetSizeDict={}
-alphabetSizeDict['var1']=5
-saxConverter = SAX(20,alphabetSizeDict)
-sax,cuts = saxConverter.fit(df, normalization=True)
-print(sax['var1'].values)
-
-for val in cuts['var1']:
-  if val not in ['-inf','inf']:
-    plt.axhline(y=val,color='red', linewidth=0.2)
-for timeVal in sax.index.to_numpy():
-  plt.axvline(x=timeVal,color='red', linewidth=0.2)
-
-print(cuts)
-plt.show()
-
-
-
-   
-    
-    
-    

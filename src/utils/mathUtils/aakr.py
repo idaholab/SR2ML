@@ -1,24 +1,19 @@
 # Copyright 2020, Battelle Energy Alliance, LLC
-# ALL RIGHTS RESERVED
 """
-Created on Mar 29, 2021
+Created on Dec 20, 2020
 
 @author: mandd
 """
 # External Imports
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing    import StandardScaler
+from sklearn.metrics.pairwise import pairwise_distances
 from sklearn.metrics.pairwise import pairwise_kernels
 # Internal Imports
 
 class AAKR():
-  """
-  Class for the Auto Associative Kernel Regression
   
-  Reference: P. Baraldi, F. Di Maio, P. Turati, E. Zio, "Robust signal reconstruction for condition monitoring 
-             of industrial components via a modified AutoAssociative Kernel Regression method," Mechanical Systems 
-             and Signal Processing, 60-61, pp. 29–44 (2015).
-  """
   def __init__(self, metric):
     """
       This method initializes the AAKR class
@@ -32,60 +27,86 @@ class AAKR():
       This method load the training data into the AAKR class
       @ In, trainData, pandas DataFrame, dataframe containing the training dataset, i.e., X^{obs_NC}
     """
-    self.trainingData = trainData
-  
+    if isinstance(trainData,pd.DataFrame):
+      self.trainingData = trainData.to_numpy()
+    else:
+      self.trainingData = trainData
+    
+    # Z-Normalize data
+    self.scaler = StandardScaler()
+    self.scaler.fit(self.trainingData)
+    self.trainingData = self.scaler.transform(self.trainingData)
 
-  def fit(self, timeSeries, **Kwargs):
+
+  def fit(self, timeSeries, batchSize=None, **Kwargs):
     """
-      This method performs the regression of the provided timeSeries using the training data X^{obs_NC}
-      @ In, timeSeries, pandas DataFrame, time series af actual recorded data
+      This method performs partition the provided timeSeries in batches before performing the regression. 
+      This is usefull when training dataset and timeSeries are very big.
+      @ In, timeSeries, pandas DataFrame, time series of actual recorded data
+      @ In, Kwargs, dict, parameters for the chosen kernel
+      @ In, batchSize, int, number of partitions of the timeSeries to perform the regression
+      @ Out, reconstructedData, pandas DataFrame, reconstructed timeSeries
+      @ Out, residual, pandas DataFrame, residual: timeSeries - reconstructedData
+    """
+    #print(timeSeries)
+    if batchSize is None:
+      return self.reconstruct(timeSeries, **Kwargs)
+    else:
+      batches = np.array_split(timeSeries, batchSize)
+      reconstructedDataList = [None] * batchSize
+      residualDataList = [None] * batchSize
+      counter = 0
+      for batch in batches:
+        print("serving batch: " + str(counter))
+        reconstructedDataBatch, residualDataBatch = self.reconstruct(batch, **Kwargs)
+        reconstructedDataList[counter] = reconstructedDataBatch
+        residualDataList[counter] = residualDataBatch
+        counter = counter + 1
+      reconstructedData = pd.concat(reconstructedDataList)
+      residualData = pd.concat(residualDataList)
+
+      return reconstructedData, residualData
+    
+  def reconstruct(self, timeSeries, **Kwargs): 
+    """
+      This method performs the regression of the provided timeSeries for one single batch 
+      using the training data X^{obs_NC}
+      @ In, timeSeries, pandas DataFrame, time series of actual recorded data
       @ In, Kwargs, dict, parameters for the chosen kernel
       @ Out, reconstructedData, pandas DataFrame, reconstructed timeSeries
-      @ Out, residual, pandas DataFrame, residual of ||timeSeries - reconstructedData||
+      @ Out, residual, pandas DataFrame, residual: timeSeries - reconstructedData
     """
     recData = {}
-    residual = {}
-    for var in timeSeries:
-      if var in self.trainingData.keys():
-        distanceMatrix = pairwise_kernels(X=timeSeries[var].values.reshape(-1, 1), 
-                                          Y=self.trainingData[var].values.reshape(-1, 1), 
-                                          metric=self.metric, 
-                                          **Kwargs)
+    resData = {}
+    keys = timeSeries.keys()
+    
+    # Normalize actual data
+    timeSeriesNorm = self.scaler.transform(timeSeries.to_numpy())
+
+    distanceMatrix = pairwise_distances(X = self.trainingData, 
+                                        Y = timeSeriesNorm, 
+                                        metric = self.metric)
+    
+    #distanceMatrix = pairwise_kernels(X=self.trainingData, 
+    #                                  Y=timeSeriesNorm, 
+    #                                  metric=self.metric, 
+    #                                  **Kwargs)
         
-        numerator = np.dot(distanceMatrix,self.trainingData[var].values.reshape(-1, 1)).T[0]
-        denominator = distanceMatrix.sum(axis=1)
-        recData[var] = np.divide(numerator,denominator)
-        residual[var] = (timeSeries[var].values.reshape(-1, 1) - recData[var])[0]
-      else:
-        print('error')
     
-    reconstructedData = pd.DataFrame(recData,  index=timeSeries.index.to_numpy())
-    residual          = pd.DataFrame(residual, index=timeSeries.index.to_numpy())
+    weights = 1.0/np.sqrt(2.0*3.14159*Kwargs['bw']**2.0) * np.exp(-distanceMatrix**2.0/(2.0*Kwargs['bw']**2.0))
+    weightSum = np.sum(weights,axis=0)
+    weightsClean = np.where(sum==0, 1, weightSum)[:, None]
+
+    recDataRaw = weights.T.dot(self.trainingData)
+    recDataRaw = recDataRaw/weightsClean
     
-    return reconstructedData, residual
-  
-
-import matplotlib.pyplot as plt
-
-trainData = np.loadtxt('train.dat')
-valData   = np.loadtxt('test_3.dat')
-timeTrain = pd.date_range('1/1/2000', periods=4000, freq='H')
-timeVal   = pd.date_range('1/1/2000', periods=1752, freq='d')
-
-trainDF = pd.DataFrame({'var1':trainData[:,5]}, index=timeTrain)
-trainDF.index.name = 'time'
-valDF   = pd.DataFrame({'var1':valData[:,5]} , index=timeVal)
-valDF.index.name = 'time'
-
-aakr = AAKR(metric='rbf')
-aakr.train(trainDF)
-reconstructData, residual = aakr.fit(valDF, gamma=.5)
-
-ax = valDF.plot(linewidth=0.4, label="measured")
-reconstructData.plot(ax=ax,linewidth=0.4, label="reconstructed")
-
-ax.legend(["measured", "reconstructed"])
-
-plt.show()
-
+    recDataRaw = self.scaler.inverse_transform(recDataRaw) 
     
+    for index,key in enumerate(keys):
+      recData[key] = recDataRaw[:,index]
+      resData[key] = recDataRaw[:,index] - timeSeries.to_numpy()[:,index]
+    
+    reconstructedData = pd.DataFrame(recData,  index=timeSeries.index)
+    residualData      = pd.DataFrame(resData,  index=timeSeries.index)
+    
+    return reconstructedData, residualData
