@@ -9,7 +9,7 @@ import spacy  # MIT License
 import textacy # Apache Software License (Apache)
 import nltk as nltk # Apache Software License (Apache License, Version 2.0)
 #import neuralcoref # MIT License (not available yet for spacy >= 3.0)
-
+import stanza # pip install stanza # Apache License, Version 2.0 
 # Internal Imports
 
 
@@ -41,6 +41,6 @@ def coreferenceResolution(triples):
   # use Stanford CoreNLP: https://stanfordnlp.github.io/CoreNLP/
   pass
 
-text = "London is the capital of England. Westminster is located in London."
+text = "London is the capital of England. Westmister is located in London."
 syntaticTranslation = syntaticAnalysis(text)
 print(syntaticTranslation)
