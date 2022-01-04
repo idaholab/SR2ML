@@ -1,0 +1,7 @@
+Step,Method,Tool
+1,Analysis of ER data,SR2ML + Knime
+2,SSC margin evaluation,SR2ML + Knime
+3,System margin analysis,SR2ML + RAVEN
+4,Match basic event to maintenance activity,TBD
+5,Project prioritization and scheduling,LOGOS
+6,Task scheduling,LOGOS

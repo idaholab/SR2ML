@@ -1,0 +1,60 @@
+<!-- 
+This FT models a generic PWR MFW system
+-->
+
+<opsa-mef>
+    <define-fault-tree name="MFW_FT">
+        <define-gate name="TOP">
+            <or>
+                <gate name="HP_heater"/>
+                <gate name="MFW_FW_pump"/>
+                <gate name="LP_heater1"/>
+                <gate name="LP_heater2"/>
+                <gate name="Clean_up_system"/>
+                <gate name="Condensate_pump"/>
+            </or>
+        </define-gate>
+
+        <define-gate name="HP_heater">
+            <or>
+                <basic-event name="HP_heater_BE1"/> <!-- =5000+1500*RAND() -->
+                <basic-event name="HP_heater_BE2"/> <!-- =80+10*RAND()     -->
+            </or>
+        </define-gate>
+
+        <define-gate name="MFW_pump">
+            <or>
+                <basic-event name="MFW_pump_BE1"/> <!-- =120+20*RAND()  -->
+                <basic-event name="MFW_pump_BE2"/> <!-- =13 + 2*RAND()  chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/viewer.html?pdfurl=https%3A%2F%2Fespace.curtin.edu.au%2Fbitstream%2Fhandle%2F20.500.11937%2F28560%2F159989_38214_ICOMS%2520-%2520Paper%252032%2520-%2520K%2520McKee.pdf%3Fsequence%3D2&clen=238115-->
+            </or>
+        </define-gate>
+
+        <define-gate name="LP_heater1">
+            <or>
+                <basic-event name="LP_heater1_BE1"/> <!-- condensate level   chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/viewer.html?pdfurl=https%3A%2F%2Fyadda.icm.edu.pl%2Fbaztech%2Felement%2Fbwmeta1.element.baztech-article-BAR0-0068-0059%2Fc%2Fhttpwww_bg_utp_edu_plartdiagnostyka2012szczepanski.pdf&clen=696395-->
+                <basic-event name="LP_heater1_BE2"/> <!--    -->
+            </or>
+        </define-gate>
+
+        <define-gate name="LP_heater2">
+            <or>
+                <basic-event name="LP_heater2_BE1"/> <!-- point to LP_heater1_BE1 -->
+                <basic-event name="LP_heater2_BE2"/> <!-- point to LP_heater1_BE2 -->
+            </or>
+        </define-gate>
+
+        <define-gate name="Clean_up_system">
+            <or>
+                <basic-event name="Clean_up_system_BE1"/> <!--    -->
+                <basic-event name="Clean_up_system_BE2"/> <!--    -->
+            </or>
+        </define-gate>
+
+        <define-gate name="Condensate_pump">
+            <or>
+                <basic-event name="Condensate_pump_BE1"/> <!-- point to MFW_FW_pump_BE1 -->
+                <basic-event name="Condensate_pump_BE2"/> <!-- point to MFW_FW_pump_BE2   -->
+            </or>
+        </define-gate>
+    </define-fault-tree>
+</opsa-mef>

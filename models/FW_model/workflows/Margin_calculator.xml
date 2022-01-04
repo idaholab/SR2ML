@@ -1,0 +1,93 @@
+<Simulation verbosity="debug">
+  <RunInfo>
+    <WorkingDir>./</WorkingDir>
+    <Sequence>simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile" type="MCSlist">MCSlist.csv</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
+      <variables>
+        HP_heater_BE1, HP_heater_BE1,
+        MFW_pump_BE1, MFW_pump_BE2,
+        LP_heater1_BE1, LP_heater1_BE2,
+        LP_heater2_BE1, LP_heater2_BE2,
+        Clean_up_system_BE1, Clean_up_system_BE2,
+        Condensate_pump_BE1, Condensate_pump_BE2
+      </variables>
+      <solver type='margin'>
+        <metric>2</metric>
+      </solver>
+      <topEventID>TOP</topEventID>
+      <map var='HP_heater_BE1'       >HP_heater_1</map>
+      <map var='HP_heater_BE2'       >HP_heater_2</map>
+      <map var='MFW_pump_BE1'        >MFW_pump_1</map>
+      <map var='MFW_pump_BE2'        >MFW_pump_2</map>
+      <map var='LP_heater1_BE1'      >LP_heater1_1</map>
+      <map var='LP_heater1_BE2'      >LP_heater1_2</map>
+      <map var='LP_heater2_BE1'      >LP_heater2_1</map>
+      <map var='LP_heater2_BE2'      >LP_heater2_2</map>
+      <map var='Clean_up_system_BE1' >Clean_up_system_1</map>
+      <map var='Clean_up_system_BE2' >Clean_up_system_2</map>
+      <map var='Condensate_pump_BE1' >Condensate_pump_1</map>
+      <map var='Condensate_pump_BE1' >Condensate_pump_2</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1000</limit>
+      </samplerInit>
+      <constant name="statusA">0.35</constant>
+      <constant name="statusB">0.2</constant>
+      <constant name="statusC">0.1</constant>
+      <constant name="statusD">0.3</constant>
+      <constant name="statusE">0.4</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <MultiRun name="simRun">
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="PointSet"        >sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_PS">
+      <type>csv</type>
+      <source>sim_PS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="inputPlaceHolder">
+      <Input>HP_heater_BE1, HP_heater_BE1,
+             MFW_pump_BE1, MFW_pump_BE2,
+             LP_heater1_BE1, LP_heater1_BE2,
+             LP_heater2_BE1, LP_heater2_BE2,
+             Clean_up_system_BE1, Clean_up_system_BE2,
+             Condensate_pump_BE1, Condensate_pump_BE2</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="sim_PS">
+      <Input>HP_heater_BE1, HP_heater_BE1,
+             MFW_pump_BE1, MFW_pump_BE2,
+             LP_heater1_BE1, LP_heater1_BE2,
+             LP_heater2_BE1, LP_heater2_BE2,
+             Clean_up_system_BE1, Clean_up_system_BE2,
+             Condensate_pump_BE1, Condensate_pump_BE2</Input>
+      <Output>TOP</Output>
+    </PointSet>
+  </DataObjects>
+
+</Simulation>
