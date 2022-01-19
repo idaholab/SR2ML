@@ -1,11 +1,7 @@
-Failure Mode,Maintenance activity,Cost,Duration,Taks
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
-,,,,
+SSC,Failure mode,Maintenance activity,Cost,Duration,Taks
+HP_heater,1,Text,10,1,A B C
+HP_heater,2,Text,20,3,A D E
+LP_heater,1,Text,10,1,A B C
+LP_heater,2,Text,25,3,A D E
+Pump,1,Text,5,2,F G
+Pump,2,Text,10,4,F H I

@@ -1,7 +1,7 @@
-Step,Method,Tool
-1,Analysis of ER data,SR2ML + Knime
-2,SSC margin evaluation,SR2ML + Knime
-3,System margin analysis,SR2ML + RAVEN
-4,Match basic event to maintenance activity,TBD
-5,Project prioritization and scheduling,LOGOS
-6,Task scheduling,LOGOS
+Step,Method,Tool,Status
+1,Analysis of ER data,SR2ML + Knime,Under development
+2,SSC margin evaluation,SR2ML + Knime,"This model is in SR2ML as an actual external model that can be used in RAVEN, should it be externalized?"
+3,System margin analysis,SR2ML + RAVEN,"This model is in SR2ML as margin based solver, Congjian is restructuring it using RAVEN templated input (see Margin_code_input.xml as temporrary input file design)"
+4,Match basic event to maintenance activity,TBD,See file failureModeToMaintenanceActivity.csv
+5,Project prioritization and scheduling,LOGOS + RAVEN,See mkp.xml
+6,Task scheduling,LOGOS,See scheduling.xml

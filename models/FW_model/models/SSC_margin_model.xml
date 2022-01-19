@@ -1,0 +1,8 @@
+<ExternalModel name="PointSetMargin" subType="SR2ML.MarginModel">
+  <variables>actualTime,marginPS1</variables>
+  <MarginModel type="PointSetMarginModel">
+    <failedDataFileID>HP_heater_BE1_data.csv</failedDataFileID>
+    <marginID>marginPS1</marginID>
+    <map var='time'>actualTime</map>
+  </MarginModel>
+</ExternalModel>
