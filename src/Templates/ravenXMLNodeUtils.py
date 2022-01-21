@@ -5,7 +5,7 @@ Created on January 19, 2022
 
 @author: wangc, mandd
 
-
+util functions for construction of raven XML input nodes
 """
 
 import logging
