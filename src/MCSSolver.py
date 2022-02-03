@@ -129,7 +129,7 @@ class MCSSolver(ExternalModelPluginBase):
         self.timeDepData = self.generateHistorySetFromSchedule(container,input.asDataset())
         container.tdFromPS = True
       else:
-        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input)
+        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename())
 
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
