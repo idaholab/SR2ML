@@ -156,7 +156,7 @@ def mcsReader(mcsListFile, type=None):
         elementsList = l.split(',')
         mcsIDs = np.append(mcsIDs,elementsList[0])
         elementsList.pop(0)
-        probability=np.append(probability,elementsList[0])
+        probability=np.append(probability,float(elementsList[0]))
         elementsList.pop(0)
         mcsList.append(list(element.rstrip('\n') for element in elementsList))
         beList.update(elementsList)
@@ -168,7 +168,7 @@ def mcsReader(mcsListFile, type=None):
         if elementsList[0].strip() == '':
           continue
         mcsIDs = np.append(mcsIDs,elementsList[0])
-        probability=np.append(probability, elementsList[1])
+        probability=np.append(probability, float(elementsList[1]))
         # skip column 3 which is the fraction to the total
         mcs = list(element.strip() for element in elementsList[3:])
         mcsList.append(mcs)

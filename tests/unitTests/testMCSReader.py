@@ -91,8 +91,8 @@ fileName = 'MCSlist.csv'
 mcsIDs, probability, mcsList, beList = mcsReader(fileName)
 desired = ['1', '2', '5', '4']
 checkArray('check MCS IDs', mcsIDs, desired, dtype=str)
-desired = ['1.86E-02', '4.00E-03', '4.00E-03', '4.00E-04']
-checkArray('check MCS probabilities', probability, desired, dtype=str)
+desired = [1.86E-02, 4.00E-03, 4.00E-03, 4.00E-04]
+checkArray('check MCS probabilities', probability, desired, dtype=float)
 desired = [['ACCUMLATOR 1 DISCHARGE CKV 001 FAILS TO OPEN','480 VAC BUS 1A1 FAILS'],
             ['ACCUMLATOR 2 DISCHARGE CKV 002 FAILS TO OPEN','480 VAC BUS 1A2 FAILS'],
             ['ACCUMLATOR 3 DISCHARGE CKV 003 FAILS TO OPEN','480 VAC BUS 1A3 FAILS'],
@@ -106,8 +106,21 @@ desired = {'ACCUMLATOR 1 DISCHARGE CKV 001 FAILS TO OPEN','480 VAC BUS 1A1 FAILS
 checkArray('check BE list', list(beList), list(desired), dtype=str)
 
 fileName = 'cutset_saphire.txt'
-mcsIDs, probability, mcsList, beList = mcsReader(fileName)
-
+mcsIDs, probability, mcsList, beList = mcsReader(fileName, type='saphire')
+desired = ['1', '4', '9', '10', '11', '12']
+checkArray('check MCS IDs', mcsIDs, desired, dtype=str)
+desired = [2.113E-2, 2.536E-5, 2.400E-6, 2.113E-6, 2.050E-6, 2.015E-6]
+checkArray('check MCS probabilities', probability, desired, dtype=float)
+desired = [['S-DGN-FR-B'],
+            ['C-PMP-FS-B','S-DGN-FR-A'],
+            ['S-TNK-FC-T1'],
+            ['C-CKV-CC-B',  'S-DGN-FR-A'],
+            ['C-CKV-CF'],
+            ['C-PMP-FR-B',  'S-DGN-FS-A']]
+for i in range(len(desired)):
+  checkArray('check MCS list', mcsList[i], desired[i], dtype=str)
+desired = {'S-DGN-FR-B','C-PMP-FS-B','S-DGN-FR-A', 'S-TNK-FC-T1', 'C-CKV-CC-B','C-CKV-CF', 'C-PMP-FR-B',  'S-DGN-FS-A'}
+checkArray('check BE list', list(beList), list(desired), dtype=str)
 print(results)
 
 sys.exit(results["fail"])
