@@ -64,6 +64,7 @@ class MCSSolver(ExternalModelPluginBase):
     """
     container.filename   = None # ID of the file containing the list of MCSs
     container.topEventID = None # ID of the Top Event (which is the union of the MCSs)
+    container.fileFrom   = None # the source of the provided MCSs file, i.e., saphire
     container.timeID     = None # ID of the temporal variable
     container.mapping    = {}   # mapping between RAVEN variables and BEs contained in the MCSs
     container.invMapping = {}   # mapping between BEs contained in the MCSss and RAVEN variable
@@ -79,6 +80,8 @@ class MCSSolver(ExternalModelPluginBase):
     for child in xmlNode:
       if child.tag == 'topEventID':
         container.topEventID = child.text.strip()
+      elif child.tag == 'fileFrom':
+        container.fileFrom = child.text.strip().lower()
       elif child.tag == 'timeID':
         container.timeID = child.text.strip()
       elif child.tag == 'tInitial':
@@ -129,7 +132,7 @@ class MCSSolver(ExternalModelPluginBase):
         self.timeDepData = self.generateHistorySetFromSchedule(container,input.asDataset())
         container.tdFromPS = True
       else:
-        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename())
+        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
 
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
