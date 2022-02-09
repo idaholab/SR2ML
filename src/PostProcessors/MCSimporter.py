@@ -48,6 +48,7 @@ class MCSImporter(PostProcessorPluginBase):
     ## collect single realization, while DataObject.load is used to collect multiple realizations
     ## However, the DataObject.load can not be directly used to collect single realization
     self.outputMultipleRealizations = True
+    self.fileFrom = None # the source of the provided MCSs file, i.e., saphire
 
   @classmethod
   def getInputSpecification(cls):
@@ -60,6 +61,7 @@ class MCSImporter(PostProcessorPluginBase):
     inputSpecification = super().getInputSpecification()
     inputSpecification.addSub(InputData.parameterInputFactory("expand",       contentType=InputTypes.BoolType))
     inputSpecification.addSub(InputData.parameterInputFactory("BElistColumn", contentType=InputTypes.StringType))
+    inputSpecification.addSub(InputData.parameterInputFactory("fileFrom", contentType=InputTypes.StringType))
     return inputSpecification
 
   def _handleInput(self, paramInput):
@@ -71,7 +73,9 @@ class MCSImporter(PostProcessorPluginBase):
     super()._handleInput(paramInput)
     expand = paramInput.findFirst('expand')
     self.expand = expand.value
-
+    fileFrom = paramInput.findFirst('fileFrom')
+    if fileFrom is not None:
+      self.fileFrom = fileFrom.value
     if self.expand:
       beListColumn = paramInput.findFirst('BElistColumn')
       self.beListColumn = beListColumn.value
@@ -108,7 +112,7 @@ class MCSImporter(PostProcessorPluginBase):
     if beFileFound==False and self.expand==True:
       self.raiseAnError(IOError, 'MCSImporterPostProcessor Post-Processor ' + self.name + ', Expand is set to False but no file with type=BElist has been found')
 
-    self.mcsIDs, self.probability, self.mcsList, self.beList = mcsReader(mcsListFile.getFilename())
+    self.mcsIDs, self.probability, self.mcsList, self.beList = mcsReader(mcsListFile.getFilename(), type=self.fileFrom)
 
     if self.expand:
       beData = pd.read_csv(BElistFile.getFilename())
