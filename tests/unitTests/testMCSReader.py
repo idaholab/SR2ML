@@ -6,12 +6,15 @@
 import os,sys
 import numpy as np
 filePath = os.path.dirname(os.path.realpath(__file__))
-frameworkDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir,os.pardir,'framework'))
+srcDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,'src'))
+sys.path.append(srcDir)
+from _utils import get_raven_loc
+frameworkDir = get_raven_loc()
+# frameworkDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir,os.pardir,'framework'))
 sys.path.append(frameworkDir)
 from utils.utils import find_crow
 find_crow(frameworkDir)
-srcDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,'src'))
-sys.path.append(srcDir)
+
 from PostProcessors.MCSimporter import mcsReader
 
 results = {"pass":0,"fail":0}
