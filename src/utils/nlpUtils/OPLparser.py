@@ -9,9 +9,13 @@ import xml.etree.ElementTree as ET
 import codecs
 from bs4 import BeautifulSoup
 import nltk
+import unicodedata
 # Internal Import
 
 def OPLentityParser(filename):
+  '''
+  This method extracts all the objects and functions out of the OPL html file and it puts them in two separate lists
+  '''
   objectList = []
   processList = []
   with open(filename) as fp:
@@ -49,8 +53,11 @@ def OPLtextParser(filename):
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
     sentences = text.split(".")
+    print(sentences)
     for index, sentence in enumerate(sentences):
-      sentences[index] = sentence.replace("\n", " ")
+      sentences[index] = sentences[index].replace("\n", " ")
+      sentences[index] = sentences[index].replace("\xa0", "")
+      sentences[index] = sentences[index].lstrip()
     return sentences
 
 def parseInstantiation(sentence,processDict,objectDict):
@@ -71,8 +78,6 @@ def OPLparser(sentences,objectList,processList):
   OPLkeywordsObjects = ['consists of'] 
   OPLkeywordsProcess = ['consumes','yields','requires','affects', 'changes']
   
-  print(sentences)
-  
   for sentence in sentences:
     #tokenizedSentence = nltk.word_tokenize(sentence)
     if OPLkeywordsDefinition[0] in sentence:
@@ -85,5 +90,6 @@ def OPLparser(sentences,objectList,processList):
 
 objectList, processList = OPLentityParser('pump_OPL.html')
 sentences = OPLtextParser('pump_OPL.html')
+print(sentences)
 sentences = OPLparser(sentences,objectList,processList)
 
