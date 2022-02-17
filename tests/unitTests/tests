@@ -1,0 +1,6 @@
+[Tests]
+ [./mcsReader]
+  type = 'RavenPython'
+  input = 'testMCSReader.py'
+ [../]
+[]
