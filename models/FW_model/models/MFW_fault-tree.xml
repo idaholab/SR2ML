@@ -1,38 +1,103 @@
-<!-- 
-This FT models a generic PWR MFW system
--->
+<!-- This FT models a generic PWR MFW system -->
 
 <opsa-mef>
     <define-fault-tree name="MFW_FT">
+    
+        <!-- Main gate for MFW system -->
         <define-gate name="TOP">
             <or>
+                <gate name="Condensate_pumps"/>
+                <gate name="LP_heaters"/>           
+                <gate name="Deaerator"/>
+                <gate name="FW_pumps"/>             
                 <gate name="HP_heater"/>
-                <gate name="MFW_FW_pump"/>
-                <gate name="LP_heater1"/>
-                <gate name="LP_heater2"/>
-                <gate name="Clean_up_system"/>
-                <gate name="Condensate_pump"/>
+                <gate name="Control_valves"/>           
             </or>
         </define-gate>
-
-        <define-gate name="HP_heater">
+        
+        <!-- Gates for sub-systems -->
+        
+        <define-gate name="Condensate_pumps">
             <or>
-                <basic-event name="HP_heater_BE1"/> <!-- =5000+1500*RAND() -->
-                <basic-event name="HP_heater_BE2"/> <!-- =80+10*RAND()     -->
+                <basic-event name="Condensate_pump_1"/> 
+                <basic-event name="Condensate_pump_2"/> 
+                <basic-event name="Condensate_pump_3"/> 
+                <basic-event name="Condensate_pump_4"/>
             </or>
         </define-gate>
-
-        <define-gate name="MFW_pump">
+        
+        <define-gate name="LP_heaters">
             <or>
-                <basic-event name="MFW_pump_BE1"/> <!-- =120+20*RAND()  -->
-                <basic-event name="MFW_pump_BE2"/> <!-- =13 + 2*RAND()  chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/viewer.html?pdfurl=https%3A%2F%2Fespace.curtin.edu.au%2Fbitstream%2Fhandle%2F20.500.11937%2F28560%2F159989_38214_ICOMS%2520-%2520Paper%252032%2520-%2520K%2520McKee.pdf%3Fsequence%3D2&clen=238115-->
+                <basic-event name="LP_heater_1"/> 
+                <basic-event name="LP_heater_2"/> 
+                <basic-event name="LP_heater_3"/> 
+                <basic-event name="LP_heater_4"/>
             </or>
         </define-gate>
+        
+        <define-gate name="Deaerator">
+            <or>
+                <basic-event name="Deaerator_BE1"/> 
+                <basic-event name="Deaerator_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="FW_pumps">
+            <or>
+                <basic-event name="FW_pump_1"/> 
+                <basic-event name="FW_pump_2"/>
+                <basic-event name="FW_pump_3"/>
+            </or>
+        </define-gate>
+        
+        <define-gate name="HP_heaters">
+            <or>
+                <basic-event name="HP_heater_1"/> 
+                <basic-event name="HP_heater_2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="Control_valves">
+            <or>
+                <basic-event name="regulating_valve"/> 
+                <basic-event name="bypass_valve"/> 
+            </or>
+        </define-gate>
+        
+        <!--  Component gates  --> 
+        
+        <define-gate name="Condensate_pump_1">
+            <or>
+                <basic-event name="Condensate_pump_1_BE1"/> 
+                <basic-event name="Condensate_pump_1_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="Condensate_pump_2">
+            <or>
+                <basic-event name="Condensate_pump_2_BE1"/> 
+                <basic-event name="Condensate_pump_2_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="Condensate_pump_3">
+            <or>
+                <basic-event name="Condensate_pump_3_BE1"/> 
+                <basic-event name="Condensate_pump_3_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="Condensate_pump_4">
+            <or>
+                <basic-event name="Condensate_pump_4_BE1"/> 
+                <basic-event name="Condensate_pump_4_BE2"/> 
+            </or>
+        </define-gate> 
 
         <define-gate name="LP_heater1">
             <or>
                 <basic-event name="LP_heater1_BE1"/> <!-- condensate level   chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/viewer.html?pdfurl=https%3A%2F%2Fyadda.icm.edu.pl%2Fbaztech%2Felement%2Fbwmeta1.element.baztech-article-BAR0-0068-0059%2Fc%2Fhttpwww_bg_utp_edu_plartdiagnostyka2012szczepanski.pdf&clen=696395-->
-                <basic-event name="LP_heater1_BE2"/> <!--    -->
+                <basic-event name="LP_heater1_BE2"/> 
             </or>
         </define-gate>
 
@@ -42,19 +107,76 @@ This FT models a generic PWR MFW system
                 <basic-event name="LP_heater2_BE2"/> <!-- point to LP_heater1_BE2 -->
             </or>
         </define-gate>
-
-        <define-gate name="Clean_up_system">
+        
+        <define-gate name="LP_heater3">
             <or>
-                <basic-event name="Clean_up_system_BE1"/> <!--    -->
-                <basic-event name="Clean_up_system_BE2"/> <!--    -->
+                <basic-event name="LP_heater3_BE1"/> 
+                <basic-event name="LP_heater3_BE2"/> 
             </or>
         </define-gate>
 
-        <define-gate name="Condensate_pump">
+        <define-gate name="LP_heater4">
             <or>
-                <basic-event name="Condensate_pump_BE1"/> <!-- point to MFW_FW_pump_BE1 -->
-                <basic-event name="Condensate_pump_BE2"/> <!-- point to MFW_FW_pump_BE2   -->
+                <basic-event name="LP_heater4_BE1"/> 
+                <basic-event name="LP_heater4_BE2"/> 
             </or>
         </define-gate>
+
+        <define-gate name="FW_pump_1">
+            <or>
+                <basic-event name="FW_pump_1_BE1"/> 
+                <basic-event name="FW_pump_1_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="FW_pump_2">
+            <or>
+                <basic-event name="FW_pump_2_BE1"/> 
+                <basic-event name="FW_pump_2_BE2"/> 
+            </or>
+        </define-gate>
+
+        <define-gate name="FW_pump_3">
+            <or>
+                <basic-event name="FW_pump_3_BE1"/> 
+                <basic-event name="FW_pump_3_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="FW_pump_4">
+            <or>
+                <basic-event name="FW_pump_4_BE1"/> 
+                <basic-event name="FW_pump_4_BE2"/> 
+            </or>
+        </define-gate> 
+
+        <define-gate name="HP_heater_1">
+            <or>
+                <basic-event name="HP_heater_1_BE1"/> 
+                <basic-event name="HP_heater_1_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="HP_heater_2">
+            <or>
+                <basic-event name="HP_heater_2_BE1"/> 
+                <basic-event name="HP_heater_2_BE2"/> 
+            </or>
+        </define-gate> 
+
+        <define-gate name="regulating_valve">
+            <or>
+                <basic-event name="regulating_valve_BE1"/> 
+                <basic-event name="regulating_valve_BE2"/> 
+            </or>
+        </define-gate>
+        
+        <define-gate name="bypass_valve">
+            <or>
+                <basic-event name="bypass_valve_BE1"/> 
+                <basic-event name="bypass_valve_BE2"/> 
+            </or>
+        </define-gate>
+                        
     </define-fault-tree>
 </opsa-mef>
