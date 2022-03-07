@@ -10,11 +10,17 @@ import codecs
 from bs4 import BeautifulSoup
 import nltk
 import unicodedata
+import re
+import networkx as nx
+import matplotlib.pyplot as plt
 # Internal Import
 
 def OPLentityParser(filename):
   '''
-  This method extracts all the objects and functions out of the OPL html file and it puts them in two separate lists
+  This method extracts all the form and functions out of the OPL html file and it puts them in two separate lists
+  @in: filename: file name containing the OPL text
+  @out: objectList: list, list of form elements contained in the OPL file
+  @out: processList: list, list of function elements contained in the OPL file
   '''
   objectList = []
   processList = []
@@ -34,6 +40,11 @@ def OPLentityParser(filename):
   return objectList, processList
 
 def OPLtextParser(filename):
+  '''
+  This method extracts all the sentences out of the OPL html file and it puts them in a list
+  @in: filename: file name containing the OPL text
+  @out: objectList: sentences, list of sentenced contained in the OPL file
+  '''
   objects = {}
   functions = {}
   #fileObj = codecs.open(filename, 'r')
@@ -53,43 +64,64 @@ def OPLtextParser(filename):
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
     sentences = text.split(".")
-    print(sentences)
+    
     for index, sentence in enumerate(sentences):
       sentences[index] = sentences[index].replace("\n", " ")
       sentences[index] = sentences[index].replace("\xa0", "")
       sentences[index] = sentences[index].lstrip()
+      
+    sentences.remove('')
+    
     return sentences
-
-def parseInstantiation(sentence,processDict,objectDict):
-  pass
-
-def parseSpecializationProcess(sentence,processDict):
-  pass
-
-def parseSpecializationObject(sentence,processDict,objectDict):
-  pass
   
-def OPLparser(sentences,objectList,processList): 
-  objectDict  = {}
-  processDict = {}
+def OPLparser(sentences): 
+  '''
+  This method translates all the sentences create a graph structure
+  @in: filename: file name containing the OPL text
+  @out: objectList: sentences, list of sentenced contained in the OPL file
+  '''
+  opmGraph = nx.MultiDiGraph()
   
-  attributes = ['environmental','physical','informatical']
+  # These are 4 set of OPL keywords 
+  OPLattributes = ['environmental','physical','informatical']
   OPLkeywordsDefinition = ['is an instance of ','is an','is']
   OPLkeywordsObjects = ['consists of'] 
   OPLkeywordsProcess = ['consumes','yields','requires','affects', 'changes']
   
+  colorMatches = {'consists of':0.1, 
+                  'consumes'   :1 ,
+                  'yields'     :2,
+                  'requires'   :3,
+                  'affects'    :4, 
+                  'changes'    :5}
+  
+  edge_colors = []
+  
   for sentence in sentences:
-    #tokenizedSentence = nltk.word_tokenize(sentence)
-    if OPLkeywordsDefinition[0] in sentence:
-      processDict,objectDict = parseInstantiation(sentence,processDict,objectDict)
-    elif OPLkeywordsDefinition[1] in sentence:
-      processDict = parseSpecializationProcess(sentence,processDict)
-    elif OPLkeywordsDefinition[2] in sentence:
-      objectDict= parseSpecializationObject(sentence,processDict,objectDict)
-  return sentences  
+    # create new elements in the graph from each sentence
+    for elem in OPLkeywordsObjects+OPLkeywordsProcess:
+      if elem in sentence:
+        partitions = sentence.partition(elem)
+        subj = partitions[0]
+        conjs = re.split('and |, ',partitions[2])
+        if '' in conjs:
+          conjs.remove('')
+        
+        for conj in conjs:
+          opmGraph.add_edge(subj, conj, key=elem)
+          edge_colors.append(colorMatches[elem])
+        
+  return opmGraph,edge_colors  
 
-objectList, processList = OPLentityParser('pump_OPL.html')
+'''Testing workflow '''
+
+formList, functionList = OPLentityParser('pump_OPL.html')
 sentences = OPLtextParser('pump_OPL.html')
 print(sentences)
-sentences = OPLparser(sentences,objectList,processList)
+opmGraph,edge_colors = OPLparser(sentences)
+
+nx.draw_networkx(opmGraph,edge_color=edge_colors)
+ax = plt.gca()
+plt.axis("off")
+plt.show()
 
