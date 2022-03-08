@@ -7,3 +7,5 @@ Pump power supply has been found burnout.
 Pump test failed due to power supply failure.
 Pump inspection revealed excessive impeller degradation.
 Pump inspection revealed excessive impeller degradation likely due to cavitation.
+Oil puddle was found in proximity of RCP pump 1A.
+Anomalous vibrations were observed for RCP pump 1A.
