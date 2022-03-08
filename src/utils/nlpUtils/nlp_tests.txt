@@ -1,0 +1,9 @@
+A leak was noticed from the RCP pump 1A.
+RCP pump 1A pressure gauge was found not operating.
+RCP pump 1A pressure gauge was found inoperative.
+Rupture of pump bearings caused shaft degradation.
+Rupture of pump bearings caused shaft degradation and consequent flow reduction.
+Pump power supply has been found burnout.
+Pump test failed due to power supply failure.
+Pump inspection revealed excessive impeller degradation.
+Pump inspection revealed excessive impeller degradation likely due to cavitation.
