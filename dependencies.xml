@@ -1,7 +1,9 @@
 <dependencies>
   <main>
-    <spacy source="forge" />
-    <nltk source="forge" />
-    <textacy source="forge" />
+    <spacy/>
+    <nltk/>
+    <!-- <textacy/> -->
+    <stanza/>
+    <neuralcoref/>
   </main>
 </dependencies>
