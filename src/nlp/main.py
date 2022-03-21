@@ -55,4 +55,8 @@ if __name__ == "__main__":
     }
   ]
   matcher.addDependency(name, dependencyList, callback=None)
+  name = 'ssc_entity_ruler'
+  patterns = [{"label":"pump_comp", "pattern":[{"LOWER":"pump"}, {"POS":"NOUN"}], "id":"ssc"}]
+  matcher.addEntityPattern(name, patterns)
+
   matcher(doc)

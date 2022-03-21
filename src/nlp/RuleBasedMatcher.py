@@ -37,9 +37,11 @@ class RuleBasedMatcher(object):
     self._match = False
     self._phraseMatch = False
     self._dependencyMatch = False
+    self._entityRuler = False
     self.matcher = Matcher(nlp.vocab)
     self.phraseMatcher = PhraseMatcher(nlp.vocab, attr="LOWER")
     self.dependencyMatcher = DependencyMatcher(nlp.vocab)
+    self.entityRuler = nlp.add_pipe("entity_ruler")
     self._callbacks = {}
     self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
     self._matchedSents = [] # collect data of matched sentences to be visualized
@@ -95,6 +97,19 @@ class RuleBasedMatcher(object):
     if not self._dependencyMatch:
       self._dependencyMatch = True
 
+  def addEntityPattern(self, name, patternList):
+    """
+      Add entity pattern, to extend doc.ents, similar function to self.extendEnt
+      @ In, name, str,
+      @ In, patternList, list, {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}]}
+    """
+    if not self.nlp.has_pipe('entity_ruler'):
+      self.nlp.add_pipe('entity_ruler')
+    if not isinstance(patternList, list):
+      patternList = [patternList]
+    self.entityRuler.add_patterns(patternList)
+    if not self._entityRuler:
+      self._entityRuler = True
 
   def __call__(self, text):
     """
@@ -123,7 +138,9 @@ class RuleBasedMatcher(object):
       for i in range(len(tokenIDs)):
         print(self._rules[name][0][i]["RIGHT_ID"] + ":",doc[tokenIDs[i]].text)
 
-
+    ## use entity ruler to identify entity
+    if self._entityRuler:
+      print("Entity Ruler: \n",[(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents])
 
   def visualize():
     """
