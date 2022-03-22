@@ -166,3 +166,25 @@ nlp.add_pipe("extract_person_orgs")
 doc = nlp("Alex Smith worked at Acme Corp Inc.")
 # If you're not in a Jupyter / IPython environment, use displacy.serve
 displacy.render(doc, options={"fine_grained": True})
+
+
+# Simple pipeline, functions with "doc" as input and output
+## examples
+def alias_resolver(doc):
+    """Lookup aliases and store result in ref_t, ref_n"""
+    for ent in doc.ents:
+        token = ent[0].text
+        if token in alias_lookup:
+            a_name, a_type = alias_lookup[token]
+            ent[0]._.ref_n, ent[0]._.ref_t = a_name, a_type
+    return propagate_ent_type(doc)
+
+def propagate_ent_type(doc):
+    """propagate entity type stored in ref_t"""
+    ents = []
+    for e in doc.ents:
+        if e[0]._.ref_n != '': # if e is a coreference
+            e = Span(doc, e.start, e.end, label=e[0]._.ref_t)
+        ents.append(e)
+    doc.ents = tuple(ents)
+    return doc    

@@ -19,8 +19,8 @@ logger.addHandler(fh)
 if __name__ == "__main__":
   nlp = spacy.load("en_core_web_sm")
   doc = r"""A leak was noticed from the RCP pump 1A.
-          RCP pump 1A pressure gauge was found not operating.
-          RCP pump 1A pressure gauge was found inoperative.
+          The RCP pump 1A pressure gauge was found not operating, and it was found inoperative.
+          The RCP pump 1A pressure gauge was found inoperative.
           Rupture of pump bearings caused shaft degradation.
           Rupture of pump bearings caused shaft degradation and consequent flow reduction.
           Pump power supply has been found burnout.
@@ -29,12 +29,15 @@ if __name__ == "__main__":
           Pump inspection revealed excessive impeller degradation likely due to cavitation.
         """
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
+  # simple match
   name = 'ssc_match'
   rules = [{"LOWER":"pump"}, {"POS":"NOUN"}]
   matcher.addPattern(name, rules, callback=None)
+  # phrase match
   name = 'ssc_phrase_match'
   phraseList = ['pump 1A', 'pump bearings', 'Pump']
   matcher.addPhrase(name, phraseList, callback=None)
+  # depency match
   name = 'ssc_dependency_match'
   dependencyList = [
     {
@@ -55,6 +58,7 @@ if __name__ == "__main__":
     }
   ]
   matcher.addDependency(name, dependencyList, callback=None)
+  # Entity rule-based match
   name = 'ssc_entity_ruler'
   patterns = [{"label":"pump_comp", "pattern":[{"LOWER":"pump"}, {"POS":"NOUN"}], "id":"ssc"}]
   matcher.addEntityPattern(name, patterns)
