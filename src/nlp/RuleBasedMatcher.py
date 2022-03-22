@@ -46,6 +46,21 @@ class RuleBasedMatcher(object):
     self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
     self._matchedSents = [] # collect data of matched sentences to be visualized
     self._visualizeMatchedSents = True
+    self._coref = False # True indicate coreference pipeline is available
+
+    ## coreferee module for Coreference Resolution
+    ## Q? at which level to perform coreferee? After NER and perform coreferee on collected sentence
+    try:
+      # check the current version spacy>=3.1.0,<3.2.0
+      from packaging.version import Version
+      ver = spacy.__version__
+      valid = Version(ver)>=Version('3.1.0') and Version(ver)<Version('3.2.0')
+      if valid:
+        import coreferee
+        self._coref = True
+        self.nlp.add_pipe('coreferee')
+    except ModuleNotFoundError:
+      logger.info('Module ')
 
   def addPattern(self, name, rules, callback=None):
     """
@@ -114,6 +129,14 @@ class RuleBasedMatcher(object):
   def __call__(self, text):
     """
     """
+    # Merging Entity Tokens
+    # We need to consider how to do this, I sugguest to first conduct rule based NER, then collect
+    # all related sentences, then create new pipelines to perform NER with "merge_entities" before the
+    # conduction of relationship extraction
+    # if self.nlp.has_pipe('merge_entities'):
+    #   _ = self.nlp.remove_pipe('merge_entities')
+    # self.nlp.add_pipe('merge_entities')
+
     doc = self.nlp(text)
     matches = []
     if self._match:
@@ -141,6 +164,11 @@ class RuleBasedMatcher(object):
     ## use entity ruler to identify entity
     if self._entityRuler:
       print("Entity Ruler: \n",[(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents])
+
+    if self._coref:
+      logger.debug('Print Coreference Info:')
+      print(doc._.coref_chains.pretty_representation)
+
 
   def visualize():
     """
