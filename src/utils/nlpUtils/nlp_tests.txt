@@ -9,3 +9,4 @@ Pump inspection revealed excessive impeller degradation.
 Pump inspection revealed excessive impeller degradation likely due to cavitation.
 Oil puddle was found in proximity of RCP pump 1A.
 Anomalous vibrations were observed for RCP pump 1A.
+Several cracks on pump shaft were observed; they could have caused pump failure within few days.
