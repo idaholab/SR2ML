@@ -1,9 +1,11 @@
 import spacy
 from spacy.matcher import Matcher
+from spacy.tokens import Token
 from spacy.tokens import Span
 from spacy import displacy
 from spacy.matcher import PhraseMatcher
 from spacy.matcher import DependencyMatcher
+from collections import deque
 
 import logging
 
@@ -14,6 +16,9 @@ logger = logging.getLogger(__name__)
 # ch = logging.StreamHandler()
 # logger.addHandler(ch)
 ##
+
+
+
 
 class RuleBasedMatcher(object):
   """
@@ -32,7 +37,9 @@ class RuleBasedMatcher(object):
     self.name = self.__class__.__name__
     logger.info(f'Create instance of {self.name}')
     # nlp = spacy.load("en_core_web_sm")
+    # pipeline sequence: entity_ruler --> merge_entities --> coreferee
     self.nlp = nlp
+    self._doc = None
     self._rules = {}
     self._match = False
     self._phraseMatch = False
@@ -56,6 +63,7 @@ class RuleBasedMatcher(object):
       ver = spacy.__version__
       valid = Version(ver)>=Version('3.1.0') and Version(ver)<Version('3.2.0')
       if valid:
+        # https://github.com/msg-systems/coreferee
         import coreferee
         self._coref = True
         self.nlp.add_pipe('coreferee')
@@ -138,6 +146,7 @@ class RuleBasedMatcher(object):
     # self.nlp.add_pipe('merge_entities')
 
     doc = self.nlp(text)
+    self._doc = doc
     matches = []
     if self._match:
       matches += self.matcher(doc, as_spans = self._asSpans) # <class 'list'>
@@ -179,6 +188,93 @@ class RuleBasedMatcher(object):
       # (if you're not running the code within a Jupyer environment, you can
       # use displacy.serve instead)
       displacy.render(self._matchedSents, style="ent", manual=True)
+
+
+  ##########################
+  # methods for relation extraction
+  ##########################
+
+  def isPassive(self, token):
+    """
+    """
+    if token.dep_.endswith('pass'): # noun
+      return True
+    for left in token.lefts: # verb
+      if left.dep_ == 'auxpass':
+        return True
+    return False
+
+  def bfs(self, root, entType, deps, firstDepOnly=False):
+    """
+      Return first child of root (included) that matches
+      entType and dependency list by breadth first search.
+      Search stops after first dependency match if firstDepOnly
+      (used for subject search - do not "jump" over subjects)
+    """
+    toVisit = deque([root]) # queue for bfs
+
+    while len(toVisit) > 0:
+      child = toVisit.popleft()
+      # print("child", child, child.dep_)
+      if child.dep_ in deps:
+        if child._.ref_t == entType:
+          return child
+        elif firstDepOnly: # first match (subjects)
+          return None
+      elif child.dep_ == 'compound' and \
+         child.head.dep_ in deps and \
+         child._.ref_t == entType: # check if contained in compound
+        return child
+      toVisit.extend(list(child.children))
+    return None
+
+  def findSubj(self, pred, entType, passive):
+    """
+      Find closest subject in predicates left subtree or
+      predicates parent's left subtree (recursive).
+      Has a filter on organizations.
+    """
+    for left in pred.lefts:
+      if passive: # if pred is passive, search for passive subject
+        subj = bfs(left, entType, ['nsubjpass', 'nsubj:pass'], True)
+      else:
+        subj = bfs(left, entType, ['nsubj'], True)
+      if subj is not None: # found it!
+        return subj
+    if pred.head != pred and not self.isPassive(pred):
+      return self.findSubj(pred.head, entType, passive) # climb up left subtree
+    else:
+      return None
+
+  def findObj(self, pred, entType, exclPrepos):
+    """
+      Find closest object in predicates right subtree.
+      Skip prepositional objects if the preposition is in exclude list.
+      Has a filter on organizations.
+    """
+    for right in pred.rights:
+      obj = bfs(right, entType, ['dobj', 'pobj', 'iobj', 'obj', 'obl'])
+      if obj is not None:
+        if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
+          continue
+        return obj
+    return None
+
+  def extractRelDep(doc, predName, predSynonyms, exclPrepos=[]):
+    """
+    """
+    for token in doc:
+      if token.pos_ == 'VERB' and token.lemma_ in predSynonyms:
+        pred = token
+        passive = self.isPassive(pred)
+        subj = self.findSubj(pred, 'ORG', passive)
+        if subj is not None:
+          obj = self.findObj(pred, 'ORG', exclPrepos)
+          if obj is not None:
+            if passive: # switch roles
+              obj, subj = subj, obj
+            yield ((subj._.ref_n, subj._.ref_t), predName,
+                   (obj._.ref_n, obj._.ref_t))
 
   ###############
   # methods can be used for callback in "add" method
