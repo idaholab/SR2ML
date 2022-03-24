@@ -1,137 +1,127 @@
 import spacy
 from spacy.language import Language
+from spacy.tokens import Span
 from spacy.matcher import Matcher
 from spacy.tokens import Token
 
-# We're using a component factory because the component needs to be
-# initialized with the shared vocab via the nlp object
-@Language.factory("html_merger")
-def create_bad_html_merger(nlp, name):
-    return BadHTMLMerger(nlp.vocab)
+#### Using spacy's Token extensions for coreferee
+if Token.has_extension('ref_n'):
+  _ = Token.remove_extension('ref_n')
+if Token.has_extension('ref_t'):
+  _ = Token.remove_extension('ref_t')
+if Token.has_extension('ref_t_'):
+  _ = Token.remove_extension('ref_t_')
+Token.set_extension('ref_n', default='')
+Token.set_extension('ref_t', default='')
 
-class BadHTMLMerger:
-    def __init__(self, vocab):
-        patterns = [
-            [{"ORTH": "<"}, {"LOWER": "br"}, {"ORTH": ">"}],
-            [{"ORTH": "<"}, {"LOWER": "br/"}, {"ORTH": ">"}],
-        ]
-        # Register a new token extension to flag bad HTML
-        Token.set_extension("bad_html", default=False)
-        self.matcher = Matcher(vocab)
-        self.matcher.add("BAD_HTML", patterns)
+customLabel = ['STRUCTURE', 'COMPONENT', 'SYSTEM']
+aliasLookup = {}
 
-    def __call__(self, doc):
-        # This method is invoked when the component is called on a Doc
-        matches = self.matcher(doc)
-        spans = []  # Collect the matched spans here
-        for match_id, start, end in matches:
-            spans.append(doc[start:end])
-        with doc.retokenize() as retokenizer:
-            for span in spans:
-                retokenizer.merge(span)
-                for token in span:
-                    token._.bad_html = True  # Mark token as bad HTML
-        return doc
+# orders of NLP pipeline: 'ner' --> 'normEntities' --> 'merge_entities' --> 'initCoref'
+# --> 'aliasResolver' --> 'coreferee' --> 'anaphorCoref'
 
-nlp = spacy.load("en_core_web_sm")
-nlp.add_pipe("html_merger", last=True)  # Add component to the pipeline
-doc = nlp("Hello<br>world! <br/> This is a test.")
-for token in doc:
-    print(token.text, token._.bad_html)
+@Language.component("normEntities")
+def normEntities(doc):
+  """
+    Normalizing Named Entities, remove the leading article and trailing particle
+    @ In, doc,
+    @ Out, doc,
+  """
+  ents = []
+  for ent in doc.ents:
+    if ent[0].pos_ == "DET": # leading article
+      ent = Span(doc, ent.start+1, ent.end, label=ent.label)
+    if len(ent) > 0:
+      if ent[-1].pos_ == "PART": # trailing particle like 's
+        ent = Span(doc, ent.start, ent.end-1, label=ent.label)
+      if len(ent) > 0:
+        ents.append(ent)
+  doc.ents = tuple(ents)
+  return doc
 
-## Take a path to a JSON file containing the patterns
+@Language.component("initCoref")
+def initCoref(doc):
+  for e in doc.ents:
+    if e.label_ in customLabel:
+      e[0]._.ref_n, e[0]._.ref_t = e.text, e.label_
+  return doc
 
-# @Language.factory("html_merger", default_config={"path": None})
-# def create_bad_html_merger(nlp, name, path):
-#     return BadHTMLMerger(nlp, path=path)
-#
-# nlp.add_pipe("html_merger", config={"path": "/path/to/patterns.json"})
+@Language.component("aliasResolver")
+def aliasResolver(doc):
+  """
+    Lookup aliases and store result in ref_t, ref_n
+  """
+  for ent in doc.ents:
+    token = ent[0].text
+    if token in aliasLookup:
+      aName, aType = aliasLookup[token]
+      ent[0]._.ref_n, ent[0]._.ref_t = aName, aType
+  return propagateEntType(doc)
 
-### Examples for customer pipeline
-from spacy.language import Language
+def propagateEntType(doc):
+  """
+    propagate entity type stored in ref_t
+  """
+  ents = []
+  for e in doc.ents:
+    if e[0]._.ref_n != '': # if e is a coreference
+      e = Span(doc, e.start, e.end, label=e[0]._.ref_t)
+    ents.append(e)
+  doc.ents = tuple(ents)
+  return doc
 
-# Usage as a decorator
-@Language.component("my_component")
-def my_component(doc):
-   # Do something to the doc
-   return doc
-
-# Usage as a function
-Language.component("my_component2", func=my_component)
-
-###############
-from spacy.language import Language
-
-# Usage as a decorator
-@Language.factory(
-   "my_component",
-   default_config={"some_setting": True},
-)
-def create_my_component(nlp, name, some_setting):
-     return MyComponent(some_setting)
-
-# Usage as function
-Language.factory(
-    "my_component",
-    default_config={"some_setting": True},
-    func=create_my_component
-)
-
-##############################################################
-import spacy
-from spacy.language import Language
-from spacy.tokens import Span
-
-nlp = spacy.load("en_core_web_sm")
-
-@Language.component("expand_person_entities")
-def expand_person_entities(doc):
-    new_ents = []
-    for ent in doc.ents:
-        if ent.label_ == "PERSON" and ent.start != 0:
-            prev_token = doc[ent.start - 1]
-            if prev_token.text in ("Dr", "Dr.", "Mr", "Mr.", "Ms", "Ms."):
-                new_ent = Span(doc, ent.start - 1, ent.end, label=ent.label)
-                new_ents.append(new_ent)
-        else:
-            new_ents.append(ent)
-    doc.ents = new_ents
+@Language.component("anaphorCoref")
+def anaphorCoref(doc):
+  """
+    Anaphora resolution using coreferee
+    This pipeline need to be added after NER.
+    The assumption here is: The entities need to be recognized first, then call
+    pipeline "initCoref" to assign initial custom attribute "ref_n" and "ref_t",
+    then call pipeline "aliasResolver" to resolve all the aliases used in the text.
+    After all these pre-processes, we can use "anaphorCoref" pipeline to resolve the
+    coreference.
+  """
+  if not Token.has_extension('coref_chains'):
     return doc
+  for token in doc:
+    coref = token._.coref_chains
+    # if token is coref and not already dereferenced
+    if coref and token._.ref_n == '':
+      # check all the references, if "ref_n" is available (determined by NER and initCoref),
+      # the value of "ref_n" will be assigned to current totken
+      for chain in coref:
+        for ref in chain:
+          if ref._.ref_n != '':
+            token._.ref_n = ref._.ref_n
+            token._.ref_t = ref._.ref_t
+            break
+  return doc
 
-# Add the component after the named entity recognizer
-nlp.add_pipe("expand_person_entities", after="ner")
+#########################################################
+# pipelines that can be used in future work
 
-doc = nlp("Dr. Alex Smith chaired first board meeting of Acme Corp Inc.")
-print([(ent.text, ent.label_) for ent in doc.ents])
+@Language.component("expandEntities")
+def expandEntities(doc):
+  """
+    Expand the current entities, recursive function to extend entity with all previous NOUN
+  """
+  newEnts = []
+  isUpdated = False
+  for ent in doc.ents:
+    if ent.label_ == "SSC" and ent.start != 0:
+      prevToken = doc[ent.start - 1]
+      if prevToken.pos_ in ['NOUN']:
+        newEnt = Span(doc, ent.start - 1, ent.end, label=ent.label)
+        newEnts.append(newEnt)
+        isUpdated = True
+    else:
+      newEnts.append(ent)
+  doc.ents = newEnts
+  if isUpdated:
+    doc = expandEntities(doc)
+  return doc
 
-#### Another way is to use Span set_extension to add the custom extension attribute.
-import spacy
-from spacy.tokens import Span
-
-nlp = spacy.load("en_core_web_sm")
-
-def get_person_title(span):
-    if span.label_ == "PERSON" and span.start != 0:
-        prev_token = span.doc[span.start - 1]
-        if prev_token.text in ("Dr", "Dr.", "Mr", "Mr.", "Ms", "Ms."):
-            return prev_token.text
-
-# Register the Span extension as 'person_title'
-Span.set_extension("person_title", getter=get_person_title)
-
-doc = nlp("Dr Alex Smith chaired first board meeting of Acme Corp Inc.")
-print([(ent.text, ent.label_, ent._.person_title) for ent in doc.ents])
-
-
-
-
-###### Can be used for relationship extraction:
-import spacy
-from spacy.language import Language
-from spacy import displacy
-
-nlp = spacy.load("en_core_web_sm")
-
+###TODO: update the following pipelines
 # @Language.component("extract_person_orgs")
 # def extract_person_orgs(doc):
 #     person_entities = [ent for ent in doc.ents if ent.label_ == "PERSON"]
@@ -144,47 +134,17 @@ nlp = spacy.load("en_core_web_sm")
 #                 print({'person': ent, 'orgs': orgs, 'past': head.tag_ == "VBD"})
 #     return doc
 
-@Language.component("extract_person_orgs")
-def extract_person_orgs(doc):
-    person_entities = [ent for ent in doc.ents if ent.label_ == "PERSON"]
-    for ent in person_entities:
-        head = ent.root.head
-        if head.lemma_ == "work":
-            preps = [token for token in head.children if token.dep_ == "prep"]
-            for prep in preps:
-                orgs = [t for t in prep.children if t.ent_type_ == "ORG"]
-                aux = [token for token in head.children if token.dep_ == "aux"]
-                past_aux = any(t.tag_ == "VBD" for t in aux)
-                past = head.tag_ == "VBD" or head.tag_ == "VBG" and past_aux
-                print({'person': ent, 'orgs': orgs, 'past': past})
-    return doc
-
-# To make the entities easier to work with, we'll merge them into single tokens
-nlp.add_pipe("merge_entities")
-nlp.add_pipe("extract_person_orgs")
-
-doc = nlp("Alex Smith worked at Acme Corp Inc.")
-# If you're not in a Jupyter / IPython environment, use displacy.serve
-displacy.render(doc, options={"fine_grained": True})
-
-
-# Simple pipeline, functions with "doc" as input and output
-## examples
-def alias_resolver(doc):
-    """Lookup aliases and store result in ref_t, ref_n"""
-    for ent in doc.ents:
-        token = ent[0].text
-        if token in alias_lookup:
-            a_name, a_type = alias_lookup[token]
-            ent[0]._.ref_n, ent[0]._.ref_t = a_name, a_type
-    return propagate_ent_type(doc)
-
-def propagate_ent_type(doc):
-    """propagate entity type stored in ref_t"""
-    ents = []
-    for e in doc.ents:
-        if e[0]._.ref_n != '': # if e is a coreference
-            e = Span(doc, e.start, e.end, label=e[0]._.ref_t)
-        ents.append(e)
-    doc.ents = tuple(ents)
-    return doc    
+# @Language.component("extract_person_orgs")
+# def extract_person_orgs(doc):
+#     person_entities = [ent for ent in doc.ents if ent.label_ == "PERSON"]
+#     for ent in person_entities:
+#         head = ent.root.head
+#         if head.lemma_ == "work":
+#             preps = [token for token in head.children if token.dep_ == "prep"]
+#             for prep in preps:
+#                 orgs = [t for t in prep.children if t.ent_type_ == "ORG"]
+#                 aux = [token for token in head.children if token.dep_ == "aux"]
+#                 past_aux = any(t.tag_ == "VBD" for t in aux)
+#                 past = head.tag_ == "VBD" or head.tag_ == "VBG" and past_aux
+#                 print({'person': ent, 'orgs': orgs, 'past': past})
+#     return doc
