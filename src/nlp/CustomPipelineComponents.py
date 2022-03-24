@@ -4,6 +4,11 @@ from spacy.tokens import Span
 from spacy.matcher import Matcher
 from spacy.tokens import Token
 
+import logging
+
+
+logger = logging.getLogger(__name__)
+
 #### Using spacy's Token extensions for coreferee
 if Token.has_extension('ref_n'):
   _ = Token.remove_extension('ref_n')
@@ -91,9 +96,10 @@ def anaphorCoref(doc):
       # the value of "ref_n" will be assigned to current totken
       for chain in coref:
         for ref in chain:
-          if ref._.ref_n != '':
-            token._.ref_n = ref._.ref_n
-            token._.ref_t = ref._.ref_t
+          refToken = doc[ref[0]]
+          if refToken._.ref_n != '':
+            token._.ref_n = refToken._.ref_n
+            token._.ref_t = refToken._.ref_t
             break
   return doc
 
