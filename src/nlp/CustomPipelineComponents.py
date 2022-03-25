@@ -29,8 +29,8 @@ aliasLookup = {}
 def normEntities(doc):
   """
     Normalizing Named Entities, remove the leading article and trailing particle
-    @ In, doc,
-    @ Out, doc,
+    @ In, doc, spacy.tokens.doc.Doc
+    @ Out, doc, spacy.tokens.doc.Doc
   """
   ents = []
   for ent in doc.ents:

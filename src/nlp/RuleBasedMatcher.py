@@ -7,6 +7,9 @@ from spacy.matcher import PhraseMatcher
 from spacy.matcher import DependencyMatcher
 from collections import deque
 
+from nlp_utils import displayNER, resetPipeline, printDepTree
+
+
 import logging
 
 
