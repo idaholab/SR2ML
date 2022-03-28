@@ -6,6 +6,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+###########################################################################
+
 def displayNER(doc, includePunct=False):
   """
     Generate data frame for visualization of spaCy doc with custom attributes.
@@ -46,7 +48,8 @@ def resetPipeline(nlp, pipes):
   for pipe in pipes:
     nlp.add_pipe(pipe)
   logger.info(f"Model: {nlp.meta['name']}, Language: {nlp.meta['lang']}")
-  logger.info('\n'.join([pipe for (pipe,_) in nlp.pipeline]))
+  logger.info('Available pipelines:'+', '.join([pipe for (pipe,_) in nlp.pipeline]))
+  return nlp
 
 def printDepTree(doc, skipPunct=True):
   """
