@@ -8,7 +8,7 @@ from spacy.matcher import DependencyMatcher
 from collections import deque
 
 from nlp_utils import displayNER, resetPipeline, printDepTree
-
+from CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref
 
 import logging
 
@@ -20,7 +20,22 @@ logger = logging.getLogger(__name__)
 # logger.addHandler(ch)
 ##
 
-
+## coreferee module for Coreference Resolution
+## Q? at which level to perform coreferee? After NER and perform coreferee on collected sentence
+_corefAvail = False
+try:
+  # check the current version spacy>=3.1.0,<3.2.0
+  from packaging.version import Version
+  ver = spacy.__version__
+  valid = Version(ver)>=Version('3.1.0') and Version(ver)<Version('3.2.0')
+  if valid:
+    # https://github.com/msg-systems/coreferee
+    import coreferee
+    _corefAvail = True
+  else:
+    logger.info(f'Module coreferee is not compatible with spacy version {ver}')
+except ModuleNotFoundError:
+  logger.info('Module coreferee can not be imported')
 
 
 class RuleBasedMatcher(object):
@@ -39,8 +54,13 @@ class RuleBasedMatcher(object):
     self.type = self.__class__.__name__
     self.name = self.__class__.__name__
     logger.info(f'Create instance of {self.name}')
-    # nlp = spacy.load("en_core_web_sm")
-    # pipeline sequence: entity_ruler --> merge_entities --> coreferee
+    # orders of NLP pipeline: 'ner' --> 'normEntities' --> 'merge_entities' --> 'initCoref'
+    # --> 'aliasResolver' --> 'coreferee' --> 'anaphorCoref'
+    if _corefAvail:
+      pipelines = ['entity_ruler','normEntities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
+    else:
+      pipelines = ['entity_ruler','normEntities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
+    nlp = resetPipeline(nlp, pipelines)
     self.nlp = nlp
     self._doc = None
     self._rules = {}
@@ -51,27 +71,15 @@ class RuleBasedMatcher(object):
     self.matcher = Matcher(nlp.vocab)
     self.phraseMatcher = PhraseMatcher(nlp.vocab, attr="LOWER")
     self.dependencyMatcher = DependencyMatcher(nlp.vocab)
-    self.entityRuler = nlp.add_pipe("entity_ruler")
+    if nlp.has_pipe("entity_ruler"):
+      self.entityRuler = nlp.get_pipe("entity_ruler")
+    else:
+      self.entityRuler = nlp.add_pipe("entity_ruler")
     self._callbacks = {}
     self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
     self._matchedSents = [] # collect data of matched sentences to be visualized
     self._visualizeMatchedSents = True
-    self._coref = False # True indicate coreference pipeline is available
-
-    ## coreferee module for Coreference Resolution
-    ## Q? at which level to perform coreferee? After NER and perform coreferee on collected sentence
-    try:
-      # check the current version spacy>=3.1.0,<3.2.0
-      from packaging.version import Version
-      ver = spacy.__version__
-      valid = Version(ver)>=Version('3.1.0') and Version(ver)<Version('3.2.0')
-      if valid:
-        # https://github.com/msg-systems/coreferee
-        import coreferee
-        self._coref = True
-        self.nlp.add_pipe('coreferee')
-    except ModuleNotFoundError:
-      logger.info('Module ')
+    self._coref = _corefAvail # True indicate coreference pipeline is available
 
   def addPattern(self, name, rules, callback=None):
     """
@@ -147,7 +155,6 @@ class RuleBasedMatcher(object):
     # if self.nlp.has_pipe('merge_entities'):
     #   _ = self.nlp.remove_pipe('merge_entities')
     # self.nlp.add_pipe('merge_entities')
-
     doc = self.nlp(text)
     self._doc = doc
     matches = []
@@ -279,6 +286,7 @@ class RuleBasedMatcher(object):
             yield ((subj._.ref_n, subj._.ref_t), predName,
                    (obj._.ref_n, obj._.ref_t))
 
+
   ###############
   # methods can be used for callback in "add" method
   ###############
@@ -288,15 +296,15 @@ class RuleBasedMatcher(object):
       @ In, matcher, spacy.Matcher, the spacy matcher instance
       @ In, doc, the document the matcher was used on
       @ In, i, int, index of the current match (matches[i])
-      @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing the matches. A
-        match tuple describes a span doc[start:end]
+      @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing
+        the matches. A match tuple describes a span doc[start:end]
     """
     id, start, end = matches[i]
     ent = Span(doc, start, end, label=id)
     doc.ents += (ent,)
     logger.debug(ent.text)
-
-  def collectSents(matcher, doc, i, matches):
+  ##TODO: how to extend it for entity ruler?
+  def collectSents(self, matcher, doc, i, matches):
     """
       collect data of matched sentences that can be used for visualization
       @ In, matcher, spacy.Matcher, the spacy matcher instance
