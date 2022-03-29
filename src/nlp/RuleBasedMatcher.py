@@ -75,6 +75,10 @@ class RuleBasedMatcher(object):
       self.entityRuler = nlp.get_pipe("entity_ruler")
     else:
       self.entityRuler = nlp.add_pipe("entity_ruler")
+    self._simpleMatches = []
+    self._phraseMatches = []
+    self._dependencyMatches = []
+    self._entityRulerMatches = []
     self._callbacks = {}
     self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
     self._matchedSents = [] # collect data of matched sentences to be visualized
@@ -157,28 +161,25 @@ class RuleBasedMatcher(object):
     # self.nlp.add_pipe('merge_entities')
     doc = self.nlp(text)
     self._doc = doc
-    matches = []
-    if self._match:
-      matches += self.matcher(doc, as_spans = self._asSpans) # <class 'list'>
-    if self._phraseMatch:
-      matches += self.phraseMatcher(doc, as_spans = self._asSpans) # <class 'list'>
-    if self._dependencyMatch:
-      depMatches = self.dependencyMatcher(doc) # <class 'list'> [tuple(match_id, token_ids)]
 
-    if self._asSpans:
-      for span in matches:
-        logger.debug(f'Matches: {span.text}, {span.label_}')
-    else:
-      for id, start, end in matches:
-        strID = self.nlp.vocab.strings[id]
-        span = doc[start:end]
-        logger.debug(f'Matches: {strID}, {start}, {end}, {span.text}')
+    if self._match:
+      self._simpleMatches += self.matcher(doc, as_spans = self._asSpans) # <class 'list'>
+    if self._phraseMatch:
+      self._phraseMatches += self.phraseMatcher(doc, as_spans = self._asSpans) # <class 'list'>
+    if self._dependencyMatch:
+      self._dependencyMatches = self.dependencyMatcher(doc) # <class 'list'> [tuple(match_id, token_ids)]
+
+    if self._match:
+      self.printMatches(self._doc, self._simpleMatches, 'Simple Matches')
+    if self._phraseMatch:
+      self.printMatches(self._doc, self._phraseMatches, 'Phrase Matches')
 
     # print dependency matches
-    for (id, tokenIDs) in depMatches:
-      name = self.nlp.vocab.strings[id]
-      for i in range(len(tokenIDs)):
-        print(self._rules[name][0][i]["RIGHT_ID"] + ":",doc[tokenIDs[i]].text)
+    if self._dependencyMatch:
+      for (id, tokenIDs) in self._dependencyMatches:
+        name = self.nlp.vocab.strings[id]
+        for i in range(len(tokenIDs)):
+          print(self._rules[name][0][i]["RIGHT_ID"] + ":",doc[tokenIDs[i]].text)
 
     ## use entity ruler to identify entity
     if self._entityRuler:
@@ -188,6 +189,20 @@ class RuleBasedMatcher(object):
       logger.debug('Print Coreference Info:')
       print(doc._.coref_chains.pretty_representation)
 
+
+  def printMatches(self, doc, matches, matchType):
+    """
+    """
+    if not self._asSpans:
+      matchList = []
+      for id, start, end in matches:
+        strID = self.nlp.vocab.strings[id]
+        span = doc[start:end]
+        matchList.append(span)
+    else:
+      matchList = matches
+    matchText = ', '.join([span.text for span in matchList])
+    logger.debug(matchType + ': ' + matchText)
 
   def visualize():
     """
@@ -290,6 +305,7 @@ class RuleBasedMatcher(object):
   ###############
   # methods can be used for callback in "add" method
   ###############
+  @staticmethod
   def extendEnt(matcher, doc, i, matches):
     """
       Extend the doc's entity
@@ -301,8 +317,9 @@ class RuleBasedMatcher(object):
     """
     id, start, end = matches[i]
     ent = Span(doc, start, end, label=id)
-    doc.ents += (ent,)
     logger.debug(ent.text)
+    doc.ents += (ent,)
+
   ##TODO: how to extend it for entity ruler?
   def collectSents(self, matcher, doc, i, matches):
     """

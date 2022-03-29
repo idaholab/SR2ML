@@ -29,6 +29,12 @@ if __name__ == "__main__":
           Pump inspection revealed excessive impeller degradation likely due to cavitation.
         """
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
+
+  ##Issue with simple and phrase matcher, if there are duplicate names, callback functions
+  ##can not be used, in which case, we can not directly extend doc.ents, which will raise the
+  ## error:  Unable to set entity information for token xx which is included in more than
+  ## one span in entities, blocked, missing or outside. (https://github.com/explosion/spaCy/discussions/9993)
+  ## In this case, we need to use "entity_ruler" to identify the matches
   # simple match
   name = 'ssc_match'
   rules = [{"LOWER":"pump"}, {"POS":"NOUN"}]

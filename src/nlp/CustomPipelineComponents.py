@@ -50,8 +50,8 @@ def initCoref(doc):
   """
   for e in doc.ents:
     #
-    if e.label_ in customLabel:
-      e[0]._.ref_n, e[0]._.ref_t = e.text, e.label_
+    # if e.label_ in customLabel:
+    e[0]._.ref_n, e[0]._.ref_t = e.text, e.label_
   return doc
 
 @Language.component("aliasResolver")
