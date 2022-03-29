@@ -349,25 +349,3 @@ class RuleBasedMatcher(object):
 
       matchedSents.append({"text": sent.text, "ents": matchEnts})
     return matchedSents
-
-  # def collectSents(self, matcher, doc, i, matches):
-  #   """
-  #     collect data of matched sentences that can be used for visualization
-  #     @ In, matcher, spacy.Matcher, the spacy matcher instance
-  #     @ In, doc, the document the matcher was used on
-  #     @ In, i, int, index of the current match (matches[i])
-  #     @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing the matches. A
-  #       match tuple describes a span doc[start:end]
-  #   """
-  #   id, start, end = matches[i]
-  #   span = doc[start:end]  # Matched span
-  #   sent = span.sent  # Sentence containing matched span
-  #   # Append mock entity for match in displaCy style to matched_sents
-  #   # get the match span by ofsetting the start and end of the span with the
-  #   # start and end of the sentence in the doc
-  #   matchEnts = [{
-  #       "start": span.start_char - sent.start_char,
-  #       "end": span.end_char - sent.start_char,
-  #       "label": "MATCH",
-  #   }]
-  #   self._matchedSents.append({"text": sent.text, "ents": matchEnts})
