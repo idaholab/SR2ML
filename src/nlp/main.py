@@ -17,16 +17,32 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 if __name__ == "__main__":
-  nlp = spacy.load("en_core_web_sm")
+  nlp = spacy.load("en_core_web_lg")
   doc = r"""A leak was noticed from the RCP pump 1A.
-          The RCP pump 1A pressure gauge was found not operating, and it was found inoperative.
-          The RCP pump 1A pressure gauge was found inoperative.
-          Rupture of pump bearings caused shaft degradation.
-          Rupture of pump bearings caused shaft degradation and consequent flow reduction.
-          Pump power supply has been found burnout.
-          Pump test failed due to power supply failure.
-          Pump inspection revealed excessive impeller degradation.
-          Pump inspection revealed excessive impeller degradation likely due to cavitation.
+RCP pump 1A pressure gauge was found not operating.
+RCP pump 1A pressure gauge was found inoperative.
+Rupture of pump bearings caused shaft degradation.
+Rupture of pump bearings caused shaft degradation and consequent flow reduction.
+Pump power supply has been found burnout.
+Pump test failed due to power supply failure.
+Pump inspection revealed excessive impeller degradation.
+Pump inspection revealed excessive impeller degradation likely due to cavitation.
+Oil puddle was found in proximity of RCP pump 1A.
+Anomalous vibrations were observed for RCP pump 1A.
+Several cracks on pump shaft were observed; they could have caused pump failure within few days.
+RCP pump 1A  had signs of past leakage.
+RCP pump 1A was cavitating and vibrating to some degree during test. This is most likely due to low flow conditions rather than mechanical issues.
+Pump flow meter was not responding.
+Cavitation was noticed but did not seem severe. The shaft vibration appears to be causing the motor to vibrate as well.
+Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation.
+The shaft deflection is causing the safety cage to rattle. Pumps not experiencing enough flow for the pumps to keep the check valves open during test.
+Pump not experiencing enough flow during test.
+Shaft made noise. Vibration seems like it is coming from the shaft.
+Slight Vibrations noticed - likely from shaft deflection.
+Visible shaft deflection in operation.
+Pump bearings appear in acceptable condition.
+Pump made noises - not nough to affect performance.
+Pump shaft has a slight deflection.
         """
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
 
@@ -66,7 +82,10 @@ if __name__ == "__main__":
   matcher.addDependency(name, dependencyList, callback=None)
   # Entity rule-based match
   name = 'ssc_entity_ruler'
-  patterns = [{"label":"pump_comp", "pattern":[{"LOWER":"pump"}, {"POS":"NOUN"}], "id":"ssc"}]
+  patterns = [{"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"pump"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"shaft"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"gauge"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"bearing"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"}]
   matcher.addEntityPattern(name, patterns)
 
   matcher(doc)
