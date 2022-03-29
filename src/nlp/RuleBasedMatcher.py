@@ -57,9 +57,9 @@ class RuleBasedMatcher(object):
     # orders of NLP pipeline: 'ner' --> 'normEntities' --> 'merge_entities' --> 'initCoref'
     # --> 'aliasResolver' --> 'coreferee' --> 'anaphorCoref'
     if _corefAvail:
-      pipelines = ['entity_ruler','normEntities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
+      pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
     else:
-      pipelines = ['entity_ruler','normEntities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
+      pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
     nlp = resetPipeline(nlp, pipelines)
     self.nlp = nlp
     self._doc = None
@@ -81,7 +81,8 @@ class RuleBasedMatcher(object):
     self._entityRulerMatches = []
     self._callbacks = {}
     self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
-    self._matchedSents = [] # collect data of matched sentences to be visualized
+    self._matchedSents = [] # collect data of matched sentences
+    self._matchedSentsForVis = [] # collect data of matched sentences to be visualized
     self._visualizeMatchedSents = True
     self._coref = _corefAvail # True indicate coreference pipeline is available
 
@@ -189,9 +190,13 @@ class RuleBasedMatcher(object):
       logger.debug('Print Coreference Info:')
       print(doc._.coref_chains.pretty_representation)
 
-    matchedSents = self.collectSents(self._doc)
+    matchedSents, matchedSentsForVis = self.collectSents(self._doc)
     self._matchedSents += matchedSents
-    print(self._matchedSents)
+    self._matchedSentsForVis += matchedSentsForVis
+    # print(self._matchedSents)
+    # self.visualize()
+
+    ## TODO: collect and expand entities, then extract health status of the entities
 
 
   def printMatches(self, doc, matches, matchType):
@@ -208,15 +213,16 @@ class RuleBasedMatcher(object):
     matchText = ', '.join([span.text for span in matchList])
     logger.debug(matchType + ': ' + matchText)
 
-  def visualize():
+  def visualize(self):
     """
     """
     if self._visualizeMatchedSents:
       # Serve visualization of sentences containing match with displaCy
       # set manual=True to make displaCy render straight from a dictionary
-      # (if you're not running the code within a Jupyer environment, you can
-      # use displacy.serve instead)
-      displacy.render(self._matchedSents, style="ent", manual=True)
+      # (if you're running the code within a Jupyer environment, you can
+      # use displacy.render instead)
+      # displacy.render(self._matchedSentsForVis, style="ent", manual=True)
+      displacy.serve(self._matchedSentsForVis, style="ent", manual=True)
 
 
   ##########################
@@ -336,6 +342,7 @@ class RuleBasedMatcher(object):
         match tuple describes a span doc[start:end]
     """
     matchedSents = []
+    matchedSentsForVis = []
     for span in doc.ents:
       sent = span.sent
       # Append mock entity for match in displaCy style to matched_sents
@@ -346,6 +353,7 @@ class RuleBasedMatcher(object):
           "end": span.end_char - sent.start_char,
           "label": span.label_,
       }]
-
-      matchedSents.append({"text": sent.text, "ents": matchEnts})
-    return matchedSents
+      if sent not in matchedSents:
+        matchedSents.append(sent)
+      matchedSentsForVis.append({"text": sent.text, "ents": matchEnts})
+    return matchedSents, matchedSentsForVis

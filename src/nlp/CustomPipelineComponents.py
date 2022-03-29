@@ -3,6 +3,9 @@ from spacy.language import Language
 from spacy.tokens import Span
 from spacy.matcher import Matcher
 from spacy.tokens import Token
+# filter_spans is used to resolve the overlap issue in entities
+# It gives primacy to longer spans (entities)
+from spacy.util import filter_spans
 
 import logging
 
@@ -18,6 +21,7 @@ if Token.has_extension('ref_t_'):
   _ = Token.remove_extension('ref_t_')
 Token.set_extension('ref_n', default='')
 Token.set_extension('ref_t', default='')
+Span.set_extension("health_status", default=None)
 
 customLabel = ['STRUCTURE', 'COMPONENT', 'SYSTEM']
 aliasLookup = {}
@@ -117,7 +121,7 @@ def expandEntities(doc):
   newEnts = []
   isUpdated = False
   for ent in doc.ents:
-    if ent.label_ == "SSC" and ent.start != 0:
+    if ent.ent_id_ == "SSC" and ent.start != 0:
       prevToken = doc[ent.start - 1]
       if prevToken.pos_ in ['NOUN']:
         newEnt = Span(doc, ent.start - 1, ent.end, label=ent.label)
@@ -125,7 +129,9 @@ def expandEntities(doc):
         isUpdated = True
     else:
       newEnts.append(ent)
-  doc.ents = newEnts
+  print(newEnts)
+  doc.ents = filter_spans(list(doc.ents) +  newEnts)
+  # doc.ents = filter_spans(newEnts)
   if isUpdated:
     doc = expandEntities(doc)
   return doc
