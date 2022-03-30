@@ -85,7 +85,11 @@ Pump shaft has a slight deflection.
   patterns = [{"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"pump"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
               {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"shaft"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
               {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"gauge"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
-              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"bearing"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"}]
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"bearing"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"supply"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"impeller"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"flow meter"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
+              {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"motor"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"}]
   matcher.addEntityPattern(name, patterns)
 
   matcher(doc)

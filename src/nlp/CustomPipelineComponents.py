@@ -110,9 +110,6 @@ def anaphorCoref(doc):
             break
   return doc
 
-#########################################################
-# pipelines that can be used in future work
-
 @Language.component("expandEntities")
 def expandEntities(doc):
   """
@@ -131,10 +128,26 @@ def expandEntities(doc):
       newEnts.append(ent)
   print(newEnts)
   doc.ents = filter_spans(list(doc.ents) +  newEnts)
-  # doc.ents = filter_spans(newEnts)
   if isUpdated:
     doc = expandEntities(doc)
   return doc
+
+# @Language.component("extractHealthStatus")
+# def extractHealthStatus(doc):
+#   """
+#     Extract the health status of identified entities
+#   """
+#   for ent in doc.ents:
+#     if ent.ent_id_ == "SSC":
+#       sent = ent.sent
+#
+#   return doc
+
+
+
+
+#########################################################
+# pipelines that can be used in future work
 
 ###TODO: update the following pipelines
 # @Language.component("extract_person_orgs")
