@@ -6,7 +6,9 @@ from spacy import displacy
 from spacy.matcher import PhraseMatcher
 from spacy.matcher import DependencyMatcher
 from collections import deque
-
+# filter_spans is used to resolve the overlap issue in entities
+# It gives primacy to longer spans (entities)
+from spacy.util import filter_spans
 from nlp_utils import displayNER, resetPipeline, printDepTree
 from CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref
 
@@ -37,6 +39,9 @@ try:
 except ModuleNotFoundError:
   logger.info('Module coreferee can not be imported')
 
+
+if not Span.has_extension('health_status'):
+  Span.set_extension("health_status", default=None)
 
 class RuleBasedMatcher(object):
   """
@@ -328,7 +333,7 @@ class RuleBasedMatcher(object):
     id, start, end = matches[i]
     ent = Span(doc, start, end, label=id)
     logger.debug(ent.text)
-    doc.ents += (ent,)
+    doc.ents = filter_spans(list(doc.ents) +[ent])
 
   ##TODO: how to extend it for entity ruler?
   @staticmethod
