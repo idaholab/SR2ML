@@ -91,6 +91,10 @@ class RuleBasedMatcher(object):
     self._visualizeMatchedSents = True
     self._coref = _corefAvail # True indicate coreference pipeline is available
     self._entityLabels = []
+    self._statusKeyword = ['fail', 'degrade', 'break', 'decline', 'go bad', 'rupture', 'breach', 'reduce', 'increase',
+        'decrease', 'fracture', 'aggravate','worsen', 'lose', 'function', 'work', 'operate', 'run', 'find', 'find out',
+        'observe', 'detect', 'determine', 'discover', 'get', 'notice', 'become', 'record', 'register', 'show']
+    self._causalKeyword = ['cause', 'stimulate', 'make', 'derive', 'trigger', 'result', 'lead', 'increase', 'decrease']
 
   def addPattern(self, name, rules, callback=None):
     """
@@ -207,8 +211,12 @@ class RuleBasedMatcher(object):
 
     ## TODO: collect and expand entities, then extract health status of the entities
 
+    ## health status
+    self.extractHealthStatus(self._matchedSents)
     ## print extracted relation
     print(*self.extractRelDep(self._matchedSents, entID='SSC', predName='causes', predSynonyms=[], exclPrepos=[]), sep='\n')
+
+
 
   def printMatches(self, doc, matches, matchType):
     """
@@ -259,25 +267,88 @@ class RuleBasedMatcher(object):
         break
     return None
 
-  # def extractHealthStatus(self, doc, predName, predSynonyms=[], exclPrepos=[]):
-  #   """
-  #     Extract health status and relation
-  #     @ In, doc,
-  #     @ In, predName, string, 'status' or 'cause'
-  #     @ In, predSynonyms, list, predicate synonyms
-  #     @ In, exclPrepos, list, exclude the prepositions
-  #   """
-  #   for ent in doc.ents:
-  #     sent = ent.sent
-  #     if len(sent.ents) == 1: # only one entity in the sentence, extract health status
-  #       token = self.findVerb(sent)
-  #       if ent.start < token.i:
-  #
-  #       elif ent.start > token.i:
-  #
-  #       if token is not None:
-  #         passive = self.isPassive(token)
+  def extractHealthStatus(self, matchedSents, predSynonyms=[], exclPrepos=[]):
+    """
+      Extract health status and relation
+      @ In, matchedSents,
+      @ In, predName, string, 'status' or 'cause'
+      @ In, predSynonyms, list, predicate synonyms
+      @ In, exclPrepos, list, exclude the prepositions
+    """
+    for sent in matchedSents:
+      ents = list(sent.ents)
+      predSyns = self._statusKeyword if len(predSynonyms) == 0 else predSynonyms
+      root = sent.root
+      if root.lemma_ not in predSyns:
+        continue
+      if root.pos_ != 'VERB':
+        continue
+      passive = self.isPassive(root)
+      if len(ents) == 1:
+        if ents[0].start < root.i:
+          healthStatus = self.findRight(root)
+        else:
+          healthStatus = self.findLeft(root, passive)
 
+        if healthStatus is None:
+          continue
+
+        logger.debug(f'{ents[0]} health status: {healthStatus.text}')
+        ents[0]._.set('health_status', healthStatus.text)
+      else:
+        logger.debug('Not yet implemented')
+
+  def findLeft(self, pred, passive):
+    """
+      Find closest subject in predicates left subtree or
+      predicates parent's left subtree (recursive).
+      Has a filter on organizations.
+    """
+    for left in pred.lefts:
+      if passive: # if pred is passive, search for passive subject
+        subj = self.findHealthStatus(left, ['nsubjpass', 'nsubj:pass'])
+      else:
+        subj = self.findHealthStatus(left, ['nsubj'])
+      if subj is not None: # found it!
+        return subj
+    if pred.head != pred and not self.isPassive(pred):
+      return self.findLeft(pred.head, passive) # climb up left subtree
+    else:
+      return None
+
+  def findRight(self, pred, exclPrepos=[]):
+    """
+      Find closest object in predicates right subtree.
+      Skip prepositional objects if the preposition is in exclude list.
+      Has a filter on organizations.
+    """
+    for right in pred.rights:
+      obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
+      if obj is not None:
+        if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
+          continue
+        return obj
+    return None
+
+  def findHealthStatus(self, root, deps):
+    """
+      Return first child of root (included) that matches
+      dependency list by breadth first search.
+      Search stops after first dependency match if firstDepOnly
+      (used for subject search - do not "jump" over subjects)
+    """
+    toVisit = deque([root]) # queue for bfs
+
+    while len(toVisit) > 0:
+      child = toVisit.popleft()
+      # print("child", child, child.dep_)
+      if child.dep_ in deps:
+        return child
+      elif child.dep_ == 'compound' and \
+         child.head.dep_ in deps: # check if contained in compound
+        return child
+      toVisit.extend(list(child.children))
+    return None
 
   def bfs(self, root, entID, deps, firstDepOnly=False):
     """
@@ -311,9 +382,9 @@ class RuleBasedMatcher(object):
     """
     for left in pred.lefts:
       if passive: # if pred is passive, search for passive subject
-        subj = self.bfs(left, entID, ['nsubjpass', 'nsubj:pass'], True)
+        subj = self.bfs(left, entID, ['nsubjpass', 'nsubj:pass'], False)
       else:
-        subj = self.bfs(left, entID, ['nsubj'], True)
+        subj = self.bfs(left, entID, ['nsubj'], False)
       if subj is not None: # found it!
         return subj
     if pred.head != pred and not self.isPassive(pred):
@@ -343,8 +414,8 @@ class RuleBasedMatcher(object):
       if len(set(sent.ents)) < 2:
         continue
       for token in sent:
-        predSynonyms = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
-        if token.pos_ == 'VERB' and token.lemma_ in predSynonyms:
+        predSyns = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
+        if token.pos_ == 'VERB' and token.lemma_ in predSyns:
           pred = token
           passive = self.isPassive(pred)
           subj = self.findSubj(pred, entID, passive)
