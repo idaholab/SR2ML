@@ -6,16 +6,15 @@
 import os,sys
 import numpy as np
 filePath = os.path.dirname(os.path.realpath(__file__))
-srcDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,'src'))
-sys.path.append(srcDir)
-from _utils import get_raven_loc
+sys.path.append(os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir))) #Plugins (including SR2ML)
+sys.path.append(os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir, os.pardir))) # RAVEN
+from SR2ML.src._utils import get_raven_loc
 frameworkDir = get_raven_loc()
-# frameworkDir = os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir,os.pardir,'framework'))
-sys.path.append(frameworkDir)
-from utils.utils import find_crow
+
+from ravenframework.utils.utils import find_crow
 find_crow(frameworkDir)
 
-from PostProcessors.MCSimporter import mcsReader
+from SR2ML.src.PostProcessors.MCSimporter import mcsReader
 
 results = {"pass":0,"fail":0}
 
