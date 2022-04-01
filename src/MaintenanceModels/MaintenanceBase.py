@@ -12,9 +12,9 @@ import numpy as np
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from SR2ML.src.Bases import ModelBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Bases import ModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class MaintenanceBase(ModelBase):

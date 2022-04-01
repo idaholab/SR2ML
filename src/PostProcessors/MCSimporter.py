@@ -23,8 +23,8 @@ import numpy as np
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
-from utils import InputData, InputTypes
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ravenframework.utils import InputData, InputTypes
 #Internal Modules End-----------------------------------------------------------
 
 class MCSImporter(PostProcessorPluginBase):

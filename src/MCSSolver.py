@@ -26,8 +26,8 @@ import copy
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from .PostProcessors.MCSimporter import mcsReader
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ..src.PostProcessors.MCSimporter import mcsReader
 #Internal Modules End-----------------------------------------------------------
 
 class MCSSolver(ExternalModelPluginBase):

@@ -14,11 +14,11 @@ import os
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from SR2ML.src import MaintenanceModels
-from utils import mathUtils as utils
-from utils import InputData
-from utils import InputTypes
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ..src import MaintenanceModels
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData
+from ravenframework.utils import InputTypes
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 
