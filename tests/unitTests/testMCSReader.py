@@ -8,6 +8,9 @@ import numpy as np
 filePath = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir))) #Plugins (including SR2ML)
 sys.path.append(os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir, os.pardir))) # RAVEN
+# for regression test (RAVEN and SR2ML in the same directory)
+sys.path.append(os.path.normpath(os.path.join(filePath,os.pardir,os.pardir,os.pardir, 'raven')))
+
 from SR2ML.src._utils import get_raven_loc
 frameworkDir = get_raven_loc()
 
