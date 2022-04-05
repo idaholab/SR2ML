@@ -1,3 +1,10 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+"""
+Created on March, 2022
+
+@author: wangc, mandd
+"""
 import pandas as pd
 import spacy
 from spacy.tokens import Span
@@ -11,6 +18,9 @@ logger = logging.getLogger(__name__)
 def displayNER(doc, includePunct=False):
   """
     Generate data frame for visualization of spaCy doc with custom attributes.
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ In, includePunct, bool, True if the punctuaction is included
+    @ Out, df, pandas.DataFrame, data frame contains attributes of tokens
   """
   rows = []
   for i, t in enumerate(doc):
@@ -38,6 +48,9 @@ def displayNER(doc, includePunct=False):
 def resetPipeline(nlp, pipes):
   """
     remove all custom pipes, and add new pipes
+    @ In, nlp, spacy.Language object, contains all components and data needed to process text
+    @ In, pipes, list, list of pipes that will be added to nlp pipeline
+    @ Out, nlp, spacy.Language object, contains updated components and data needed to process text
   """
   customPipes = [pipe for (pipe, _) in nlp.pipeline
                   if pipe not in ['tagger', 'parser', 'ner',
@@ -54,6 +67,9 @@ def resetPipeline(nlp, pipes):
 def printDepTree(doc, skipPunct=True):
   """
     Utility function to pretty print the dependency tree.
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ In, skipPunct, bool, True if skip punctuactions
+    @ Out, None
   """
   def printRecursive(root, indent, skipPunct):
     if not root.dep_ == 'punct' or not skipPunct:

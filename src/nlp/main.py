@@ -1,3 +1,11 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+"""
+Created on March, 2022
+
+@author: wangc, mandd
+"""
+
 import logging
 from RuleBasedMatcher import RuleBasedMatcher
 import spacy

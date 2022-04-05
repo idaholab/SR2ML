@@ -1,3 +1,10 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+"""
+Created on March, 2022
+
+@author: wangc, mandd
+"""
 import spacy
 from spacy.language import Language
 from spacy.tokens import Span
@@ -33,8 +40,8 @@ aliasLookup = {}
 def normEntities(doc):
   """
     Normalizing Named Entities, remove the leading article and trailing particle
-    @ In, doc, spacy.tokens.doc.Doc
-    @ Out, doc, spacy.tokens.doc.Doc
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after the normalizing named entities
   """
   ents = []
   for ent in doc.ents:
@@ -51,6 +58,9 @@ def normEntities(doc):
 @Language.component("initCoref")
 def initCoref(doc):
   """
+    Initialize the coreference, assign text and label to custom extension "ref_n" and "ref_t"
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after the initializing coreference
   """
   for e in doc.ents:
     #
@@ -62,6 +72,8 @@ def initCoref(doc):
 def aliasResolver(doc):
   """
     Lookup aliases and store result in ref_t, ref_n
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after the alias lookup
   """
   for ent in doc.ents:
     token = ent[0].text
@@ -73,6 +85,8 @@ def aliasResolver(doc):
 def propagateEntType(doc):
   """
     propagate entity type stored in ref_t
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after entity type extension
   """
   ents = []
   for e in doc.ents:
@@ -92,6 +106,8 @@ def anaphorCoref(doc):
     then call pipeline "aliasResolver" to resolve all the aliases used in the text.
     After all these pre-processes, we can use "anaphorCoref" pipeline to resolve the
     coreference.
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after the anaphora resolution using coreferee
   """
   if not Token.has_extension('coref_chains'):
     return doc
@@ -114,6 +130,8 @@ def anaphorCoref(doc):
 def expandEntities(doc):
   """
     Expand the current entities, recursive function to extend entity with all previous NOUN
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines 
+    @ Out, doc, spacy.tokens.doc.Doc, the document after expansion of current entities
   """
   newEnts = []
   isUpdated = False
@@ -142,37 +160,3 @@ def expandEntities(doc):
 #       sent = ent.sent
 #
 #   return doc
-
-
-
-
-#########################################################
-# pipelines that can be used in future work
-
-###TODO: update the following pipelines
-# @Language.component("extract_person_orgs")
-# def extract_person_orgs(doc):
-#     person_entities = [ent for ent in doc.ents if ent.label_ == "PERSON"]
-#     for ent in person_entities:
-#         head = ent.root.head
-#         if head.lemma_ == "work":
-#             preps = [token for token in head.children if token.dep_ == "prep"]
-#             for prep in preps:
-#                 orgs = [token for token in prep.children if token.ent_type_ == "ORG"]
-#                 print({'person': ent, 'orgs': orgs, 'past': head.tag_ == "VBD"})
-#     return doc
-
-# @Language.component("extract_person_orgs")
-# def extract_person_orgs(doc):
-#     person_entities = [ent for ent in doc.ents if ent.label_ == "PERSON"]
-#     for ent in person_entities:
-#         head = ent.root.head
-#         if head.lemma_ == "work":
-#             preps = [token for token in head.children if token.dep_ == "prep"]
-#             for prep in preps:
-#                 orgs = [t for t in prep.children if t.ent_type_ == "ORG"]
-#                 aux = [token for token in head.children if token.dep_ == "aux"]
-#                 past_aux = any(t.tag_ == "VBD" for t in aux)
-#                 past = head.tag_ == "VBD" or head.tag_ == "VBG" and past_aux
-#                 print({'person': ent, 'orgs': orgs, 'past': past})
-#     return doc

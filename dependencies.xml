@@ -2,8 +2,9 @@
   <main>
     <spacy/>
     <nltk/>
-    <!-- <textacy/> -->
+    <textacy/>
     <stanza/>
-    <neuralcoref/>
+    <coreferee source='pip'/>
+    <pandas/>
   </main>
 </dependencies>

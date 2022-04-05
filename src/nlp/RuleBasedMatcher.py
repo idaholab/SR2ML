@@ -1,3 +1,10 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+"""
+Created on March, 2022
+
+@author: wangc, mandd
+"""
 import spacy
 from spacy.matcher import Matcher
 from spacy.tokens import Token
@@ -45,13 +52,13 @@ if not Span.has_extension('health_status'):
 
 class RuleBasedMatcher(object):
   """
+    Rule Based Matcher Class
   """
 
   def __init__(self, nlp, *args, **kwargs):
     """
       Construct
-      @ In, nlp, A spaCy language model object
-      @ In, labels, list, the
+      @ In, nlp, spacy.Language object, contains all components and data needed to process text
       @ In, args, list, positional arguments
       @ In, kwargs, dict, keyword arguments
       @ Out, None
@@ -99,8 +106,8 @@ class RuleBasedMatcher(object):
   def addPattern(self, name, rules, callback=None):
     """
       Add rules
-      @ In, name, str,
-      @ In, rules, list,
+      @ In, name, str, the name for the pattern
+      @ In, rules, list, the rules used to match the entities, for example:
         rules = [{"LOWER": "hello"}, {"IS_PUNCT": True}, {"LOWER": "world"}]
     """
     logger.debug('Add rules')
@@ -117,8 +124,8 @@ class RuleBasedMatcher(object):
   def addPhrase(self, name, phraseList, callback=None):
     """
       Add phrase patterns
-      @ In, name, str,
-      @ In, phraseList, list,
+      @ In, name, str, the name for the phrase pattern
+      @ In, phraseList, list, the phrase list, for example:
         phraseList = ["hello", "world"]
     """
     logger.debug(f'Add phrase pattern for {name}')
@@ -132,8 +139,8 @@ class RuleBasedMatcher(object):
   def addDependency(self, name, patternList, callback=None):
     """
       Add dependency pattern
-      @ In, name, str,
-      @ In, patternList, list,
+      @ In, name, str, the name for the dependency pattern
+      @ In, patternList, list, the dependency pattern list
     """
     logger.debug(f'Add dependency pattern for {name}')
     if not isinstance(patternList, list):
@@ -149,8 +156,9 @@ class RuleBasedMatcher(object):
   def addEntityPattern(self, name, patternList):
     """
       Add entity pattern, to extend doc.ents, similar function to self.extendEnt
-      @ In, name, str,
-      @ In, patternList, list, {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}]}
+      @ In, name, str, the name for the entity pattern.
+      @ In, patternList, list, the pattern list, for example:
+        {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}]}
     """
     if not self.nlp.has_pipe('entity_ruler'):
       self.nlp.add_pipe('entity_ruler')
@@ -164,6 +172,9 @@ class RuleBasedMatcher(object):
 
   def __call__(self, text):
     """
+      Find all token sequences matching the supplied pattern
+      @ In, text, string, the text that need to be processed
+      @ Out, None
     """
     # Merging Entity Tokens
     # We need to consider how to do this, I sugguest to first conduct rule based NER, then collect
@@ -220,6 +231,10 @@ class RuleBasedMatcher(object):
 
   def printMatches(self, doc, matches, matchType):
     """
+      Print the matches
+      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+      @ In, matches, list of matches
+      @ In, matchType, string, the type for matches
     """
     if not self._asSpans:
       matchList = []
@@ -234,6 +249,9 @@ class RuleBasedMatcher(object):
 
   def visualize(self):
     """
+      Visualize the processed document
+      @ In, None
+      @ Out, None
     """
     if self._visualizeMatchedSents:
       # Serve visualization of sentences containing match with displaCy
@@ -250,6 +268,9 @@ class RuleBasedMatcher(object):
 
   def isPassive(self, token):
     """
+      Check the passiveness of the token
+      @ In, token, spacy.tokens.Token, the token of the doc
+      @ Out, isPassive, True, if the token is passive
     """
     if token.dep_.endswith('pass'): # noun
       return True
@@ -260,6 +281,9 @@ class RuleBasedMatcher(object):
 
   def findVerb(self, doc):
     """
+      Find the first verb in the doc
+      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+      @ Out, token, spacy.tokens.Token, the token that has VERB pos
     """
     for token in doc:
       if token.pos_ == 'VERB':
@@ -270,8 +294,7 @@ class RuleBasedMatcher(object):
   def extractHealthStatus(self, matchedSents, predSynonyms=[], exclPrepos=[]):
     """
       Extract health status and relation
-      @ In, matchedSents,
-      @ In, predName, string, 'status' or 'cause'
+      @ In, matchedSents, list, the matched sentences
       @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
@@ -303,6 +326,9 @@ class RuleBasedMatcher(object):
       Find closest subject in predicates left subtree or
       predicates parent's left subtree (recursive).
       Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, passive, bool, True if passive
+      @ Out, subj, spacy.tokens.Token, the token that represent subject
     """
     for left in pred.lefts:
       if passive: # if pred is passive, search for passive subject
@@ -321,6 +347,8 @@ class RuleBasedMatcher(object):
       Find closest object in predicates right subtree.
       Skip prepositional objects if the preposition is in exclude list.
       Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, exclPrepos, list, list of the excluded prepositions
     """
     for right in pred.rights:
       obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
@@ -336,6 +364,9 @@ class RuleBasedMatcher(object):
       dependency list by breadth first search.
       Search stops after first dependency match if firstDepOnly
       (used for subject search - do not "jump" over subjects)
+      @ In, root, spacy.tokens.Token, the root token
+      @ In, deps, list, the dependency list
+      @ Out, child, token, the token represents the health status
     """
     toVisit = deque([root]) # queue for bfs
 
@@ -356,6 +387,11 @@ class RuleBasedMatcher(object):
       entType and dependency list by breadth first search.
       Search stops after first dependency match if firstDepOnly
       (used for subject search - do not "jump" over subjects)
+      @ In, root, spacy.tokens.Token, the root token
+      @ In, entID, string, the ID for the entity
+      @ In, deps, list, list of dependency
+      @ In, firstDepOnly, bool, True if only search for the first dependency
+      @ Out, child, spacy.tokens.Token, the matched token
     """
     toVisit = deque([root]) # queue for bfs
 
@@ -379,6 +415,10 @@ class RuleBasedMatcher(object):
       Find closest subject in predicates left subtree or
       predicates parent's left subtree (recursive).
       Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, entID, string, the ID for the entity
+      @ In, passive, bool, True if the predicate token is passive
+      @ Out, subj, spacy.tokens.Token, the token that represents subject
     """
     for left in pred.lefts:
       if passive: # if pred is passive, search for passive subject
@@ -397,6 +437,10 @@ class RuleBasedMatcher(object):
       Find closest object in predicates right subtree.
       Skip prepositional objects if the preposition is in exclude list.
       Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, entID, string, the ID for the entity
+      @ In, exclPrepos, list, the list of prepositions that will be excluded
+      @ Out, obj, spacy.tokens.Token,, the token that represents the object
     """
     for right in pred.rights:
       obj = self.bfs(right, entID, ['dobj', 'pobj', 'iobj', 'obj', 'obl'])
@@ -408,7 +452,12 @@ class RuleBasedMatcher(object):
 
   def extractRelDep(self, matchedSents, entID, predName='causes', predSynonyms=[], exclPrepos=[]):
     """
-      @ In, doc, the matched sentences
+      @ In, matchedSents, list, the list of matched sentences
+      @ In, entID, string, the ID of entity
+      @ In, predName, string, the given name for predicate
+      @ In, predSynonyms, list, the list of predicate synonyms
+      @ In, exclPrepos, list, the list of exlcuded prepositions
+      @ Out, (subject tuple, predicate, object tuple), generator, the extracted causal relation
     """
     for sent in matchedSents:
       if len(set(sent.ents)) < 2:
@@ -436,7 +485,7 @@ class RuleBasedMatcher(object):
     """
       Extend the doc's entity
       @ In, matcher, spacy.Matcher, the spacy matcher instance
-      @ In, doc, the document the matcher was used on
+      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
       @ In, i, int, index of the current match (matches[i])
       @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing
         the matches. A match tuple describes a span doc[start:end]
@@ -452,7 +501,7 @@ class RuleBasedMatcher(object):
     """
       collect data of matched sentences that can be used for visualization
       @ In, matcher, spacy.Matcher, the spacy matcher instance
-      @ In, doc, the document the matcher was used on
+      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
       @ In, i, int, index of the current match (matches[i])
       @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing the matches. A
         match tuple describes a span doc[start:end]
