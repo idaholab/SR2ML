@@ -13,14 +13,15 @@ import unicodedata
 import re
 import networkx as nx
 import matplotlib.pyplot as plt
+import spacy
 # Internal Import
 
 def OPLentityParser(filename):
   '''
-  This method extracts all the form and functions out of the OPL html file and it puts them in two separate lists
-  @in: filename: file name containing the OPL text
-  @out: objectList: list, list of form elements contained in the OPL file
-  @out: processList: list, list of function elements contained in the OPL file
+  This method extracts all the form and function entities out of the OPL html file and it puts them in two separate lists
+  @in: filename, file name containing the OPL text
+  @out: objectList, list, list of form elements contained in the OPL file
+  @out: processList, list, list of function elements contained in the OPL file
   '''
   objectList = []
   processList = []
@@ -42,8 +43,8 @@ def OPLentityParser(filename):
 def OPLtextParser(filename):
   '''
   This method extracts all the sentences out of the OPL html file and it puts them in a list
-  @in: filename: file name containing the OPL text
-  @out: objectList: sentences, list of sentenced contained in the OPL file
+  @in: filename, file name containing the OPL text
+  @out: objectList, sentences, list of sentenced contained in the OPL file
   '''
   objects = {}
   functions = {}
@@ -74,6 +75,19 @@ def OPLtextParser(filename):
     
     return sentences
   
+def listLemmatization(wordList):
+  '''
+  This method is designed to lemmatize all words contained in the list wordList
+  @in: wordList, list, list containing the words to lemmatize
+  @out: lemmatizedWords, list, list containing the lemmatized words
+  '''
+  nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner'])
+  lemmatizer = nlp.get_pipe("lemmatizer")
+  lemmatizedWords = []
+  for elem in functionList:
+    lemmatizedWords.append([token.lemma_ for token in nlp(elem)][0])  
+  return lemmatizedWords
+  
 def OPLparser(sentences): 
   '''
   This method translates all the sentences create a graph structure
@@ -82,7 +96,7 @@ def OPLparser(sentences):
   '''
   opmGraph = nx.MultiDiGraph()
   
-  # These are 4 set of OPL keywords 
+  # These are 4 sets of OPL keywords 
   OPLattributes = ['environmental','physical','informatical']
   OPLkeywordsDefinition = ['is an instance of ','is an','is']
   OPLkeywordsObjects = ['consists of'] 
@@ -114,10 +128,12 @@ def OPLparser(sentences):
   return opmGraph,edge_colors  
 
 '''Testing workflow '''
-
 formList, functionList = OPLentityParser('pump_OPL.html')
+
+lemmatizedFunctionList = listLemmatization(functionList)
+print(lemmatizedFunctionList)
+
 sentences = OPLtextParser('pump_OPL.html')
-print(sentences)
 opmGraph,edge_colors = OPLparser(sentences)
 
 nx.draw_networkx(opmGraph,edge_color=edge_colors)
