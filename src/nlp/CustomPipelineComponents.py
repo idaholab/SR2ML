@@ -130,7 +130,7 @@ def anaphorCoref(doc):
 def expandEntities(doc):
   """
     Expand the current entities, recursive function to extend entity with all previous NOUN
-    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines 
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
     @ Out, doc, spacy.tokens.doc.Doc, the document after expansion of current entities
   """
   newEnts = []
