@@ -1,0 +1,10 @@
+<dependencies>
+  <main>
+    <spacy/>
+    <nltk/>
+    <textacy/>
+    <stanza/>
+    <coreferee source='pip'/>
+    <pandas/>
+  </main>
+</dependencies>

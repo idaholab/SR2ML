@@ -17,18 +17,18 @@ import re
 
 def NERentityParser(text):
   nlp = spacy.load('en_core_web_sm')
-  
+
   # Print out current pipeline
   print(*nlp.pipeline, sep='\n')
-  
+
   # Print out current NER entities
   print(nlp.get_pipe("ner").labels)
-  
+
   doc = nlp(text)
-  
+
   # Print out NER entities identified in text
   print(*[(e.text, e.label_) for e in doc.ents], sep=' ')
-  
+
   # Save NER pipeline applied to text on SVG file
   svg = displacy.render(doc, style='ent', jupyter=False)
   filename = 'OPMparser.svg'
@@ -37,23 +37,23 @@ def NERentityParser(text):
 
 def opmFormEntityParser(text, formEntitiesList, functionEntitiesList):
   nlp = spacy.load('en_core_web_sm')
-  
+
   if nlp.has_pipe('entity_ruler'):
     nlp.remove_pipe('entity_ruler')
-  
+
   #patterns = [{'label':'OPM_form',
   #             'pattern': [{'TEXT': {'IN':formEntitiesList}, 'ENT_TYPE':'OPM_form'}]}]
-  
+
   patterns = [{'label'  :'OPM_FORM',
                'pattern': {'TEXT': {'IN':formEntitiesList}}}]
-  
+
   entity_ruler = EntityRuler(nlp, patterns=patterns, overwrite_ents=True)
   nlp.add_pipe('entity_ruler')
   doc = nlp(text)
-  
+
   # Print out NER entities identified in text
   print(*[(e.text, e.label_) for e in doc.ents], sep=' ')
-  
+
   # Save NER pipeline applied to text on SVG file
   svg = displacy.render(doc, style='ent', jupyter=False)
   filename = 'OPMparser.svg'
