@@ -6,10 +6,10 @@ Created on May 3, 2021
 
 # External Imports
 import xml.etree.ElementTree as ET
-import codecs
+# import codecs
 from bs4 import BeautifulSoup
-import nltk
-import unicodedata
+# import nltk
+# import unicodedata
 import re
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -75,7 +75,7 @@ def OPLtextParser(filename):
 
     return sentences
 
-def listLemmatization(wordList):
+def listLemmatization(functionList):
   '''
   This method is designed to lemmatize all words contained in the list wordList
   @in: wordList, list, list containing the words to lemmatize

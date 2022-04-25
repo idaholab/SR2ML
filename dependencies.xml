@@ -6,5 +6,7 @@
     <stanza/>
     <coreferee source='pip'/>
     <pandas/>
+    <bs4/>
+    <networkx/>
   </main>
 </dependencies>
