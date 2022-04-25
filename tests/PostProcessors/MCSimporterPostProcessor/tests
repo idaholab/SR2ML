@@ -9,4 +9,9 @@
     input  = 'test_MCSimporter_noExpand.xml'
     csv    = 'MCSimporterNoExpand/PrintPS.csv'
   [../]
+  [./MCSimporterSaphire]
+    type   = 'RavenFramework'
+    input  = 'test_MCSimporter_Saphire.xml'
+    csv    = 'MCSimporterSaphire/PrintPS.csv'
+  [../]
 []

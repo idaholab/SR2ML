@@ -1,0 +1,12 @@
+[Tests]
+ [./pointSet]
+  type = 'RavenFramework'
+  input = 'test_pointSet_margin_model.xml'
+  csv = 'PointSetModel/Out.csv '
+ [../]
+ [./pointSet2D]
+  type = 'RavenFramework'
+  input = 'test_pointSet_2D_margin_model.xml'
+  csv = 'PointSetModel2D/Out.csv '
+ [../]
+[]

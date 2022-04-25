@@ -14,21 +14,13 @@ import os
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from SR2ML.src import MaintenanceModels
-from utils import mathUtils as utils
-from utils import InputData
-from utils import InputTypes
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ..src import MaintenanceModels
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData
+from ravenframework.utils import InputTypes
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End--------------------------------------------------------------------------------
 
-## option to use logging
-# logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
-# logger = logging.getLogger()
-# fh = logging.FileHandler(filename='logos.log', mode='w')
-# fh.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
-# fh.setFormatter(formatter)
-# logger.addHandler(fh)
 
 class MaintenanceModel(ExternalModelPluginBase):
   """
@@ -64,6 +56,7 @@ class MaintenanceModel(ExternalModelPluginBase):
     if self._modelType is None:
       raise IOError("Required attribute 'type' for node 'MaintenanceModel' is not provided!")
     self._model = MaintenanceModels.returnInstance(self._modelType)
+    self._model.handleInput(self._modelXMLInput)
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -82,7 +75,6 @@ class MaintenanceModel(ExternalModelPluginBase):
       @ In, inputDict, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
-    self._model.handleInput(self._modelXMLInput)
     self._model.initialize(inputDict)
     self._model.run(inputDict)
     outputDict = {}

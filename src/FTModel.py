@@ -11,8 +11,8 @@ import numpy as np
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from .PostProcessors.FTStructure import FTStructure
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ..src.PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 
