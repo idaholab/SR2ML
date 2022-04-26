@@ -16,8 +16,8 @@ from collections import deque
 # filter_spans is used to resolve the overlap issue in entities
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
-from nlp_utils import displayNER, resetPipeline, printDepTree
-from CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref
+from .nlp_utils import displayNER, resetPipeline, printDepTree
+from .CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref
 
 import logging
 
