@@ -126,17 +126,3 @@ def OPLparser(sentences):
           edge_colors.append(colorMatches[elem])
 
   return opmGraph,edge_colors
-
-'''Testing workflow '''
-formList, functionList = OPLentityParser('pump_OPL.html')
-
-lemmatizedFunctionList = listLemmatization(functionList)
-print(lemmatizedFunctionList)
-
-sentences = OPLtextParser('pump_OPL.html')
-opmGraph,edge_colors = OPLparser(sentences)
-
-nx.draw_networkx(opmGraph,edge_color=edge_colors)
-ax = plt.gca()
-plt.axis("off")
-plt.show()
