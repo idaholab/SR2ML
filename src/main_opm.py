@@ -37,6 +37,23 @@ if __name__ == "__main__":
   # Parse OPM model
   opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
   formList, functionList = OPLentityParser(opmFile)
+  # convert opm formList into matcher patterns
+  label = "pump_component"
+  id = "SSC"
+  patterns = []
+
+  def generatePattern(form, label, id):
+    """
+    """
+    ptn = []
+    form = ' '.join(form.lower().split())
+    ptn.append({"LOWER":form})
+    pattern = {"label":label, "pattern":ptn, "id": id}
+    return pattern
+
+  for form in formList:
+    pattern = generatePattern(form, label=label, id=id)
+    patterns.append(pattern)
   # text that needs to be processed.
   # TODO: load text from external files
   doc = r"""A leak was noticed from the RCP pump 1A.
@@ -67,27 +84,8 @@ if __name__ == "__main__":
         """
   # load nlp model and matcher
   nlp = spacy.load("en_core_web_lg")
-  matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
-  # convert opm formList into matcher patterns
   name = 'ssc_entity_ruler'
-  label = "pump_component"
-  id = "SSC"
-  patterns = []
-
-  def generatePattern(form, label, id):
-    """
-    """
-    ptn = []
-    form = ' '.join(form.lower().split())
-    ptn.append({"LOWER":form})
-    pattern = {"label":label, "pattern":ptn, "id": id}
-    return pattern
-
-  for form in formList:
-    pattern = generatePattern(form, label=label, id=id)
-    patterns.append(pattern)
-
-  print(patterns)
+  matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
   matcher.addEntityPattern(name, patterns)
 
 
