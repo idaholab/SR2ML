@@ -5,6 +5,7 @@ Created on March, 2022
 
 @author: wangc, mandd
 """
+import pandas as pd
 import spacy
 from spacy.matcher import Matcher
 from spacy.tokens import Token
@@ -17,9 +18,10 @@ from collections import deque
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
 from .nlp_utils import displayNER, resetPipeline, printDepTree
-from .CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref
+from .CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref, mergePhrase
 
 import logging
+import os
 
 
 logger = logging.getLogger(__name__)
@@ -68,11 +70,27 @@ class RuleBasedMatcher(object):
     logger.info(f'Create instance of {self.name}')
     # orders of NLP pipeline: 'ner' --> 'normEntities' --> 'merge_entities' --> 'initCoref'
     # --> 'aliasResolver' --> 'coreferee' --> 'anaphorCoref'
+
+    # pipeline 'merge_noun_chunks' can be used to merge phrases (see also displacy option)
+    self.nlp = nlp
+
+    self._causalFile = os.path.join(os.path.dirname(__file__), 'cause_effect_keywords.csv') # header includes: VERB, NOUN, TRANSITION
+    # SCONJ->Because, CCONJ->so, ADP->as, ADV->therefore
+    self._causalPOS = {'VERB':['VERB'], 'NOUN':['NOUN'], 'TRANSITION':['SCONJ', 'CCONJ', 'ADP', 'ADV']}
+    self._causalKeywords = self.getKeywords(self._causalFile)
+
+    self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
+    self._statusKeywords = self.getKeywords(self._statusFile)
+
+    # if _corefAvail:
+    #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
+    # else:
+    #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
     if _corefAvail:
-      pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
+      self.pipelines = ['entity_ruler', 'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref']
     else:
-      pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
-    nlp = resetPipeline(nlp, pipelines)
+      self.pipelines = ['entity_ruler', 'mergePhrase','normEntities', 'initCoref', 'aliasResolver', 'anaphorCoref']
+    nlp = resetPipeline(nlp, self.pipelines)
     self.nlp = nlp
     self._doc = None
     self._rules = {}
@@ -98,10 +116,64 @@ class RuleBasedMatcher(object):
     self._visualizeMatchedSents = True
     self._coref = _corefAvail # True indicate coreference pipeline is available
     self._entityLabels = []
+
+
+
     self._statusKeyword = ['fail', 'degrade', 'break', 'decline', 'go bad', 'rupture', 'breach', 'reduce', 'increase',
         'decrease', 'fracture', 'aggravate','worsen', 'lose', 'function', 'work', 'operate', 'run', 'find', 'find out',
         'observe', 'detect', 'determine', 'discover', 'get', 'notice', 'become', 'record', 'register', 'show']
     self._causalKeyword = ['cause', 'stimulate', 'make', 'derive', 'trigger', 'result', 'lead', 'increase', 'decrease']
+
+
+  def getKeywords(self, filename):
+    """
+      Get the keywords from given file
+      @ In, filename, str, the file name to read the keywords
+      @ Out, kw, dict, dictionary contains the keywords
+    """
+    kw = {}
+    ds = pd.read_csv(filename, skipinitialspace=True)
+    for col in ds.columns:
+      vars = set(ds[col].dropna())
+      kw[col] = self.extractLemma(vars)
+    return kw
+
+  def extractLemma(self, varList):
+    """
+      Lammatize the variable list
+      @ In, varList, list, list of variables
+      @ Out, lemVar, list, list of lammatized variables
+    """
+    var = ' '.join(varList)
+    lemVar = [token.lemma_ for token in self.nlp(var)]
+    return lemVar
+
+  def addKeywords(self, keywords, ktype):
+    """
+      Method to update self._causalKeywords or self._statusKeywords
+      @ In, keywords, dict, keywords that will be add to self._causalKeywords or self._statusKeywords
+      @ In, ktype, string, either 'status' or 'causal'
+    """
+    if type(keywords) != dict:
+      raise IOError('"addCausalKeywords" method can only accept dictionary, but got {}'.format(type(keywords)))
+    if ktype.lower() == 'status':
+      for key, val in keywords.items():
+        if type(val) != list:
+          val = [val]
+        val = self.extractLemma(val)
+        if key in self._statusKeywords:
+          self._statusKeywords[key].extend(val)
+        else:
+          logger.warning('keyword "{}" cannot be accepted, valid keys for the keywords are "{}"'.format(key, ','.join(list(self._statusKeywords.keys()))))
+    elif ktype.lower() == 'causal':
+      for key, val in keywords.items():
+        if type(val) != list:
+          val = [val]
+        val = self.extractLemma(val)
+        if key in self._causalKeywords:
+          self._causalKeywords[key].extend(val)
+        else:
+          logger.warning('keyword "{}" cannot be accepted, valid keys for the keywords are "{}"'.format(key, ','.join(list(self._causalKeywords.keys()))))
 
   def addPattern(self, name, rules, callback=None):
     """
@@ -279,6 +351,16 @@ class RuleBasedMatcher(object):
         return True
     return False
 
+  def isNegation(self, token):
+    """
+    """
+    if token.dep_ == 'neg':
+      return True, token.text
+    for left in token.lefts:
+      if left.dep_ == 'neg':
+        return True, left.text
+    return False
+
   def findVerb(self, doc):
     """
       Find the first verb in the doc
@@ -298,28 +380,62 @@ class RuleBasedMatcher(object):
       @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
+    self.extractStatusFromPredicate(matchedSents, predSynonyms=self._statusKeywords['VERB'])
+
+    # for sent in matchedSents:
+    #   ents = list(sent.ents)
+    #   predSyns = self._statusKeyword if len(predSynonyms) == 0 else predSynonyms
+    #   root = sent.root
+    #   if root.lemma_ not in predSyns:
+    #     continue
+    #   if root.pos_ != 'VERB':
+    #     continue
+    #   passive = self.isPassive(root)
+    #   if len(ents) == 1:
+    #     if ents[0].start < root.i:
+    #       healthStatus = self.findRight(root)
+    #     else:
+    #       healthStatus = self.findLeft(root, passive)
+    #
+    #     if healthStatus is None:
+    #       continue
+    #
+    #     logger.debug(f'{ents[0]} health status: {healthStatus.text}')
+    #     ents[0]._.set('health_status', healthStatus.text)
+    #   else:
+    #     logger.debug('Not yet implemented')
+
+
+  def extractStatusFromPredicate(self, matchedSents, predSynonyms=[], exclPrepos=[]):
+    """
+      Extract health status
+      @ In, matchedSents, list, the matched sentences
+      @ In, predSynonyms, list, predicate synonyms
+      @ In, exclPrepos, list, exclude the prepositions
+    """
     for sent in matchedSents:
       ents = list(sent.ents)
-      predSyns = self._statusKeyword if len(predSynonyms) == 0 else predSynonyms
+      # TODO: multiple entities exist, skip for now
+      if len(ents) > 1:
+        continue
       root = sent.root
-      if root.lemma_ not in predSyns:
+      # print('root', root, root.pos_, root.lemma_)
+      if root.lemma_ not in predSynonyms:
+        print('root not in predSyns', root.lemma_)
         continue
       if root.pos_ != 'VERB':
+        print('root not verb', root.text, root.pos_)
         continue
+      print('root verb', root, root.pos_, root.lemma_)
       passive = self.isPassive(root)
-      if len(ents) == 1:
-        if ents[0].start < root.i:
-          healthStatus = self.findRight(root)
-        else:
-          healthStatus = self.findLeft(root, passive)
-
-        if healthStatus is None:
-          continue
-
-        logger.debug(f'{ents[0]} health status: {healthStatus.text}')
-        ents[0]._.set('health_status', healthStatus.text)
+      if ents[0].start < root.i:
+        healthStatus = self.findRight(root)
       else:
-        logger.debug('Not yet implemented')
+        healthStatus = self.findLeft(root, passive)
+      if healthStatus is None:
+        continue
+      logger.debug(f'{ents[0]} health status: {healthStatus.text}')
+      ents[0]._.set('health_status', healthStatus.text)
 
   def findLeft(self, pred, passive):
     """
@@ -350,7 +466,9 @@ class RuleBasedMatcher(object):
       @ In, pred, spacy.tokens.Token, the predicate token
       @ In, exclPrepos, list, list of the excluded prepositions
     """
+    print('pred', pred)
     for right in pred.rights:
+      print('right', right)
       obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
       if obj is not None:
         if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
@@ -372,7 +490,7 @@ class RuleBasedMatcher(object):
 
     while len(toVisit) > 0:
       child = toVisit.popleft()
-      # print("child", child, child.dep_)
+      print("child", child, child.dep_)
       if child.dep_ in deps:
         return child
       elif child.dep_ == 'compound' and \
