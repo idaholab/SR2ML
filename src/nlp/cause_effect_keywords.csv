@@ -1,0 +1,32 @@
+VERB,NOUN,TRANSITION
+affect,actor,accordingly
+constitute ,consequence,consequently
+create,end,hence
+force,impact,on account of
+initiate,product,so
+restrain,agent,as a result
+benefit,creation,due to
+construct ,event,if then
+damage,influence,results in
+harm,result,therefore
+insitute,author,because of
+stop,creator,for that reason
+cause,factor,leads to
+contribute,issue,since
+determine,source,thus
+induce,benefit,
+preclude,damage,
+compose,ground,
+control,outcome,
+facilitate,condition,
+influence,effect,
+prevent,harm,
+stimulate,outgrowth,
+make,reason,
+derive,,
+trigger,,
+result,,
+lead,,
+increase,,
+decrease,,
+reveal,,
