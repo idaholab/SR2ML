@@ -150,13 +150,28 @@ def expandEntities(doc):
     doc = expandEntities(doc)
   return doc
 
-# @Language.component("extractHealthStatus")
-# def extractHealthStatus(doc):
-#   """
-#     Extract the health status of identified entities
-#   """
-#   for ent in doc.ents:
-#     if ent.ent_id_ == "SSC":
-#       sent = ent.sent
-#
-#   return doc
+@Language.component("mergePhrase")
+def mergePhrase(doc):
+  """
+    Expand the current entities
+    This method will keep "DET" or "PART", using pipeline "normEntities" after this pipeline to remove them
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after expansion of current entities
+  """
+  with doc.retokenize() as retokenizer:
+    for np in list(doc.noun_chunks):
+      # skip ents since ents are recognized by OPM model and entity_ruler
+      # TODO: we may expand the ents, combined with pipeline "expandEntities"
+      if len(np.ents) > 0:
+        continue
+      attrs = {
+          "tag": np.root.tag_,
+          "lemma": np.root.lemma_,
+          "ent_type": np.root.ent_type_,
+          "_": {
+                "ref_n": np.root._.ref_n,
+                "ref_t": np.root._.ref_t,
+                },
+      }
+      retokenizer.merge(np, attrs=attrs)
+  return doc
