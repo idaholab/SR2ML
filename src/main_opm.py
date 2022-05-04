@@ -35,7 +35,9 @@ logger.addHandler(fh)
 if __name__ == "__main__":
 
   # Parse OPM model
-  opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
+  # opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
+  # some modifications, bearings --> pump bearings
+  opmFile = os.path.abspath("./nlp/pump_opl.html")
   formList, functionList = OPLentityParser(opmFile)
   # convert opm formList into matcher patterns
   label = "pump_component"
@@ -45,9 +47,7 @@ if __name__ == "__main__":
   def generatePattern(form, label, id):
     """
     """
-    ptn = []
-    form = ' '.join(form.lower().split())
-    ptn.append({"LOWER":form})
+    ptn = [{"LOWER":elem} for elem in form.lower().split()]
     pattern = {"label":label, "pattern":ptn, "id": id}
     return pattern
 
@@ -59,9 +59,9 @@ if __name__ == "__main__":
   doc = r"""A leak was noticed from the RCP pump 1A.
             RCP pump 1A pressure gauge was found not operating.
             RCP pump 1A pressure gauge was found inoperative.
-            Rupture of pump bearings caused shaft degradation.
-            Rupture of pump bearings caused shaft degradation and consequent flow reduction.
-            Pump power supply has been found burnout.
+            Rupture of pump bearings caused pump shaft degradation.
+            Rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
+            Power supply has been found burnout.
             Pump test failed due to power supply failure.
             Pump inspection revealed excessive impeller degradation.
             Pump inspection revealed excessive impeller degradation likely due to cavitation.
@@ -71,13 +71,13 @@ if __name__ == "__main__":
             RCP pump 1A  had signs of past leakage.
             RCP pump 1A was cavitating and vibrating to some degree during test. This is most likely due to low flow conditions rather than mechanical issues.
             Pump flow meter was not responding.
-            Cavitation was noticed but did not seem severe. The shaft vibration appears to be causing the motor to vibrate as well.
+            Cavitation was noticed but did not seem severe. The pump shaft vibration appears to be causing the motor to vibrate as well.
             Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation.
-            The shaft deflection is causing the safety cage to rattle. Pumps not experiencing enough flow for the pumps to keep the check valves open during test.
+            The pump shaft deflection is causing the safety cage to rattle. Pumps not experiencing enough flow for the pumps to keep the check valves open during test.
             Pump not experiencing enough flow during test.
-            Shaft made noise. Vibration seems like it is coming from the shaft.
-            Slight Vibrations noticed - likely from shaft deflection.
-            Visible shaft deflection in operation.
+            Pump shaft made noise. Vibration seems like it is coming from the pump shaft.
+            Slight Vibrations noticed - likely from pump shaft deflection.
+            Visible pump shaft deflection in operation.
             Pump bearings appear in acceptable condition.
             Pump made noises - not nough to affect performance.
             Pump shaft has a slight deflection.

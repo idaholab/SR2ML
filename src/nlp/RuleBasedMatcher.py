@@ -389,6 +389,13 @@ class RuleBasedMatcher(object):
         break
     return None
 
+  def getCustomEnts(self, ents, labels):
+    """
+    """
+    customEnts = [ent for ent in ents if ent.label_ in labels]
+    return customEnts
+
+
   def extractHealthStatus(self, matchedSents, predSynonyms=[], exclPrepos=[]):
     """
       Extract health status and relation
@@ -432,7 +439,8 @@ class RuleBasedMatcher(object):
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
-      ents = list(sent.ents)
+      ents = self.getCustomEnts(sent.ents, self._entityLabels)
+      # ents = list(sent.ents)
       # TODO: multiple entities exist, skip for now
       if len(ents) > 1:
         continue
@@ -447,7 +455,7 @@ class RuleBasedMatcher(object):
         continue
       passive = self.isPassive(root)
       # last is punct, the one before last is the root
-      if sent[-2].i == root.i:
+      if root.nbor().pos_ in ['PUNCT']:
         healthStatus = root
       elif ents[0].start < root.i:
         healthStatus = self.findRightObj(root)
@@ -507,7 +515,6 @@ class RuleBasedMatcher(object):
       @ In, exclPrepos, list, list of the excluded prepositions
     """
     for right in pred.rights:
-      print('---', pred, right)
       pos = right.pos_
       if pos in ['VERB', 'NOUN', 'ADJ']:
         if right.lemma_ in self._statusKeywords[pos]:
