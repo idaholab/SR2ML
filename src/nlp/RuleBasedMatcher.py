@@ -496,7 +496,7 @@ class RuleBasedMatcher(object):
     else:
       return None
 
-  def findRightObj(self, pred, exclPrepos=[]):
+  def findRightObj(self, pred, deps=['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'], exclPrepos=[]):
     """
       Find closest object in predicates right subtree.
       Skip prepositional objects if the preposition is in exclude list.
@@ -505,7 +505,7 @@ class RuleBasedMatcher(object):
       @ In, exclPrepos, list, list of the excluded prepositions
     """
     for right in pred.rights:
-      obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
+      obj = self.findHealthStatus(right, deps)
       if obj is not None:
         if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
           continue
@@ -543,6 +543,12 @@ class RuleBasedMatcher(object):
       child = toVisit.popleft()
       # print("child", child, child.dep_)
       if child.dep_ in deps:
+        # to handle preposition
+        nbor = child.nbor()
+        # TODO, what else need to be added
+        # can not use the first check only, since is nbor is 'during', it will also satisfy the check condition
+        if nbor.dep_ in ['prep'] and nbor.lemma_ in ['of']:
+          return self.findRightObj(nbor, deps=['pobj'])
         return child
       elif child.dep_ == 'compound' and \
          child.head.dep_ in deps: # check if contained in compound
