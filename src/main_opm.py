@@ -59,6 +59,10 @@ if __name__ == "__main__":
   doc = r"""A leak was noticed from the RCP pump 1A.
             RCP pump 1A pressure gauge was found not operating.
             RCP pump 1A pressure gauge was found inoperative.
+            RCP pump 1A had signs of past leakage.
+            The Pump is not experiencing enough flow during test.
+            Slight Vibrations is noticed - likely from pump shaft deflection.
+            Pump flow meter was not responding.
             Rupture of pump bearings caused pump shaft degradation.
             Rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
             Power supply has been found burnout.
@@ -68,15 +72,14 @@ if __name__ == "__main__":
             Oil puddle was found in proximity of RCP pump 1A.
             Anomalous vibrations were observed for RCP pump 1A.
             Several cracks on pump shaft were observed; they could have caused pump failure within few days.
-            RCP pump 1A  had signs of past leakage.
             RCP pump 1A was cavitating and vibrating to some degree during test. This is most likely due to low flow conditions rather than mechanical issues.
-            Pump flow meter was not responding.
-            Cavitation was noticed but did not seem severe. The pump shaft vibration appears to be causing the motor to vibrate as well.
+            Cavitation was noticed but did not seem severe.
+            The pump shaft vibration appears to be causing the motor to vibrate as well.
             Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation.
-            The pump shaft deflection is causing the safety cage to rattle. Pumps not experiencing enough flow for the pumps to keep the check valves open during test.
-            Pump not experiencing enough flow during test.
-            Pump shaft made noise. Vibration seems like it is coming from the pump shaft.
-            Slight Vibrations noticed - likely from pump shaft deflection.
+            The pump shaft deflection is causing the safety cage to rattle.
+            The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
+            Pump shaft made noise.
+            Vibration seems like it is coming from the pump shaft.
             Visible pump shaft deflection in operation.
             Pump bearings appear in acceptable condition.
             Pump made noises - not nough to affect performance.

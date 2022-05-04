@@ -375,7 +375,7 @@ class RuleBasedMatcher(object):
     for left in token.lefts:
       if left.dep_ == 'neg':
         return True, left.text
-    return False
+    return False, ''
 
   def findVerb(self, doc):
     """
@@ -451,23 +451,29 @@ class RuleBasedMatcher(object):
         elif root.pos_ in ['VERB', 'NOUN', 'ADJ']:
           self.addKeywords({root.pos_:[root]}, 'status')
       if root.pos_ != 'VERB':
-        # print('--- root not verb', root.text, root.pos_)
+        print('--- root not verb', root.text, root.pos_)
         continue
+      neg, negText = self.isNegation(root)
       passive = self.isPassive(root)
-      # last is punct, the one before last is the root
-      if root.nbor().pos_ in ['PUNCT']:
-        healthStatus = root
-      elif ents[0].start < root.i:
+      # # last is punct, the one before last is the root
+      # if root.nbor().pos_ in ['PUNCT']:
+      #   healthStatus = root
+      if ents[0].start < root.i:
         healthStatus = self.findRightObj(root)
         # no object is found
         if not healthStatus:
           healthStatus = self.findRightKeyword(root)
+        # last is punct, the one before last is the root
+        if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+          healthStatus = root
       else:
         healthStatus = self.findLeftSubj(root, passive)
       if healthStatus is None:
         continue
-      logger.debug(f'{ents[0]} health status: {healthStatus.text}')
-      ents[0]._.set('health_status', healthStatus.text)
+      if not neg:
+        neg, negText = self.isNegation(healthStatus)
+      logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
+      ents[0]._.set('health_status', negText + healthStatus.text)
 
   def findLeftSubj(self, pred, passive):
     """
