@@ -403,38 +403,6 @@ class RuleBasedMatcher(object):
       @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
-    self.extractStatusFromPredicate(matchedSents)
-
-    # for sent in matchedSents:
-    #   ents = list(sent.ents)
-    #   predSyns = self._statusKeyword if len(predSynonyms) == 0 else predSynonyms
-    #   root = sent.root
-    #   if root.lemma_ not in predSyns:
-    #     continue
-    #   if root.pos_ != 'VERB':
-    #     continue
-    #   passive = self.isPassive(root)
-    #   if len(ents) == 1:
-    #     if ents[0].start < root.i:
-    #       healthStatus = self.findRightObj(root)
-    #     else:
-    #       healthStatus = self.findLeftSubj(root, passive)
-    #
-    #     if healthStatus is None:
-    #       continue
-    #
-    #     logger.debug(f'{ents[0]} health status: {healthStatus.text}')
-    #     ents[0]._.set('health_status', healthStatus.text)
-    #   else:
-    #     logger.debug('Not yet implemented')
-
-
-  def extractStatusFromPredicate(self, matchedSents, exclPrepos=[]):
-    """
-      Extract health status
-      @ In, matchedSents, list, the matched sentences
-      @ In, exclPrepos, list, exclude the prepositions
-    """
     predSynonyms = self._statusKeywords['VERB']
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
