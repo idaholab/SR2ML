@@ -409,9 +409,9 @@ class RuleBasedMatcher(object):
     #   passive = self.isPassive(root)
     #   if len(ents) == 1:
     #     if ents[0].start < root.i:
-    #       healthStatus = self.findRight(root)
+    #       healthStatus = self.findRightObj(root)
     #     else:
-    #       healthStatus = self.findLeft(root, passive)
+    #       healthStatus = self.findLeftSubj(root, passive)
     #
     #     if healthStatus is None:
     #       continue
@@ -432,7 +432,6 @@ class RuleBasedMatcher(object):
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
-      print(sent)
       ents = list(sent.ents)
       # TODO: multiple entities exist, skip for now
       if len(ents) > 1:
@@ -447,20 +446,22 @@ class RuleBasedMatcher(object):
         # print('--- root not verb', root.text, root.pos_)
         continue
       passive = self.isPassive(root)
-      # print('****', root, passive)
       # last is punct, the one before last is the root
       if sent[-2].i == root.i:
         healthStatus = root
       elif ents[0].start < root.i:
-        healthStatus = self.findRight(root)
+        healthStatus = self.findRightObj(root)
+        # no object is found
+        if not healthStatus:
+          healthStatus = self.findRightKeyword(root)
       else:
-        healthStatus = self.findLeft(root, passive)
+        healthStatus = self.findLeftSubj(root, passive)
       if healthStatus is None:
         continue
       logger.debug(f'{ents[0]} health status: {healthStatus.text}')
       ents[0]._.set('health_status', healthStatus.text)
 
-  def findLeft(self, pred, passive):
+  def findLeftSubj(self, pred, passive):
     """
       Find closest subject in predicates left subtree or
       predicates parent's left subtree (recursive).
@@ -477,11 +478,11 @@ class RuleBasedMatcher(object):
       if subj is not None: # found it!
         return subj
     if pred.head != pred and not self.isPassive(pred):
-      return self.findLeft(pred.head, passive) # climb up left subtree
+      return self.findLeftSubj(pred.head, passive) # climb up left subtree
     else:
       return None
 
-  def findRight(self, pred, exclPrepos=[]):
+  def findRightObj(self, pred, exclPrepos=[]):
     """
       Find closest object in predicates right subtree.
       Skip prepositional objects if the preposition is in exclude list.
@@ -490,12 +491,27 @@ class RuleBasedMatcher(object):
       @ In, exclPrepos, list, list of the excluded prepositions
     """
     for right in pred.rights:
-      # print('right', right)
       obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
       if obj is not None:
         if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
           continue
         return obj
+    return None
+
+  def findRightKeyword(self, pred, exclPrepos=[]):
+    """
+      Find
+      Skip prepositional objects if the preposition is in exclude list.
+      Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, exclPrepos, list, list of the excluded prepositions
+    """
+    for right in pred.rights:
+      print('---', pred, right)
+      pos = right.pos_
+      if pos in ['VERB', 'NOUN', 'ADJ']:
+        if right.lemma_ in self._statusKeywords[pos]:
+          return right
     return None
 
   def findHealthStatus(self, root, deps):
