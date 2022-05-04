@@ -18,7 +18,14 @@ from collections import deque
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
 from .nlp_utils import displayNER, resetPipeline, printDepTree
-from .CustomPipelineComponents import normEntities, initCoref, aliasResolver, anaphorCoref, mergePhrase
+## import pipelines
+from .CustomPipelineComponents import normEntities
+from .CustomPipelineComponents import initCoref
+from .CustomPipelineComponents import aliasResolver
+from .CustomPipelineComponents import anaphorCoref
+from .CustomPipelineComponents import mergePhrase
+from .CustomPipelineComponents import pysbdSentenceBoundaries
+
 
 import logging
 import os
@@ -81,15 +88,24 @@ class RuleBasedMatcher(object):
 
     self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
     self._statusKeywords = self.getKeywords(self._statusFile)
+    self._updateStatusKeywords = False
+    self._updateCausalKeywords = False
+
+    # TODO: right now, we are trying to use 'parser' and 'sentencizer' to parse the sentences,
+    # But the parse is not always accurate, especially for sentence which endswith "pump 1A."
 
     # if _corefAvail:
     #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
     # else:
     #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
     if _corefAvail:
-      self.pipelines = ['entity_ruler', 'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref']
+      self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
+                      'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver',
+                      'coreferee','anaphorCoref']
     else:
-      self.pipelines = ['entity_ruler', 'mergePhrase','normEntities', 'initCoref', 'aliasResolver', 'anaphorCoref']
+      self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
+                      'mergePhrase','normEntities', 'initCoref', 'aliasResolver',
+                      'anaphorCoref']
     nlp = resetPipeline(nlp, self.pipelines)
     self.nlp = nlp
     self._doc = None
@@ -380,7 +396,7 @@ class RuleBasedMatcher(object):
       @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
-    self.extractStatusFromPredicate(matchedSents, predSynonyms=self._statusKeywords['VERB'])
+    self.extractStatusFromPredicate(matchedSents)
 
     # for sent in matchedSents:
     #   ents = list(sent.ents)
@@ -406,29 +422,36 @@ class RuleBasedMatcher(object):
     #     logger.debug('Not yet implemented')
 
 
-  def extractStatusFromPredicate(self, matchedSents, predSynonyms=[], exclPrepos=[]):
+  def extractStatusFromPredicate(self, matchedSents, exclPrepos=[]):
     """
       Extract health status
       @ In, matchedSents, list, the matched sentences
-      @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
+    predSynonyms = self._statusKeywords['VERB']
+    statusNoun = self._statusKeywords['NOUN']
+    statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
+      print(sent)
       ents = list(sent.ents)
       # TODO: multiple entities exist, skip for now
       if len(ents) > 1:
         continue
       root = sent.root
-      # print('root', root, root.pos_, root.lemma_)
       if root.lemma_ not in predSynonyms:
-        print('root not in predSyns', root.lemma_)
-        continue
+        if not self._updateStatusKeywords:
+          continue
+        elif root.pos_ in ['VERB', 'NOUN', 'ADJ']:
+          self.addKeywords({root.pos_:[root]}, 'status')
       if root.pos_ != 'VERB':
-        print('root not verb', root.text, root.pos_)
+        # print('--- root not verb', root.text, root.pos_)
         continue
-      print('root verb', root, root.pos_, root.lemma_)
       passive = self.isPassive(root)
-      if ents[0].start < root.i:
+      # print('****', root, passive)
+      # last is punct, the one before last is the root
+      if sent[-2].i == root.i:
+        healthStatus = root
+      elif ents[0].start < root.i:
         healthStatus = self.findRight(root)
       else:
         healthStatus = self.findLeft(root, passive)
@@ -466,9 +489,8 @@ class RuleBasedMatcher(object):
       @ In, pred, spacy.tokens.Token, the predicate token
       @ In, exclPrepos, list, list of the excluded prepositions
     """
-    print('pred', pred)
     for right in pred.rights:
-      print('right', right)
+      # print('right', right)
       obj = self.findHealthStatus(right, ['dobj', 'pobj', 'iobj', 'obj', 'obl', 'oprd'])
       if obj is not None:
         if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
@@ -490,7 +512,7 @@ class RuleBasedMatcher(object):
 
     while len(toVisit) > 0:
       child = toVisit.popleft()
-      print("child", child, child.dep_)
+      # print("child", child, child.dep_)
       if child.dep_ in deps:
         return child
       elif child.dep_ == 'compound' and \

@@ -83,7 +83,7 @@ if __name__ == "__main__":
             Pump shaft has a slight deflection.
         """
   # load nlp model and matcher
-  nlp = spacy.load("en_core_web_lg")
+  nlp = spacy.load("en_core_web_lg", exclude=[])
   name = 'ssc_entity_ruler'
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
   matcher.addEntityPattern(name, patterns)
