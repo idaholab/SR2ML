@@ -59,7 +59,10 @@ def resetPipeline(nlp, pipes):
     _ = nlp.remove_pipe(pipe)
   # re-add specified pipes
   for pipe in pipes:
-    nlp.add_pipe(pipe)
+    if pipe in ['pysbdSentenceBoundaries']:
+      nlp.add_pipe(pipe, before='parser')
+    else:
+      nlp.add_pipe(pipe)
   logger.info(f"Model: {nlp.meta['name']}, Language: {nlp.meta['lang']}")
   logger.info('Available pipelines:'+', '.join([pipe for (pipe,_) in nlp.pipeline]))
   return nlp

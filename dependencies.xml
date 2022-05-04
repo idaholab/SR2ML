@@ -8,5 +8,7 @@
     <pandas/>
     <bs4/>
     <networkx/>
+    <!-- pysbd is used for sentence boundary disambiguation -->
+    <pysbd/>
   </main>
 </dependencies>

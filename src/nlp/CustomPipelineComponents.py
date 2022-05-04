@@ -14,6 +14,9 @@ from spacy.tokens import Token
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
 
+# use pysbd as a sentencizer component for spacy
+import pysbd
+
 import logging
 
 
@@ -156,7 +159,7 @@ def mergePhrase(doc):
     Expand the current entities
     This method will keep "DET" or "PART", using pipeline "normEntities" after this pipeline to remove them
     @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
-    @ Out, doc, spacy.tokens.doc.Doc, the document after expansion of current entities
+    @ Out, doc, spacy.tokens.doc.Doc, the document after merge phrase
   """
   with doc.retokenize() as retokenizer:
     for np in list(doc.noun_chunks):
@@ -174,4 +177,19 @@ def mergePhrase(doc):
                 },
       }
       retokenizer.merge(np, attrs=attrs)
+  return doc
+
+@Language.component("pysbdSentenceBoundaries")
+def pysbdSentenceBoundaries(doc):
+  """
+    Use pysbd as a sentencizer component for spacy
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after process
+  """
+  seg = pysbd.Segmenter(language="en", clean=False, char_span=True)
+  sentsCharSpans = seg.segment(doc.text)
+  charSpans = [doc.char_span(sentSpan.start, sentSpan.end) for sentSpan in sentsCharSpans]
+  startTokenIds = [span[0].idx for span in charSpans if span is not None]
+  for token in doc:
+      token.is_sent_start = True if token.idx in startTokenIds else False
   return doc
