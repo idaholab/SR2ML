@@ -133,7 +133,7 @@ class RuleBasedMatcher(object):
     self._coref = _corefAvail # True indicate coreference pipeline is available
     self._entityLabels = {} # labels for rule-based entities
     self._labelSSC = 'SSC'
-    self._labelCausal = 'causal_keywords'
+    self._labelCausal = 'causal'
 
 
 
@@ -324,7 +324,7 @@ class RuleBasedMatcher(object):
     ## health status
     self.extractHealthStatus(self._matchedSents)
     ## print extracted relation
-    print(*self.extractRelDep(self._matchedSents, entID='SSC', predName='causes', predSynonyms=[], exclPrepos=[]), sep='\n')
+    # print(*self.extractRelDep(self._matchedSents, entID='SSC', predName='causes', predSynonyms=[], exclPrepos=[]), sep='\n')
 
 
 
@@ -647,41 +647,57 @@ class RuleBasedMatcher(object):
     # 5. create causal keywords patterns, then use entity_ruler to identify them
 
     for sent in matchedSents:
-    #   root = sent.root
-    #   passive = self.isPassive(root)
-    #   valid = self.isValidKeyword(root, self._causalKeywords)
-    #   if valid:
-    #
-    #
-    #
-    #   ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-    #
-    #   if len(ents) == 1:
-    #     ## check
-    #     continue
-    #   if len(ents) > 1 and root.lemma_ not in self._causalKeywords['VERB']:
-    #     continue
-    #   if len(ents) == 2:
-    #
-    #     logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
-    #     ents[0]._.set('health_status', negText + healthStatus.text)
+      causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
+      sscEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
 
+      if len(causalEnts) == 0: #  no causal keyword is found, skipping
+        continue
+      elif len(causalEnts) == 1 and len(sscEnts) == 1: # single causal keyword, single entity, report missing causal relation
+        logger.debug(f'missing causal relation: {sent}')
+      elif len(causalEnts) == 1 and len(sscEnts) == 2: # Two entities and One causal keyword
+        root = causalEnts[0].root
+        rootLoc = root.i
+        passive = self.isPassive(root)
+        if passive:
+          logger.debug(f'({sscEnts[1]} health status: {sscEnts[1]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[1]._.health_status})')
+        else:
+          logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}) "{causalEnts[0]}" ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
 
-
-
-      for token in sent:
-        predSyns = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
-        if token.pos_ == 'VERB' and token.lemma_ in predSyns:
-          pred = token
-          passive = self.isPassive(pred)
-          subj = self.findSubj(pred, entID, passive)
-          if subj is not None:
-            obj = self.findObj(pred, entID, exclPrepos)
-            if obj is not None:
-              if passive: # switch roles
-                obj, subj = subj, obj
-              yield ((subj._.ref_n, subj._.ref_t), predName,
-                     (obj._.ref_n, obj._.ref_t))
+      # root = sent.root
+      # passive = self.isPassive(root)
+      # valid = self.isValidKeyword(root, self._causalKeywords)
+      # if valid:
+      #
+      #
+      #
+      # ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
+      #
+      # if len(ents) == 1:
+      #   ## check
+      #   continue
+      # if len(ents) > 1 and root.lemma_ not in self._causalKeywords['VERB']:
+      #   continue
+      # if len(ents) == 2:
+      #
+      #   logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
+      #   ents[0]._.set('health_status', negText + healthStatus.text)
+      #
+      #
+      #
+      #
+      # for token in sent:
+      #   predSyns = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
+      #   if token.pos_ == 'VERB' and token.lemma_ in predSyns:
+      #     pred = token
+      #     passive = self.isPassive(pred)
+      #     subj = self.findSubj(pred, entID, passive)
+      #     if subj is not None:
+      #       obj = self.findObj(pred, entID, exclPrepos)
+      #       if obj is not None:
+      #         if passive: # switch roles
+      #           obj, subj = subj, obj
+      #         yield ((subj._.ref_n, subj._.ref_t), predName,
+      #                (obj._.ref_n, obj._.ref_t))
 
 
   ###############
@@ -703,8 +719,8 @@ class RuleBasedMatcher(object):
     doc.ents = filter_spans(list(doc.ents) +[ent])
 
   ##TODO: how to extend it for entity ruler?
-  @staticmethod
-  def collectSents(doc):
+  # @staticmethod
+  def collectSents(self, doc):
     """
       collect data of matched sentences that can be used for visualization
       @ In, matcher, spacy.Matcher, the spacy matcher instance
@@ -716,6 +732,8 @@ class RuleBasedMatcher(object):
     matchedSents = []
     matchedSentsForVis = []
     for span in doc.ents:
+      if span.ent_id_ != self._labelSSC:
+        continue
       sent = span.sent
       # Append mock entity for match in displaCy style to matched_sents
       # get the match span by ofsetting the start and end of the span with the
