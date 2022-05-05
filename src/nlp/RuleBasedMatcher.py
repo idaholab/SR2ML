@@ -411,37 +411,51 @@ class RuleBasedMatcher(object):
       # ents = list(sent.ents)
       # TODO: multiple entities exist, skip for now
       if len(ents) > 1:
-        continue
-      root = sent.root
-      if root.lemma_ not in predSynonyms:
-        if not self._updateStatusKeywords:
-          continue
-        elif root.pos_ in ['VERB', 'NOUN', 'ADJ']:
-          self.addKeywords({root.pos_:[root]}, 'status')
-      if root.pos_ != 'VERB':
-        print('--- root not verb', root.text, root.pos_)
-        continue
-      neg, negText = self.isNegation(root)
-      passive = self.isPassive(root)
-      # # last is punct, the one before last is the root
-      # if root.nbor().pos_ in ['PUNCT']:
-      #   healthStatus = root
-      if ents[0].start < root.i:
-        healthStatus = self.findRightObj(root)
-        # no object is found
-        if not healthStatus:
-          healthStatus = self.findRightKeyword(root)
-        # last is punct, the one before last is the root
-        if not healthStatus and root.nbor().pos_ in ['PUNCT']:
-          healthStatus = root
+        for ent in ents:
+          root = ent.root
+          if root.dep_ in ['pobj']:
+            healthStatus = root.head.head
+          elif root.dep_ in ['compound']:
+            healthStatus = root.head
+          else:
+            continue
+          neg, negText = self.isNegation(healthStatus)
+          logger.debug(f'{ent} health status: {negText} {healthStatus.text}')
+          ent._.set('health_status', negText + healthStatus.text)
       else:
-        healthStatus = self.findLeftSubj(root, passive)
-      if healthStatus is None:
-        continue
-      if not neg:
-        neg, negText = self.isNegation(healthStatus)
-      logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
-      ents[0]._.set('health_status', negText + healthStatus.text)
+        root = sent.root
+        neg, negText = self.isNegation(root)
+        if root.lemma_ not in predSynonyms and root.pos_ != 'VERB':
+          if root.pos_ in ['NOUN', 'ADJ']:
+            healthStatus = root
+            if self._updateStatusKeywords:
+              self.addKeywords({root.pos_:[root]}, 'status')
+        elif root.pos_ != 'VERB':
+          print('--- root not verb', root.text, root.pos_)
+          continue
+        else:
+          passive = self.isPassive(root)
+          # # last is punct, the one before last is the root
+          # if root.nbor().pos_ in ['PUNCT']:
+          #   healthStatus = root
+          if ents[0].start < root.i:
+            healthStatus = self.findRightObj(root)
+            # no object is found
+            if not healthStatus:
+              healthStatus = self.findRightKeyword(root)
+            # last is punct, the one before last is the root
+            if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+              healthStatus = root
+          else:
+            healthStatus = self.findLeftSubj(root, passive)
+        if healthStatus is None:
+          continue
+        if not neg:
+          neg, negText = self.isNegation(healthStatus)
+        # may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
+        # is not identified properly
+        logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
+        ents[0]._.set('health_status', negText + healthStatus.text)
 
   def findLeftSubj(self, pred, passive):
     """

@@ -72,7 +72,8 @@ if __name__ == "__main__":
             Oil puddle was found in proximity of RCP pump 1A.
             Anomalous vibrations were observed for RCP pump 1A.
             Several cracks on pump shaft were observed; they could have caused pump failure within few days.
-            RCP pump 1A was cavitating and vibrating to some degree during test. This is most likely due to low flow conditions rather than mechanical issues.
+            RCP pump 1A was cavitating and vibrating to some degree during test.
+            This is most likely due to low flow conditions rather than mechanical issues.
             Cavitation was noticed but did not seem severe.
             The pump shaft vibration appears to be causing the motor to vibrate as well.
             Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation.
