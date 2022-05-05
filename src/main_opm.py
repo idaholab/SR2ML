@@ -33,9 +33,45 @@ fh.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
 
+#####################################################################
+# Utils functions
+
+def generatePattern(form, label, id, attr="LOWER"):
+  """
+    Generate entity pattern
+    @ In, form, str or list, the given str or list of lemmas that will be used to generate pattern
+    @ In, label, str, the label name for the pattern
+    @ In, id, str, the id name for the pattern
+    @ In, attr, str, attribute used for the pattern, either "LOWER" or "LEMMA"
+    @ Out, pattern, dict, pattern will be used by entity matcher
+  """
+  if attr.lower() == "lower":
+    attr = "LOWER"
+    ptn = [{attr:elem} for elem in form.lower().split()]
+  elif attr.lower() == "lemma":
+    attr = "LEMMA"
+    ptn = [{attr:elem} for elem in form]
+  else:
+    raise IOError(f"Incorrect 'attr={attr}' is provided, valid value for 'attr' is either 'LOWER' or 'LEMMA'")
+  pattern = {"label":label, "pattern":ptn, "id": id}
+  return pattern
+
+def extractLemma(var):
+  """
+    Lammatize the variable list
+    @ In, var, str, string
+    @ Out, lemVar, list, list of lammatized variables
+  """
+  var = ' '.join(var.split())
+  lemVar = [token.lemma_ for token in nlp(var)]
+  return lemVar
+
+#####################################################################
+
+
 if __name__ == "__main__":
   nlp = spacy.load("en_core_web_lg", exclude=[])
-  ######################################################################
+  ###################################################################
   # Parse OPM model
   # opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
   # some modifications, bearings --> pump bearings
@@ -45,29 +81,6 @@ if __name__ == "__main__":
   label = "pump_component"
   id = "SSC"
   patternsOPM = []
-
-  def generatePattern(form, label, id, attr="LOWER"):
-    """
-    """
-    if attr.lower() == "lower":
-      attr = "LOWER"
-      ptn = [{attr:elem} for elem in form.lower().split()]
-    elif attr.lower() == "lemma":
-      attr = "LEMMA"
-      ptn = [{attr:elem} for elem in form]
-    pattern = {"label":label, "pattern":ptn, "id": id}
-    return pattern
-
-  def extractLemma(var):
-    """
-      Lammatize the variable list
-      @ In, varList, list, list of variables
-      @ Out, lemVar, list, list of lammatized variables
-    """
-    var = ' '.join(var.split())
-    lemVar = [token.lemma_ for token in nlp(var)]
-    return lemVar
-
   for form in formList:
     pattern = generatePattern(form, label=label, id=id, attr="LOWER")
     patternsOPM.append(pattern)

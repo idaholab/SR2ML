@@ -322,11 +322,17 @@ class RuleBasedMatcher(object):
     ## TODO: collect and expand entities, then extract health status of the entities
 
     ## health status
+    logger.info('Start to extract health status')
     self.extractHealthStatus(self._matchedSents)
+    logger.info('End of health status extraction!')
+    ## causal relation
+    logger.info('Start to extract causal relation using OPM model information')
+    self.extractRelDep(self._matchedSents)
+    logger.info('End of causal relation extraction!')
     ## print extracted relation
-    # print(*self.extractRelDep(self._matchedSents, entID='SSC', predName='causes', predSynonyms=[], exclPrepos=[]), sep='\n')
-
-
+    logger.info('Start to use general extraction method to extract causal relation')
+    print(*self.extract(self._matchedSents, predSynonyms=self._causalKeywords['VERB'], exclPrepos=[]), sep='\n')
+    logger.info('End of causal relation extraction using general extraction method!')
 
   def printMatches(self, doc, matches, matchType):
     """
@@ -380,13 +386,22 @@ class RuleBasedMatcher(object):
 
   def isNegation(self, token):
     """
+      Check negation status of given token
+      @ In, token, spacy.tokens.Token, token from spacy.tokens.doc.Doc
+      @ Out, (neg, text), tuple, the negation status and the token text
     """
+    neg = False
+    text = ''
     if token.dep_ == 'neg':
-      return True, token.text
+      neg = True
+      text = token.text
+      return neg, text
     for left in token.lefts:
       if left.dep_ == 'neg':
-        return True, left.text
-    return False, ''
+        neg = True
+        text = left.text
+        return neg, text
+    return neg, text
 
   def findVerb(self, doc):
     """
@@ -402,10 +417,13 @@ class RuleBasedMatcher(object):
 
   def getCustomEnts(self, ents, labels):
     """
+      Get the custom entities
+      @ In, ents, list, all entities from the processed doc
+      @ In, labels, list, list of labels to be used to get the custom entities out of "ents"
+      @ Out, customEnts, list, the customEnts associates with the "labels"
     """
     customEnts = [ent for ent in ents if ent.label_ in labels]
     return customEnts
-
 
   def extractHealthStatus(self, matchedSents, predSynonyms=[], exclPrepos=[]):
     """
@@ -529,7 +547,6 @@ class RuleBasedMatcher(object):
       @ Out, child, token, the token represents the health status
     """
     toVisit = deque([root]) # queue for bfs
-
     while len(toVisit) > 0:
       child = toVisit.popleft()
       # print("child", child, child.dep_)
@@ -547,96 +564,9 @@ class RuleBasedMatcher(object):
       toVisit.extend(list(child.children))
     return None
 
-  def bfs(self, root, entID, deps, firstDepOnly=False):
-    """
-      Return first child of root (included) that matches
-      entType and dependency list by breadth first search.
-      Search stops after first dependency match if firstDepOnly
-      (used for subject search - do not "jump" over subjects)
-      @ In, root, spacy.tokens.Token, the root token
-      @ In, entID, string, the ID for the entity
-      @ In, deps, list, list of dependency
-      @ In, firstDepOnly, bool, True if only search for the first dependency
-      @ Out, child, spacy.tokens.Token, the matched token
-    """
-    toVisit = deque([root]) # queue for bfs
-
-    while len(toVisit) > 0:
-      child = toVisit.popleft()
-      # print("child", child, child.dep_)
-      if child.dep_ in deps:
-        if child.ent_id_ == entID:
-          return child
-        elif firstDepOnly: # first match (subjects)
-          return None
-      elif child.dep_ == 'compound' and \
-         child.head.dep_ in deps and \
-         child.ent_id_ == entID: # check if contained in compound
-        return child
-      toVisit.extend(list(child.children))
-    return None
-
-  def findSubj(self, pred, entID, passive):
-    """
-      Find closest subject in predicates left subtree or
-      predicates parent's left subtree (recursive).
-      Has a filter on organizations.
-      @ In, pred, spacy.tokens.Token, the predicate token
-      @ In, entID, string, the ID for the entity
-      @ In, passive, bool, True if the predicate token is passive
-      @ Out, subj, spacy.tokens.Token, the token that represents subject
-    """
-    for left in pred.lefts:
-      if passive: # if pred is passive, search for passive subject
-        subj = self.bfs(left, entID, ['nsubjpass', 'nsubj:pass'], False)
-      else:
-        subj = self.bfs(left, entID, ['nsubj'], False)
-      if subj is not None: # found it!
-        return subj
-    if pred.head != pred and not self.isPassive(pred):
-      return self.findSubj(pred.head, entID, passive) # climb up left subtree
-    else:
-      return None
-
-  def findObj(self, pred, entID, exclPrepos):
-    """
-      Find closest object in predicates right subtree.
-      Skip prepositional objects if the preposition is in exclude list.
-      Has a filter on organizations.
-      @ In, pred, spacy.tokens.Token, the predicate token
-      @ In, entID, string, the ID for the entity
-      @ In, exclPrepos, list, the list of prepositions that will be excluded
-      @ Out, obj, spacy.tokens.Token,, the token that represents the object
-    """
-    for right in pred.rights:
-      obj = self.bfs(right, entID, ['dobj', 'pobj', 'iobj', 'obj', 'obl'])
-      if obj is not None:
-        if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
-          continue
-        return obj
-    return None
-
-  def isValidKeyword(self, var, keywords):
-    """
-      @ In, var, token
-      @ In, keywords, list/dict
-    """
-    if isinstance(keywords, dict):
-      for _, vals in keywords.items():
-        if var.lemma_ in vals:
-          return True
-    elif isinstance(keywords, list):
-      if var.lemma_ in keywords:
-        return True
-    return False
-
-  def extractRelDep(self, matchedSents, entID, predName='causes', predSynonyms=[], exclPrepos=[]):
+  def extractRelDep(self, matchedSents):
     """
       @ In, matchedSents, list, the list of matched sentences
-      @ In, entID, string, the ID of entity
-      @ In, predName, string, the given name for predicate
-      @ In, predSynonyms, list, the list of predicate synonyms
-      @ In, exclPrepos, list, the list of exlcuded prepositions
       @ Out, (subject tuple, predicate, object tuple), generator, the extracted causal relation
     """
     # TODO List
@@ -662,42 +592,6 @@ class RuleBasedMatcher(object):
           logger.debug(f'({sscEnts[1]} health status: {sscEnts[1]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[1]._.health_status})')
         else:
           logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}) "{causalEnts[0]}" ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
-
-      # root = sent.root
-      # passive = self.isPassive(root)
-      # valid = self.isValidKeyword(root, self._causalKeywords)
-      # if valid:
-      #
-      #
-      #
-      # ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-      #
-      # if len(ents) == 1:
-      #   ## check
-      #   continue
-      # if len(ents) > 1 and root.lemma_ not in self._causalKeywords['VERB']:
-      #   continue
-      # if len(ents) == 2:
-      #
-      #   logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
-      #   ents[0]._.set('health_status', negText + healthStatus.text)
-      #
-      #
-      #
-      #
-      # for token in sent:
-      #   predSyns = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
-      #   if token.pos_ == 'VERB' and token.lemma_ in predSyns:
-      #     pred = token
-      #     passive = self.isPassive(pred)
-      #     subj = self.findSubj(pred, entID, passive)
-      #     if subj is not None:
-      #       obj = self.findObj(pred, entID, exclPrepos)
-      #       if obj is not None:
-      #         if passive: # switch roles
-      #           obj, subj = subj, obj
-      #         yield ((subj._.ref_n, subj._.ref_t), predName,
-      #                (obj._.ref_n, obj._.ref_t))
 
 
   ###############
@@ -747,3 +641,120 @@ class RuleBasedMatcher(object):
         matchedSents.append(sent)
       matchedSentsForVis.append({"text": sent.text, "ents": matchEnts})
     return matchedSents, matchedSentsForVis
+
+
+
+#############################################################################
+# some useful methods, but currently they are not used
+
+  def extract(self, sents, predSynonyms=[], exclPrepos=[]):
+    """
+      General extraction method
+      @ In, sents, list, the list of sentences
+      @ In, predSynonyms, list, the list of predicate synonyms
+      @ In, exclPrepos, list, the list of exlcuded prepositions
+      @ Out, (subject tuple, predicate, object tuple), generator, the extracted causal relation
+    """
+    for sent in sents:
+      root = sent.root
+      if root.pos_ == 'VERB' and root.lemma_ in predSynonyms:
+        passive = self.isPassive(root)
+        subj = self.findSubj(root, passive)
+        if subj is not None:
+          obj = self.findObj(root, deps=['dobj', 'pobj', 'iobj', 'obj', 'obl'], exclPrepos=[])
+          if obj is not None:
+            if passive: # switch roles
+              obj, subj = subj, obj
+            yield ((subj), root, (obj))
+      else:
+        for token in sent:
+          if token.lemma_ in predSynonyms:
+            root = token
+            passive = self.isPassive(root)
+            subj = self.findSubj(root, passive)
+            if subj is not None:
+              obj = self.findObj(root, deps=['dobj', 'pobj', 'iobj', 'obj', 'obl'], exclPrepos=[])
+              if obj is not None:
+                if passive: # switch roles
+                  obj, subj = subj, obj
+                yield ((subj), root, (obj))
+
+  def bfs(self, root, deps):
+    """
+      Return first child of root (included) that matches
+      entType and dependency list by breadth first search.
+      Search stops after first dependency match if firstDepOnly
+      (used for subject search - do not "jump" over subjects)
+      @ In, root, spacy.tokens.Token, the root token
+      @ In, deps, list, list of dependency
+      @ Out, child, spacy.tokens.Token, the matched token
+    """
+    toVisit = deque([root]) # queue for bfs
+    while len(toVisit) > 0:
+      child = toVisit.popleft()
+      if child.dep_ in deps:
+        # to handle preposition
+        nbor = child.nbor()
+        if nbor.dep_ in ['prep'] and nbor.lemma_ in ['of']:
+          obj = self.findObj(nbor, deps=['pobj'])
+          return obj
+        else:
+          return child
+      elif child.dep_ == 'compound' and \
+         child.head.dep_ in deps: # check if contained in compound
+        return child
+      toVisit.extend(list(child.children))
+    return None
+
+  def findSubj(self, pred, passive):
+    """
+      Find closest subject in predicates left subtree or
+      predicates parent's left subtree (recursive).
+      Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, passive, bool, True if the predicate token is passive
+      @ Out, subj, spacy.tokens.Token, the token that represents subject
+    """
+    for left in pred.lefts:
+      if passive: # if pred is passive, search for passive subject
+        subj = self.bfs(left, ['nsubjpass', 'nsubj:pass'])
+      else:
+        subj = self.bfs(left, ['nsubj'])
+      if subj is not None: # found it!
+        return subj
+    if pred.head != pred and not self.isPassive(pred):
+      return self.findSubj(pred.head, passive) # climb up left subtree
+    else:
+      return None
+
+  def findObj(self, pred, deps=['dobj', 'pobj', 'iobj', 'obj', 'obl'], exclPrepos=[]):
+    """
+      Find closest object in predicates right subtree.
+      Skip prepositional objects if the preposition is in exclude list.
+      Has a filter on organizations.
+      @ In, pred, spacy.tokens.Token, the predicate token
+      @ In, exclPrepos, list, the list of prepositions that will be excluded
+      @ Out, obj, spacy.tokens.Token,, the token that represents the object
+    """
+    for right in pred.rights:
+      obj = self.bfs(right, deps)
+      if obj is not None:
+        if obj.dep_ == 'pobj' and obj.head.lemma_.lower() in exclPrepos: # check preposition
+          continue
+        return obj
+    return None
+
+  def isValidKeyword(self, var, keywords):
+    """
+      @ In, var, token
+      @ In, keywords, list/dict
+    """
+    if isinstance(keywords, dict):
+      for _, vals in keywords.items():
+        if var.lemma_ in vals:
+          return True
+    elif isinstance(keywords, list):
+      if var.lemma_ in keywords:
+        return True
+    return False
+#######################################################################################
