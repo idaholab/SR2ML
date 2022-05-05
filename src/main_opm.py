@@ -9,6 +9,7 @@ Created on March, 2022
 import logging
 from nlp.RuleBasedMatcher import RuleBasedMatcher
 import spacy
+import pandas as pd
 
 import os
 import sys
@@ -33,27 +34,59 @@ fh.setFormatter(formatter)
 logger.addHandler(fh)
 
 if __name__ == "__main__":
-
+  nlp = spacy.load("en_core_web_lg", exclude=[])
+  ######################################################################
   # Parse OPM model
   # opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
   # some modifications, bearings --> pump bearings
   opmFile = os.path.abspath("./nlp/pump_opl.html")
   formList, functionList = OPLentityParser(opmFile)
-  # convert opm formList into matcher patterns
+  # convert opm formList into matcher patternsOPM
   label = "pump_component"
   id = "SSC"
-  patterns = []
+  patternsOPM = []
 
-  def generatePattern(form, label, id):
+  def generatePattern(form, label, id, attr="LOWER"):
     """
     """
-    ptn = [{"LOWER":elem} for elem in form.lower().split()]
+    if attr.lower() == "lower":
+      attr = "LOWER"
+      ptn = [{attr:elem} for elem in form.lower().split()]
+    elif attr.lower() == "lemma":
+      attr = "LEMMA"
+      ptn = [{attr:elem} for elem in form]
     pattern = {"label":label, "pattern":ptn, "id": id}
     return pattern
 
+  def extractLemma(var):
+    """
+      Lammatize the variable list
+      @ In, varList, list, list of variables
+      @ Out, lemVar, list, list of lammatized variables
+    """
+    var = ' '.join(var.split())
+    lemVar = [token.lemma_ for token in nlp(var)]
+    return lemVar
+
   for form in formList:
-    pattern = generatePattern(form, label=label, id=id)
-    patterns.append(pattern)
+    pattern = generatePattern(form, label=label, id=id, attr="LOWER")
+    patternsOPM.append(pattern)
+
+  ########################################################################
+  #  Parse causal keywords, and generate patterns for them
+  #  The patterns can be used to identify the causal relationships
+  causalLabel = "causal_keywords"
+  causalID = "causal"
+  patternsCausal = []
+  causalFilename = os.path.join(os.path.dirname(__file__), 'nlp', 'cause_effect_keywords.csv')
+  ds = pd.read_csv(causalFilename, skipinitialspace=True)
+  for col in ds.columns:
+    vars = set(ds[col].dropna())
+    for var in vars:
+      lemVar = extractLemma(var)
+      pattern = generatePattern(lemVar, label=causalLabel, id=causalID, attr="LEMMA")
+      patternsCausal.append(pattern)
+
   # text that needs to be processed.
   # TODO: load text from external files
   doc = r"""A leak was noticed from the RCP pump 1A.
@@ -90,9 +123,10 @@ if __name__ == "__main__":
   nlp = spacy.load("en_core_web_lg", exclude=[])
   name = 'ssc_entity_ruler'
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
-  matcher.addEntityPattern(name, patterns)
+  matcher.addEntityPattern(name, patternsOPM)
 
-
+  causalName = 'causal_keywords_entity_ruler'
+  matcher.addEntityPattern(causalName, patternsCausal)
 
   # ##Issue with simple and phrase matcher, if there are duplicate names, callback functions
   # ##can not be used, in which case, we can not directly extend doc.ents, which will raise the
