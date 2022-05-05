@@ -131,7 +131,9 @@ class RuleBasedMatcher(object):
     self._matchedSentsForVis = [] # collect data of matched sentences to be visualized
     self._visualizeMatchedSents = True
     self._coref = _corefAvail # True indicate coreference pipeline is available
-    self._entityLabels = []
+    self._entityLabels = {} # labels for rule-based entities
+    self._labelSSC = 'SSC'
+    self._labelCausal = 'causal_keywords'
 
 
 
@@ -253,7 +255,16 @@ class RuleBasedMatcher(object):
     if not isinstance(patternList, list):
       patternList = [patternList]
     # TODO: able to check "id" and "label", able to use "name"
-    self._entityLabels += [pa.get('label') for pa in patternList if pa.get('label') is not None]
+    for pa in patternList:
+      label = pa.get('label')
+      id = pa.get('id')
+      if id is not None:
+        if id not in self._entityLabels:
+          self._entityLabels[id] = set([label]) if label is not None else set()
+        else:
+          self._entityLabels[id] = self._entityLabels[id].union(set([label])) if label is not None else set()
+
+    # self._entityLabels += [pa.get('label') for pa in patternList if pa.get('label') is not None]
     self.entityRuler.add_patterns(patternList)
     if not self._entityRuler:
       self._entityRuler = True
@@ -296,7 +307,7 @@ class RuleBasedMatcher(object):
     ## use entity ruler to identify entity
     if self._entityRuler:
       logger.debug('Entity Ruler Matches:')
-      print([(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents if ent.label_ in self._entityLabels])
+      print([(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents if ent.label_ in self._entityLabels[self._labelSSC]])
 
     if self._coref:
       logger.debug('Print Coreference Info:')
@@ -407,7 +418,7 @@ class RuleBasedMatcher(object):
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
-      ents = self.getCustomEnts(sent.ents, self._entityLabels)
+      ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       if len(ents) > 1 or sent.root.lemma_ in self._causalKeywords['VERB']:
         for ent in ents:
           root = ent.root
@@ -420,7 +431,7 @@ class RuleBasedMatcher(object):
           neg, negText = self.isNegation(healthStatus)
           logger.debug(f'{ent} health status: {negText} {healthStatus.text}')
           ent._.set('health_status', negText + healthStatus.text)
-      else:
+      elif len(ents) == 1:
         root = sent.root
         neg, negText = self.isNegation(root)
         if root.lemma_ not in predSynonyms and root.pos_ != 'VERB':
@@ -605,6 +616,20 @@ class RuleBasedMatcher(object):
         return obj
     return None
 
+  def isValidKeyword(self, var, keywords):
+    """
+      @ In, var, token
+      @ In, keywords, list/dict
+    """
+    if isinstance(keywords, dict):
+      for _, vals in keywords.items():
+        if var.lemma_ in vals:
+          return True
+    elif isinstance(keywords, list):
+      if var.lemma_ in keywords:
+        return True
+    return False
+
   def extractRelDep(self, matchedSents, entID, predName='causes', predSynonyms=[], exclPrepos=[]):
     """
       @ In, matchedSents, list, the list of matched sentences
@@ -614,9 +639,36 @@ class RuleBasedMatcher(object):
       @ In, exclPrepos, list, the list of exlcuded prepositions
       @ Out, (subject tuple, predicate, object tuple), generator, the extracted causal relation
     """
+    # TODO List
+    # 1. check causal verbs
+    # 2. check causal nouns
+    # 3. check causal transitions
+    # 4. report missing causal relations (only one ent is present and causal keyword is found)
+    # 5. create causal keywords patterns, then use entity_ruler to identify them
+
     for sent in matchedSents:
-      if len(set(sent.ents)) < 2:
-        continue
+    #   root = sent.root
+    #   passive = self.isPassive(root)
+    #   valid = self.isValidKeyword(root, self._causalKeywords)
+    #   if valid:
+    #
+    #
+    #
+    #   ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
+    #
+    #   if len(ents) == 1:
+    #     ## check
+    #     continue
+    #   if len(ents) > 1 and root.lemma_ not in self._causalKeywords['VERB']:
+    #     continue
+    #   if len(ents) == 2:
+    #
+    #     logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
+    #     ents[0]._.set('health_status', negText + healthStatus.text)
+
+
+
+
       for token in sent:
         predSyns = [token.lemma_] if len(predSynonyms) == 0 else predSynonyms
         if token.pos_ == 'VERB' and token.lemma_ in predSyns:
