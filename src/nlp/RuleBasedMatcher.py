@@ -135,14 +135,6 @@ class RuleBasedMatcher(object):
     self._labelSSC = 'SSC'
     self._labelCausal = 'causal'
 
-
-
-    self._statusKeyword = ['fail', 'degrade', 'break', 'decline', 'go bad', 'rupture', 'breach', 'reduce', 'increase',
-        'decrease', 'fracture', 'aggravate','worsen', 'lose', 'function', 'work', 'operate', 'run', 'find', 'find out',
-        'observe', 'detect', 'determine', 'discover', 'get', 'notice', 'become', 'record', 'register', 'show']
-    self._causalKeyword = ['cause', 'stimulate', 'make', 'derive', 'trigger', 'result', 'lead', 'increase', 'decrease']
-
-
   def getKeywords(self, filename):
     """
       Get the keywords from given file
