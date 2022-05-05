@@ -408,9 +408,7 @@ class RuleBasedMatcher(object):
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
       ents = self.getCustomEnts(sent.ents, self._entityLabels)
-      # ents = list(sent.ents)
-      # TODO: multiple entities exist, skip for now
-      if len(ents) > 1:
+      if len(ents) > 1 or sent.root.lemma_ in self._causalKeywords['VERB']:
         for ent in ents:
           root = ent.root
           if root.dep_ in ['pobj']:
@@ -452,7 +450,7 @@ class RuleBasedMatcher(object):
           continue
         if not neg:
           neg, negText = self.isNegation(healthStatus)
-        # may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
+        # TODO: may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
         # is not identified properly
         logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
         ents[0]._.set('health_status', negText + healthStatus.text)
