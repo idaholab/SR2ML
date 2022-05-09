@@ -98,6 +98,10 @@ class RuleBasedMatcher(object):
     #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
     # else:
     #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
+
+    ## pipelines "merge_entities" and "merge_noun_chunks" can be used to merge noun phrases and entities
+    ## for easier analysis
+
     if _corefAvail:
       self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
                       'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver',
