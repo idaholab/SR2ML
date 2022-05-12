@@ -45,12 +45,13 @@ def generatePattern(form, label, id, attr="LOWER"):
     @ In, attr, str, attribute used for the pattern, either "LOWER" or "LEMMA"
     @ Out, pattern, dict, pattern will be used by entity matcher
   """
+  # if any of "!", "?", "+", "*" present in the provided string "form", we will treat it as determiter for the form
   if attr.lower() == "lower":
     attr = "LOWER"
-    ptn = [{attr:elem} for elem in form.lower().split()]
+    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form.lower().split()]
   elif attr.lower() == "lemma":
     attr = "LEMMA"
-    ptn = [{attr:elem} for elem in form]
+    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form]
   else:
     raise IOError(f"Incorrect 'attr={attr}' is provided, valid value for 'attr' is either 'LOWER' or 'LEMMA'")
   pattern = {"label":label, "pattern":ptn, "id": id}
