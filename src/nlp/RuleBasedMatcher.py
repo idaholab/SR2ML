@@ -84,6 +84,16 @@ class RuleBasedMatcher(object):
     self._causalFile = os.path.join(os.path.dirname(__file__), 'cause_effect_keywords.csv') # header includes: VERB, NOUN, TRANSITION
     # SCONJ->Because, CCONJ->so, ADP->as, ADV->therefore
     self._causalPOS = {'VERB':['VERB'], 'NOUN':['NOUN'], 'TRANSITION':['SCONJ', 'CCONJ', 'ADP', 'ADV']}
+    # current columns include: "VERB", "NOUN", "TRANSITION", "causal-relator", "effect-relator", "causal-noun", "effect-noun"
+    # For relator, such as becaue, therefore, as, etc.
+    #   if the column starts with causal, which means causal entity --> keyword --> effect entity
+    #   if the column starts with effect, which means effect entity <-- keyword <-- causal entity
+    # For NOUN
+    #   if the column starts with causal, which means causal entity --> keyword --> effect entity
+    #   if the column starts with effect, the relation is depend on the keyword.dep_
+    #   First check the right child of the keyword is ADP with dep_ "prep",
+    #   Then, check the dep_ of keyword, if it is "dobj", then causal entity --> keyword --> effect entity
+    #   elif it is "nsubj" or "nsubjpass" or "attr", then effect entity <-- keyword <-- causal entity
     self._causalKeywords = self.getKeywords(self._causalFile)
 
     self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
@@ -156,11 +166,13 @@ class RuleBasedMatcher(object):
     """
       Lammatize the variable list
       @ In, varList, list, list of variables
-      @ Out, lemVar, list, list of lammatized variables
+      @ Out, lemmaList, list, list of lammatized variables
     """
-    var = ' '.join(varList)
-    lemVar = [token.lemma_ for token in self.nlp(var)]
-    return lemVar
+    lemmaList = []
+    for var in varList:
+      lemVar = [token.lemma_ for token in self.nlp(var) if token.lemma_ not in ["!", "?", "+", "*"]]
+      lemmaList.append(lemVar)
+    return lemmaList
 
   def addKeywords(self, keywords, ktype):
     """
@@ -583,11 +595,63 @@ class RuleBasedMatcher(object):
       elif len(causalEnts) == 1 and len(sscEnts) == 2: # Two entities and One causal keyword
         root = causalEnts[0].root
         rootLoc = root.i
-        passive = self.isPassive(root)
-        if passive:
-          logger.debug(f'({sscEnts[1]} health status: {sscEnts[1]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[1]._.health_status})')
-        else:
-          logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}) "{causalEnts[0]}" ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        causalEntLemma = [token.lemma_ for token in causalEnts[0] if token.lemma_ != "DET"]
+        if root.pos_ == 'VERB':
+          passive = self.isPassive(root)
+          if passive:
+            logger.debug(f'({sscEnts[1]} health status: {sscEnts[1]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[1]._.health_status})')
+          else:
+            logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}) "{causalEnts[0]}" ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        elif root.pos_ == 'NOUN':
+          if causalEntLemma in self._causalKeywords['causal-noun']:
+            if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+              # assert sscEnts[1].root in root.subtree
+              logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+            elif rootLoc < sscEnts[0].start and sscEnts[1].root not in sscEnts[0].conjuncts:
+              # assert sscEnts[0].root in root.subtree
+              logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+          elif causalEntLemma in self._causalKeywords['effect-noun']:
+            if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+              # assert sscEnts[1].root in root.subtree
+              if root.dep_ in ['attr']:
+                logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), <--- "{causalEnts[0]}", <--- ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+              elif root.dep_ in ['dobj']:
+                logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+            elif rootLoc < sscEnts[0].start and sscEnts[1].root not in sscEnts[0].conjuncts:
+              # assert sscEnts[0].root in root.subtree
+              logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        elif causalEntLemma in self._causalKeywords['causal-relator']:
+          if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+            logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+          else:
+            logger.debug(f'Not yet implemented! causal keyword {causalEntLemma}, sentence {sent}')
+        elif causalEntLemma in self._causalKeywords['effect-relator']:
+          if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+            logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), <--- "{causalEnts[0]}", <--- ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+          elif rootLoc < sscEnts[0].start and sscEnts[1].root not in sscEnts[0].conjuncts:
+            logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+
+
+        # The following checks is not complete, swith to different method
+        # elif root.pos_ == 'SCONJ':
+        #   if rootLoc < sscEnts[0].start:
+        #     logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        #   elif rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+        #     logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), <--- "{causalEnts[0]}", ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        #   else:
+        #     logger.debug(f'Unknow relation: {(sscEnts[0].start, sscEnts[0])}, {(sscEnts[1].start, sscEnts[1])}, {(rootLoc, causalEnts[0])}')
+        # elif root.pos_ == ' CCONJ':
+        #   if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+        #     logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        #   else:
+        #     logger.debug(f'Unknow relation: {(sscEnts[0].start, sscEnts[0])}, {(sscEnts[1].start, sscEnts[1])}, {(rootLoc, causalEnts[0])}')
+        # elif root.pos_ == 'ADV' and root.dep_ == 'advmod':
+        #   if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
+        #     logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+        #   else:
+        #     logger.debug(f'Unknow relation: {(sscEnts[0].start, sscEnts[0])}, {(sscEnts[1].start, sscEnts[1])}, {(rootLoc, causalEnts[0])}')
+        # elif root.pos_ == 'ADP':
+        #   logger.debug('not yet implemented')
 
 
   ###############
