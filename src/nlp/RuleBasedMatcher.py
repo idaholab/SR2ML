@@ -58,6 +58,8 @@ except ModuleNotFoundError:
 
 if not Span.has_extension('health_status'):
   Span.set_extension("health_status", default=None)
+if not Span.has_extension('conjecture'):
+  Span.set_extension('conjecture', default=False)
 
 class RuleBasedMatcher(object):
   """
@@ -332,6 +334,11 @@ class RuleBasedMatcher(object):
     ## health status
     logger.info('Start to extract health status')
     self.extractHealthStatus(self._matchedSents)
+    ## Access health status
+    for sent in self._matchedSents:
+      ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
+      for ent in ents:
+        print(ent._.health_status)
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
@@ -392,6 +399,19 @@ class RuleBasedMatcher(object):
         return True
     return False
 
+  def isConjecture(self, token):
+    """
+      Check the conjecture of the token
+      @ In, token, spacy.tokens.Token, the token of the doc, the token should be the root of the Doc
+      @ Out, isConjecture, True, if the token/sentence indicates conjecture
+    """
+    for left in token.lefts: # Check modal auxilliary verb: can, could, may, might, must, shall, should, will, would
+      if left.dep_.startswith('aux') and left.tag_ in ['MD']:
+        return True
+    if token.pos_ == 'VERB' and token.tag_ == 'VB': # If it is a verb, and there is no inflectional morphology for the verb
+      return True
+    return False
+
   def isNegation(self, token):
     """
       Check negation status of given token
@@ -404,11 +424,19 @@ class RuleBasedMatcher(object):
       neg = True
       text = token.text
       return neg, text
+    # check left for verbs
     for left in token.lefts:
       if left.dep_ == 'neg':
         neg = True
         text = left.text
         return neg, text
+    # The following can be used to check the negation status of the sentence
+    # # check the subtree
+    # for sub in token.subtree:
+    #   if sub.dep_ == 'neg':
+    #     neg = True
+    #     text = sub.text
+    #     return neg, text
     return neg, text
 
   def findVerb(self, doc):
@@ -444,9 +472,12 @@ class RuleBasedMatcher(object):
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
+      conjecture = False
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       if len(ents) > 1 or sent.root.lemma_ in self._causalKeywords['VERB']:
+        conjecture = self.isConjecture(sent.root)
         for ent in ents:
+          healthStatus = None
           root = ent.root
           if root.dep_ in ['pobj']:
             healthStatus = root.head.head
@@ -456,8 +487,10 @@ class RuleBasedMatcher(object):
             continue
           neg, negText = self.isNegation(healthStatus)
           logger.debug(f'{ent} health status: {negText} {healthStatus.text}')
-          ent._.set('health_status', negText + healthStatus.text)
+          ent._.set('health_status', ' '.join([negText,healthStatus.text]))
+          ent._.set('conjecture',conjecture)
       elif len(ents) == 1:
+        healthStatus = None
         root = sent.root
         neg, negText = self.isNegation(root)
         if root.lemma_ not in predSynonyms and root.pos_ != 'VERB':
@@ -470,6 +503,7 @@ class RuleBasedMatcher(object):
           continue
         else:
           passive = self.isPassive(root)
+          conjecture = self.isConjecture(root)
           # # last is punct, the one before last is the root
           # if root.nbor().pos_ in ['PUNCT']:
           #   healthStatus = root
@@ -490,7 +524,8 @@ class RuleBasedMatcher(object):
         # TODO: may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
         # is not identified properly
         logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
-        ents[0]._.set('health_status', negText + healthStatus.text)
+        ents[0]._.set('health_status', ' '.join([negText,healthStatus.text]))
+        ents[0]._.set('conjecture', conjecture)
 
   def findLeftSubj(self, pred, passive):
     """
@@ -609,7 +644,7 @@ class RuleBasedMatcher(object):
               logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
             elif rootLoc < sscEnts[0].start and sscEnts[1].root not in sscEnts[0].conjuncts:
               # assert sscEnts[0].root in root.subtree
-              logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
+              logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) <--- ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
           elif causalEntLemma in self._causalKeywords['effect-noun']:
             if rootLoc > sscEnts[0].start and rootLoc < sscEnts[1].start:
               # assert sscEnts[1].root in root.subtree
@@ -630,7 +665,9 @@ class RuleBasedMatcher(object):
             logger.debug(f'({sscEnts[0]} health status: {sscEnts[0]._.health_status}), <--- "{causalEnts[0]}", <--- ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
           elif rootLoc < sscEnts[0].start and sscEnts[1].root not in sscEnts[0].conjuncts:
             logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1]._.health_status})')
-
+      # TODO, handle more than two entities
+      elif len(causalEnts) == 1 and len(sscEnts) > 2:
+        continue
 
         # The following checks is not complete, swith to different method
         # elif root.pos_ == 'SCONJ':
