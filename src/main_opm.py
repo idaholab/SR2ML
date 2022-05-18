@@ -130,7 +130,7 @@ if __name__ == "__main__":
             Vibration seems like it is coming from the pump shaft.
             Visible pump shaft deflection in operation.
             Pump bearings appear in acceptable condition.
-            Pump made noises - not nough to affect performance.
+            Pump made noises - not enough to affect performance.
             Pump shaft has a slight deflection.
         """
   # load nlp model and matcher
