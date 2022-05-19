@@ -188,7 +188,7 @@ def pysbdSentenceBoundaries(doc):
   """
   seg = pysbd.Segmenter(language="en", clean=False, char_span=True)
   sentsCharSpans = seg.segment(doc.text)
-  charSpans = [doc.char_span(sentSpan.start, sentSpan.end) for sentSpan in sentsCharSpans]
+  charSpans = [doc.char_span(sentSpan.start, sentSpan.end, alignment_mode="contract") for sentSpan in sentsCharSpans]
   startTokenIds = [span[0].idx for span in charSpans if span is not None]
   for token in doc:
       token.is_sent_start = True if token.idx in startTokenIds else False
