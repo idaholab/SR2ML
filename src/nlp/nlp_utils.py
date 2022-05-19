@@ -10,6 +10,9 @@ import spacy
 from spacy.tokens import Span
 import logging
 
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +63,8 @@ def resetPipeline(nlp, pipes):
   # re-add specified pipes
   for pipe in pipes:
     if pipe in ['pysbdSentenceBoundaries']:
-      nlp.add_pipe(pipe, before='parser')
+      # nlp.add_pipe(pipe, before='parser')
+      nlp.add_pipe(pipe, first=True)
     else:
       nlp.add_pipe(pipe)
   logger.info(f"Model: {nlp.meta['name']}, Language: {nlp.meta['lang']}")
@@ -84,3 +88,16 @@ def printDepTree(doc, skipPunct=True):
 
   for sent in doc.sents: # iterate over all sentences in a doc
     printRecursive(sent.root, indent=0, skipPunct=skipPunct)
+
+
+def plotDAG(edges, colors='k'):
+  """
+  @ In, edges, list of tuples, [(subj, conj), (..,..)] or [(subj, conj, {"color":"blue"}), (..,..)]
+  @ In, colors, str or list, list of colors
+  """
+  g = nx.MultiDiGraph()
+  g.add_edges_from(edges)
+  nx.draw_networkx(g, edge_color=colors)
+  ax = plot.gca()
+  plt.axis("off")
+  plot.show()
