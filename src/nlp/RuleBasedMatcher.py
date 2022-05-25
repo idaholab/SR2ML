@@ -190,7 +190,7 @@ class RuleBasedMatcher(object):
           val = [val]
         val = self.extractLemma(val)
         if key in self._statusKeywords:
-          self._statusKeywords[key].extend(val)
+          self._statusKeywords[key].append(val)
         else:
           logger.warning('keyword "{}" cannot be accepted, valid keys for the keywords are "{}"'.format(key, ','.join(list(self._statusKeywords.keys()))))
     elif ktype.lower() == 'causal':
@@ -199,7 +199,7 @@ class RuleBasedMatcher(object):
           val = [val]
         val = self.extractLemma(val)
         if key in self._causalKeywords:
-          self._causalKeywords[key].extend(val)
+          self._causalKeywords[key].append(val)
         else:
           logger.warning('keyword "{}" cannot be accepted, valid keys for the keywords are "{}"'.format(key, ','.join(list(self._causalKeywords.keys()))))
 
@@ -474,7 +474,7 @@ class RuleBasedMatcher(object):
     for sent in matchedSents:
       conjecture = False
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-      if len(ents) > 1 or sent.root.lemma_ in self._causalKeywords['VERB']:
+      if len(ents) > 1 or [sent.root.lemma_] in self._causalKeywords['VERB']:
         conjecture = self.isConjecture(sent.root)
         for ent in ents:
           healthStatus = None
@@ -493,7 +493,7 @@ class RuleBasedMatcher(object):
         healthStatus = None
         root = sent.root
         neg, negText = self.isNegation(root)
-        if root.lemma_ not in predSynonyms and root.pos_ != 'VERB':
+        if [root.lemma_] not in predSynonyms and root.pos_ != 'VERB':
           if root.pos_ in ['NOUN', 'ADJ']:
             healthStatus = root
             if self._updateStatusKeywords:
@@ -575,7 +575,7 @@ class RuleBasedMatcher(object):
     for right in pred.rights:
       pos = right.pos_
       if pos in ['VERB', 'NOUN', 'ADJ']:
-        if right.lemma_ in self._statusKeywords[pos]:
+        if [right.lemma_] in self._statusKeywords[pos]:
           return right
     return None
 
@@ -754,7 +754,7 @@ class RuleBasedMatcher(object):
     """
     for sent in sents:
       root = sent.root
-      if root.pos_ == 'VERB' and root.lemma_ in predSynonyms:
+      if root.pos_ == 'VERB' and [root.lemma_] in predSynonyms:
         passive = self.isPassive(root)
         subj = self.findSubj(root, passive)
         if subj is not None:
@@ -765,7 +765,7 @@ class RuleBasedMatcher(object):
             yield ((subj), root, (obj))
       else:
         for token in sent:
-          if token.lemma_ in predSynonyms:
+          if [token.lemma_] in predSynonyms:
             root = token
             passive = self.isPassive(root)
             subj = self.findSubj(root, passive)

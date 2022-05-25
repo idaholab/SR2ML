@@ -1,4 +1,4 @@
-VERB,NOUN,TRANSITION,causal-relator,effect-relator,causal-noun,effect-noun
+VERB,NOUN,TRANSITION,effect-relator,causal-relator,causal-noun,effect-noun
 affect,actor,accordingly,on account of,hence,actor,consequence
 constitute ,consequence,consequently,due to,consequently,agent,impact
 create,end,hence,because,so,creation,product
