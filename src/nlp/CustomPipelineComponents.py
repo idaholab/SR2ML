@@ -162,11 +162,15 @@ def mergePhrase(doc):
     @ Out, doc, spacy.tokens.doc.Doc, the document after merge phrase
   """
   with doc.retokenize() as retokenizer:
-    for np in list(doc.noun_chunks):
+    for np in doc.noun_chunks:
       # skip ents since ents are recognized by OPM model and entity_ruler
       # TODO: we may expand the ents, combined with pipeline "expandEntities"
-      if len(np.ents) > 0:
+      if len(list(np.ents)) > 1:
         continue
+      elif len(list(np.ents)) == 1:
+        if np.ents[0].label_ not in ['causal_keywords', 'ORG', 'DATE']:
+          # print(np.ents[0].label_)
+          continue
       attrs = {
           "tag": np.root.tag_,
           "lemma": np.root.lemma_,

@@ -473,8 +473,11 @@ class RuleBasedMatcher(object):
     statusAdj = self._statusKeywords['ADJ']
     for sent in matchedSents:
       conjecture = False
+      causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-      if len(ents) > 1 or [sent.root.lemma_] in self._causalKeywords['VERB']:
+      # if len(ents) > 1 and [sent.root.lemma_] in self._causalKeywords['VERB']:
+      if len(ents) > 1 and len(causalEnts) > 0:
+      # if len(ents) > 1:
         conjecture = self.isConjecture(sent.root)
         for ent in ents:
           healthStatus = None
@@ -509,6 +512,13 @@ class RuleBasedMatcher(object):
           #   healthStatus = root
           if ents[0].start < root.i:
             healthStatus = self.findRightObj(root)
+            if healthStatus and healthStatus.dep_ == 'pobj':
+              # include 'dobj' 'prep' and 'pobj'
+              # examples
+              # Pump had noise of cavitation
+              # RCP pump 1A had signs of past leakage
+              if healthStatus.head.head.dep_ == 'dobj':
+                healthStatus = healthStatus.doc[healthStatus.head.head.i:healthStatus.i+1]
             # no object is found
             if not healthStatus:
               healthStatus = self.findRightKeyword(root)
@@ -520,7 +530,10 @@ class RuleBasedMatcher(object):
         if healthStatus is None:
           continue
         if not neg:
-          neg, negText = self.isNegation(healthStatus)
+          if isinstance(healthStatus, Span):
+            neg, negText = self.isNegation(healthStatus.root)
+          else:
+            neg, negText = self.isNegation(healthStatus)
         # TODO: may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
         # is not identified properly
         logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
