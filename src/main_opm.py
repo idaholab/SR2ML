@@ -133,6 +133,9 @@ if __name__ == "__main__":
             Pump made noises - not enough to affect performance.
             Pump shaft has a slight deflection.
         """
+  # doc = """
+  #             Pump made noises - not enough to affect performance.
+  # """
   # load nlp model and matcher
   nlp = spacy.load("en_core_web_lg", exclude=[])
   name = 'ssc_entity_ruler'
