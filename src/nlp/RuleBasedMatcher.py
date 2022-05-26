@@ -338,6 +338,7 @@ class RuleBasedMatcher(object):
     for sent in self._matchedSents:
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       for ent in ents:
+        # print(ent)
         print(ent._.health_status)
     logger.info('End of health status extraction!')
     ## causal relation
@@ -471,20 +472,23 @@ class RuleBasedMatcher(object):
     predSynonyms = self._statusKeywords['VERB']
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
+    causalStatus = False
     for sent in matchedSents:
       conjecture = False
       causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       # if len(ents) > 1 and [sent.root.lemma_] in self._causalKeywords['VERB']:
-      if len(ents) > 1 and len(causalEnts) > 0:
-      # if len(ents) > 1:
+      causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
+      causalStatus = causalStatus and len(ents) == 1
+      # if causalStatus and len(ents) > 1:
+      if (len(ents) > 1 and len(causalEnts) > 0) or causalStatus:
         conjecture = self.isConjecture(sent.root)
         for ent in ents:
           healthStatus = None
           root = ent.root
           if root.dep_ in ['pobj']:
             healthStatus = root.head.head
-          elif root.dep_ in ['compound']:
+          elif root.dep_ in ['compound', 'nsubj']:
             healthStatus = root.head
           else:
             continue
