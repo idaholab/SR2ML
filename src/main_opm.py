@@ -134,7 +134,9 @@ if __name__ == "__main__":
             Pump shaft has a slight deflection.
         """
   # doc = """
-  #             Pump made noises - not enough to affect performance.
+  #           Pump inspection revealed excessive impeller degradation.
+  #           Pump inspection revealed excessive impeller degradation likely due to cavitation.
+  #           Pump and pump shaft revealed excessive impeller degradation.
   # """
   # load nlp model and matcher
   nlp = spacy.load("en_core_web_lg", exclude=[])
