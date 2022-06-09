@@ -11,9 +11,9 @@ from scipy.stats import norm
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .ScipyStatsModelBase import ScipyStatsModelBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Reliabilities.ScipyStatsModelBase import ScipyStatsModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class NormalModel(ScipyStatsModelBase):
@@ -58,11 +58,9 @@ class NormalModel(ScipyStatsModelBase):
     super()._handleInput(paramInput)
     for child in paramInput.subparts:
       if child.getName().lower() == 'sigma':
-        self._sigma = self.setVariable(child.value)
-        self._variableDict['_sigma'] = self._sigma
+        self.setVariable('_sigma', child.value)
       elif child.getName().lower() == 'tm':
-        self._tm = self.setVariable(child.value)
-        self._variableDict['_tm'] = self._tm
+        self.setVariable('_tm', child.value)
 
   def initialize(self, inputDict):
     """

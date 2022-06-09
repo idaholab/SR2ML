@@ -19,8 +19,8 @@ Created on Jan 29, 2018
 
 import numpy as np
 
-from utils import InputData, InputTypes, utils
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ravenframework.utils import InputData, InputTypes, utils
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
 
 class DataLabeling(PostProcessorPluginBase):
   """

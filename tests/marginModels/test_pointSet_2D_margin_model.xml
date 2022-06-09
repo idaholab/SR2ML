@@ -1,0 +1,88 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>plugins/SR2ML.marginModel.PointSetMarginModel</name>
+    <author>mandd</author>
+    <created>2021-06-07</created>
+    <classesTested>Models.ExternalModel</classesTested>
+    <description>
+      This input tests the PointSetMarginModel model 2D data.
+      The failure data was generated from a uniform distribution [9K,10K] (i.e., =9.0+RAND() ).
+      Given actualTime between 2 and 3, the normalize margin should be distributed between. 
+    </description>
+
+  </TestInfo>
+  
+  <RunInfo>
+    <WorkingDir>PointSetModel2D</WorkingDir>
+    <Sequence>MCRun,print</Sequence>
+  </RunInfo>
+  
+  <Models>
+    <ExternalModel name="PointSetMargin" subType="SR2ML.MarginModel">
+      <variables>actualTime,actualTemp,marginPS1</variables>
+      <MarginModel type="PointSetMarginModel">
+        <failedDataFileID>failureData.csv</failedDataFileID>
+        <marginID>marginPS1</marginID>
+	      <map var='time'>actualTime</map>
+	      <map var='avgT'>actualTemp</map>
+      </MarginModel>
+    </ExternalModel>
+  </Models>
+
+  <Distributions>
+    <Uniform name="actualTimeDist">
+      <lowerBound>4000</lowerBound>
+      <upperBound>5000</upperBound>
+    </Uniform>
+     <Uniform name="actualTempDist">
+      <lowerBound>20</lowerBound>
+      <upperBound>30</upperBound>
+    </Uniform>
+  </Distributions>
+
+  <Samplers>
+    <MonteCarlo name="MC">
+      <samplerInit>
+        <limit>100</limit>
+      </samplerInit>
+      <variable name="actualTime">
+        <distribution>actualTimeDist</distribution>
+      </variable>
+      <variable name="actualTemp">
+        <distribution>actualTempDist</distribution>
+      </variable>
+    </MonteCarlo>
+  </Samplers>
+
+  <DataObjects>
+    <PointSet name="Input">
+      <Input>actualTime,actualTemp</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="Output">
+      <Input>actualTime,actualTemp</Input>
+      <Output>marginPS1</Output>
+    </PointSet>
+  </DataObjects>
+
+  <Steps>
+    <MultiRun name="MCRun">
+      <Input          class="DataObjects"   type="PointSet">Input</Input>
+      <Model          class="Models"        type="ExternalModel">PointSetMargin</Model>
+      <Sampler        class="Samplers"      type="MonteCarlo">MC</Sampler>
+      <Output         class="DataObjects"   type="PointSet">Output</Output>
+    </MultiRun>
+    <IOStep name="print">
+     <Input          class="DataObjects"   type="PointSet">Output</Input>
+     <Output         class="OutStreams"    type="Print">Out</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Out">
+      <type>csv</type>
+      <source>Output</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+</Simulation>

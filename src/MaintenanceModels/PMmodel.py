@@ -12,9 +12,9 @@ import numpy.ma as ma
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .MaintenanceBase import MaintenanceBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.MaintenanceModels.MaintenanceBase import MaintenanceBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class PMModel(MaintenanceBase):
@@ -77,26 +77,19 @@ class PMModel(MaintenanceBase):
       if child.getName().lower() == 'type':
         self.type = child.value
       if child.getName().lower() == 'rho':
-        self.rho = self.setVariable(child.value)
-        self._variableDict['rho'] = self.rho
+        self.setVariable('rho', child.value)
       if child.getName().lower() == 'tpm':
-        self.Tpm = self.setVariable(child.value)
-        self._variableDict['Tpm'] = self.Tpm
+        self.setVariable('Tpm', child.value)
       if child.getName().lower() == 'tr':
-        self.Tr = self.setVariable(child.value)
-        self._variableDict['Tr'] = self.Tr
+        self.setVariable('Tr', child.value)
       if child.getName().lower() == 'tt':
-        self.Tt = self.setVariable(child.value)
-        self._variableDict['Tt'] = self.Tt
+        self.setVariable('Tt', child.value)
       if child.getName().lower() == 'lambda':
-        self.Lambda = self.setVariable(child.value)
-        self._variableDict['Lambda'] = self.Lambda
+        self.setVariable('Lambda', child.value)
       if child.getName().lower() == 'tm':
-        self.Tm = self.setVariable(child.value)
-        self._variableDict['Tm'] = self.Tm
+        self.setVariable('Tm', child.value)
       if child.getName().lower() == 'ti':
-        self.Ti = self.setVariable(child.value)
-        self._variableDict['Ti'] = self.Ti
+        self.setVariable('Ti', child.value)
 
   def initialize(self, inputDict):
     """

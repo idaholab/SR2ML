@@ -14,8 +14,8 @@ from operator import mul
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from utils.randomUtils import newRNG
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ravenframework.utils.randomUtils import newRNG
 
 #Internal Modules End-----------------------------------------------------------
 

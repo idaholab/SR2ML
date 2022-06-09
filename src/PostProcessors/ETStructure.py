@@ -17,10 +17,8 @@ Created on April 30, 2018
 @author: mandd
 """
 #Internal Modules---------------------------------------------------------------
-import MessageHandler
-from utils import utils
-from utils import xmlUtils as xmlU
-import MessageHandler
+from ravenframework.utils import utils
+from ravenframework.utils import xmlUtils as xmlU
 #Internal Modules End-----------------------------------------------------------
 
 #External Modules---------------------------------------------------------------

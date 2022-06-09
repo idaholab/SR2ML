@@ -21,8 +21,8 @@ import numpy as np
 import copy
 #External Modules End--------------------------------------------------------------------------------
 
-from utils import InputData, InputTypes
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ravenframework.utils import InputData, InputTypes
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
 
 class RiskMeasuresDiscrete(PostProcessorPluginBase):
   """
