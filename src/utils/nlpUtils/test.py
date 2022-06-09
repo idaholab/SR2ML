@@ -94,7 +94,7 @@ if __name__ == "__main__":
     triples = []
     for sentence in sentences:
         triples.append(processSentence(sentence))
-    
+
     for triple in triples:
       print(triple)
     printGraph(triples)

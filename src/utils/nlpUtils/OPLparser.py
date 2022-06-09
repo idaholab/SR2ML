@@ -37,7 +37,7 @@ def OPLentityParser(filename):
         elif element['color'] == '#000078':
           elem = element.string.replace("\n", " ")
           if elem not in processList:
-            processList.append(elem)          
+            processList.append(elem)
   return objectList, processList
 
 def OPLtextParser(filename):
@@ -52,10 +52,10 @@ def OPLtextParser(filename):
   #print(fileObj.read())
   with open(filename) as fp:
     soup = BeautifulSoup(fp, "html.parser")
-    
+
     # kill all script and style elements
     for script in soup(["script", "style"]):
-        script.extract()    # rip it out   
+        script.extract()    # rip it out
     # get text
     text = soup.get_text()
     # break into lines and remove leading and trailing space on each
@@ -65,16 +65,16 @@ def OPLtextParser(filename):
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
     sentences = text.split(".")
-    
+
     for index, sentence in enumerate(sentences):
       sentences[index] = sentences[index].replace("\n", " ")
       sentences[index] = sentences[index].replace("\xa0", "")
       sentences[index] = sentences[index].lstrip()
-      
+
     sentences.remove('')
-    
+
     return sentences
-  
+
 def listLemmatization(wordList):
   '''
   This method is designed to lemmatize all words contained in the list wordList
@@ -85,32 +85,32 @@ def listLemmatization(wordList):
   lemmatizer = nlp.get_pipe("lemmatizer")
   lemmatizedWords = []
   for elem in functionList:
-    lemmatizedWords.append([token.lemma_ for token in nlp(elem)][0])  
+    lemmatizedWords.append([token.lemma_ for token in nlp(elem)][0])
   return lemmatizedWords
-  
-def OPLparser(sentences): 
+
+def OPLparser(sentences):
   '''
   This method translates all the sentences create a graph structure
   @in: filename: file name containing the OPL text
   @out: objectList: sentences, list of sentenced contained in the OPL file
   '''
   opmGraph = nx.MultiDiGraph()
-  
-  # These are 4 sets of OPL keywords 
+
+  # These are 4 sets of OPL keywords
   OPLattributes = ['environmental','physical','informatical']
   OPLkeywordsDefinition = ['is an instance of ','is an','is']
-  OPLkeywordsObjects = ['consists of'] 
+  OPLkeywordsObjects = ['consists of']
   OPLkeywordsProcess = ['consumes','yields','requires','affects', 'changes']
-  
-  colorMatches = {'consists of':0.1, 
+
+  colorMatches = {'consists of':0.1,
                   'consumes'   :1 ,
                   'yields'     :2,
                   'requires'   :3,
-                  'affects'    :4, 
+                  'affects'    :4,
                   'changes'    :5}
-  
+
   edge_colors = []
-  
+
   for sentence in sentences:
     # create new elements in the graph from each sentence
     for elem in OPLkeywordsObjects+OPLkeywordsProcess:
@@ -120,12 +120,12 @@ def OPLparser(sentences):
         conjs = re.split('and |, ',partitions[2])
         if '' in conjs:
           conjs.remove('')
-        
+
         for conj in conjs:
           opmGraph.add_edge(subj, conj, key=elem)
           edge_colors.append(colorMatches[elem])
-        
-  return opmGraph,edge_colors  
+
+  return opmGraph,edge_colors
 
 '''Testing workflow '''
 formList, functionList = OPLentityParser('pump_OPL.html')
@@ -140,4 +140,3 @@ nx.draw_networkx(opmGraph,edge_color=edge_colors)
 ax = plt.gca()
 plt.axis("off")
 plt.show()
-
