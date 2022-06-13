@@ -89,7 +89,7 @@
   input = 'test_MCSSolverMcCormick.xml'
   UnorderedCsv   = 'MCSSolverMcCormick/Print_sim_PS1.csv MCSSolverMcCormick/Print_sim_PS2.csv MCSSolverMcCormick/Print_sim_PS3.csv MCSSolverMcCormick/Print_sim_PS4.csv MCSSolverMcCormick/Print_sim_PS5.csv'
  [../]
- 
+
  [./TestMCSSolverTD]
   type  = 'RavenFramework'
   input = 'test_MCSSolver_TD.xml'
@@ -101,10 +101,16 @@
   input = 'test_MCSSolver_TD_fromPS.xml'
   UnorderedCsv   = 'MCSSolverTDfromPS/Print_sim_HS_0.csv'
  [../]
- 
+
  [./TestMCSSolver_margin]
   type  = 'RavenFramework'
   input = 'test_MCSSolver_margin.xml'
   UnorderedCsv   = 'MCSSolverMargin/Print_sim_PS.csv'
+ [../]
+
+ [./TestMCSSolverSaphire]
+  type  = 'RavenFramework'
+  input = 'test_MCSSolver_Saphire.xml'
+  UnorderedCsv   = 'MCSSolverSaphire/Print_sim_PS.csv'
  [../]
 []

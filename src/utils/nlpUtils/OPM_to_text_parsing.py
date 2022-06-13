@@ -68,4 +68,3 @@ text_base = 'Over the last quarter Apple sold nearly 20 thousand iPods for a pro
 #NERentityParser(text_base)
 print(formList)
 opmFormEntityParser(text_OPM, formList, functionList)
-

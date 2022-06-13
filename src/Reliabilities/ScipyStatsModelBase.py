@@ -7,9 +7,9 @@ Created on Jan. 30 2020
 """
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .ReliabilityBase import ReliabilityBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Reliabilities.ReliabilityBase import ReliabilityBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class ScipyStatsModelBase(ReliabilityBase):

@@ -1,0 +1,89 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>SR2ML/tests.MCSSolver</name>
+    <author>wangc</author>
+    <created>2022-02-09</created>
+    <classesTested>SR2ML.MCSSolver</classesTested>
+    <description>
+      Test the MCSSolver model to process SAPHIRE output of MCSs and
+      to import such Boolean logic structure as a RAVEN model. Provided the sampled
+      values of Basic Events (BEs) probabilities, the MCSSolver determines the
+      probability of Top Event (TE), i.e., the union of the MCSs.
+    </description>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>MCSSolverSaphire</WorkingDir>
+    <Sequence>simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile" type="MCSlist">cutset_saphire.txt</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
+      <variables>statusBE1,statusBE2,statusBE3,statusBE4,,statusBE5,statusBE6,statusBE7,statusBE8,TOP</variables>
+      <solver type='probability'>
+        <solverOrder>3</solverOrder>
+      </solver>
+      <fileFrom>saphire</fileFrom>
+      <topEventID>TOP</topEventID>
+      <map var='statusBE1'>S-DGN-FR-B</map>
+      <map var='statusBE2'>C-PMP-FS-B</map>
+      <map var='statusBE3'>S-DGN-FR-A</map>
+      <map var='statusBE4'>S-TNK-FC-T1</map>
+      <map var='statusBE5'>C-CKV-CC-B</map>
+      <map var='statusBE6'>C-CKV-CF</map>
+      <map var='statusBE7'>C-PMP-FR-B</map>
+      <map var='statusBE8'>S-DGN-FS-A</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <constant name="statusBE1">0.1</constant>
+      <constant name="statusBE2">0.15</constant>
+      <constant name="statusBE3">0.3</constant>
+      <constant name="statusBE4">0.08</constant>
+      <constant name="statusBE5">0.05</constant>
+      <constant name="statusBE6">0.1</constant>
+      <constant name="statusBE7">0.15</constant>
+      <constant name="statusBE8">0.2</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <MultiRun name="simRun">
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="PointSet"        >sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_PS">
+      <type>csv</type>
+      <source>sim_PS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="inputPlaceHolder">
+      <Input>statusBE1,statusBE2,statusBE3,statusBE4,statusBE5,statusBE6,statusBE7,statusBE8</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="sim_PS">
+      <Input>statusBE1,statusBE2,statusBE3,statusBE4,statusBE5,statusBE6,statusBE7,statusBE8</Input>
+      <Output>TOP</Output>
+    </PointSet>
+  </DataObjects>
+
+</Simulation>

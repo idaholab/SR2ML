@@ -12,8 +12,8 @@ import copy
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
 #Internal Modules End--------------------------------------------------------------------------------
 
 class ModelBase(object):
@@ -51,6 +51,7 @@ class ModelBase(object):
     self._model = None
     # class of model
     self._modelClass = None
+    self.workingDir = None
 
   def handleInput(self, xmlNode):
     """
@@ -70,6 +71,14 @@ class ModelBase(object):
       @ In, paramInput, InputData.ParameterInput, the parsed xml input
       @ Out, None
     """
+
+  def setWorkingDir(self, workingDir):
+    """
+      Set the path for working direcotry
+      @ In, workingDir, str, the path for working directory
+      @ Out, None
+    """
+    self.workingDir = workingDir
 
   def initialize(self, inputDict):
     """
@@ -99,25 +108,31 @@ class ModelBase(object):
     """
     return self._dynamicHandling
 
-  def setVariable(self, value):
+  def setVariable(self, name, value):
     """
       Set value if a float/int/list is provided in the node text, otherwise treat the provided value as RAVEN variable
+      @ In, name, str, the name of variable
       @ In, value, str or float or list, the value of given variable
-      @ Out, ret, str or float or numpy.array, the recasted value
+      @ Out, None
     """
     ret = None
     # multi-entry or single-entry?
     if len(value) == 1:
       if not utils.isAFloatOrInt(value[0]):
         ret = value[0]
-      else:
+        ## add it to _variableDict, so the code can aware of this variable
+        if name in self._variableDict.keys():
+          raise KeyError('Duplicate variable: "{}" is found! Please check your input file.'.format(name))
+        self._variableDict[name] = ret
+      else: ## string is provided, so treat it as RAVEN variables
         ret = np.atleast_1d(value)
     else:
       # should be floats; InputData assures the entries are the same type already
       if not utils.isAFloatOrInt(value[0]):
         raise IOError('Multiple non-number entries are found, but require either a single variable name or multiple float entries: {}'.format(value))
       ret = np.asarray(value)
-    return ret
+    ## assign self variables, so that both RAVEN and SR2ML can retrieve this variable
+    setattr(self, name, ret)
 
   def loadVariables(self, need, inputDict):
     """

@@ -6,10 +6,10 @@ Created on May 3, 2021
 
 # External Imports
 import xml.etree.ElementTree as ET
-import codecs
+# import codecs
 from bs4 import BeautifulSoup
-import nltk
-import unicodedata
+# import nltk
+# import unicodedata
 import re
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -75,7 +75,7 @@ def OPLtextParser(filename):
 
     return sentences
 
-def listLemmatization(wordList):
+def listLemmatization(functionList):
   '''
   This method is designed to lemmatize all words contained in the list wordList
   @in: wordList, list, list containing the words to lemmatize
@@ -126,17 +126,3 @@ def OPLparser(sentences):
           edge_colors.append(colorMatches[elem])
 
   return opmGraph,edge_colors
-
-'''Testing workflow '''
-formList, functionList = OPLentityParser('pump_OPL.html')
-
-lemmatizedFunctionList = listLemmatization(functionList)
-print(lemmatizedFunctionList)
-
-sentences = OPLtextParser('pump_OPL.html')
-opmGraph,edge_colors = OPLparser(sentences)
-
-nx.draw_networkx(opmGraph,edge_color=edge_colors)
-ax = plt.gca()
-plt.axis("off")
-plt.show()
