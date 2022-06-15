@@ -14,6 +14,9 @@ from spacy.tokens import Token
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
 
+# use pysbd as a sentencizer component for spacy
+import pysbd
+
 import logging
 
 
@@ -150,13 +153,47 @@ def expandEntities(doc):
     doc = expandEntities(doc)
   return doc
 
-# @Language.component("extractHealthStatus")
-# def extractHealthStatus(doc):
-#   """
-#     Extract the health status of identified entities
-#   """
-#   for ent in doc.ents:
-#     if ent.ent_id_ == "SSC":
-#       sent = ent.sent
-#
-#   return doc
+@Language.component("mergePhrase")
+def mergePhrase(doc):
+  """
+    Expand the current entities
+    This method will keep "DET" or "PART", using pipeline "normEntities" after this pipeline to remove them
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after merge phrase
+  """
+  with doc.retokenize() as retokenizer:
+    for np in doc.noun_chunks:
+      # skip ents since ents are recognized by OPM model and entity_ruler
+      # TODO: we may expand the ents, combined with pipeline "expandEntities"
+      if len(list(np.ents)) > 1:
+        continue
+      elif len(list(np.ents)) == 1:
+        if np.ents[0].label_ not in ['causal_keywords', 'ORG', 'DATE']:
+          # print(np.ents[0].label_)
+          continue
+      attrs = {
+          "tag": np.root.tag_,
+          "lemma": np.root.lemma_,
+          "ent_type": np.root.ent_type_,
+          "_": {
+                "ref_n": np.root._.ref_n,
+                "ref_t": np.root._.ref_t,
+                },
+      }
+      retokenizer.merge(np, attrs=attrs)
+  return doc
+
+@Language.component("pysbdSentenceBoundaries")
+def pysbdSentenceBoundaries(doc):
+  """
+    Use pysbd as a sentencizer component for spacy
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after process
+  """
+  seg = pysbd.Segmenter(language="en", clean=False, char_span=True)
+  sentsCharSpans = seg.segment(doc.text)
+  charSpans = [doc.char_span(sentSpan.start, sentSpan.end, alignment_mode="contract") for sentSpan in sentsCharSpans]
+  startTokenIds = [span[0].idx for span in charSpans if span is not None]
+  for token in doc:
+      token.is_sent_start = True if token.idx in startTokenIds else False
+  return doc
