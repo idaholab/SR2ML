@@ -78,6 +78,8 @@ if __name__ == "__main__":
   # some modifications, bearings --> pump bearings
   opmFile = os.path.abspath("./nlp/pump_opl.html")
   formList, functionList = OPLentityParser(opmFile)
+  for elem in formList:
+    print(elem)
   # convert opm formList into matcher patternsOPM
   label = "pump_component"
   id = "SSC"
