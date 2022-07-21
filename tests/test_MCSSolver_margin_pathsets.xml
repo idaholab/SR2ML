@@ -1,0 +1,103 @@
+<Simulation verbosity="debug">
+  <!--
+  This is a test for the system: TopEvent = A or B D or B E or C D or CE
+  Basic event margin values: A=0.35
+                             B=0.2
+                             C=0.1
+                             D=0.3
+                             E=0.4
+  Margin of top event is calculated as: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
+  where:
+                MCS   Margin
+               *****************
+                A    0.35
+                BD   0.360555128
+                BE   0.447213595
+                CD   0.316227766
+                CE   0.412310563
+
+  Given these values, M(TopEvent) = 0.316227766
+  -->
+  <TestInfo>
+    <name>SR2ML/tests.MCSSolver</name>
+    <author>mandd</author>
+    <created>2021-04-27</created>
+    <classesTested>SR2ML.MCSSolver</classesTested>
+    <description>
+      This model is designed to read from file a list of Minimal Cut Sets (MCSs) and
+      to import such Boolean logic structure as a RAVEN model. Provided the sampled
+      values of Basic Events (BEs) margin values, the MCSSolver determines the
+      margin of Top Event (TE) using the Euclidean metrics
+    </description>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>MCSSolverMargin</WorkingDir>
+    <Sequence>simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile" type="MCSlist">MCSlist.csv</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
+      <variables>statusA,statusB,statusC,statusD,statusE,
+                 TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</variables>
+      <solver type='margin'>
+        <metric>2</metric>
+        <setType>path</setType>
+      </solver>
+      <topEventID>TOP</topEventID>
+      <map var='statusA'>A</map>
+      <map var='statusB'>B</map>
+      <map var='statusC'>C</map>
+      <map var='statusD'>D</map>
+      <map var='statusE'>E</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <constant name="statusA">0.35</constant>
+      <constant name="statusB">0.2</constant>
+      <constant name="statusC">0.1</constant>
+      <constant name="statusD">0.3</constant>
+      <constant name="statusE">0.4</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <MultiRun name="simRun">
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="PointSet"        >sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS_path</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_PS_path">
+      <type>csv</type>
+      <source>sim_PS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="inputPlaceHolder">
+      <Input>statusA,statusB,statusC,statusD,statusE</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="sim_PS">
+      <Input>statusA,statusB,statusC,statusD,statusE</Input>
+      <Output>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</Output>
+    </PointSet>
+  </DataObjects>
+
+</Simulation>

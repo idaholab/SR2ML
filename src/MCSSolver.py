@@ -45,6 +45,7 @@ class MCSSolver(ExternalModelPluginBase):
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
     self.mcsList = None        # List containing all the MCSs; each MCS is a list of basic events
+    self.solver['setType'] = None
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -76,6 +77,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
+    setTypes = ['path','cut']
 
     for child in xmlNode:
       if child.tag == 'topEventID':
@@ -102,7 +104,12 @@ class MCSSolver(ExternalModelPluginBase):
             metricValue = childChild.text.strip()
             if metricValue not in metricOrder.keys():
               raise IOError("MCSSolver: value in xml node metric is not allowed (0,1,2,inf)")
-            self.solver['metric'] = metricOrder[metricValue]
+            self.solver['metric'] = metricOrder[metricValue]           
+          elif childChild.tag == 'setType':
+            setType = childChild.text.strip()
+            if setType not in setTypes:
+              raise IOError("MCSSolver: set type in xml node setType is not allowed (cut,or path)")
+            self.solver['setType'] = setType
       elif child.tag == 'variables':
         variables = [str(var.strip()) for var in child.text.split(",")]
       elif child.tag == 'map':
@@ -152,7 +159,7 @@ class MCSSolver(ExternalModelPluginBase):
         #                      (['D', 'C'], ['A', 'E']) ]
 
         basicEventCombined = list(set(itertools.chain.from_iterable(term)) for term in terms)
-        self.topEventTerms[order]=basicEventCombined
+        self.topEventTerms[order] = basicEventCombined
 
     return kwargs
 
@@ -164,6 +171,7 @@ class MCSSolver(ExternalModelPluginBase):
       @ In, inputs, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
+    
     if self.timeDepData is None:
       self.runStatic(container, inputs)
     else:
@@ -185,8 +193,13 @@ class MCSSolver(ExternalModelPluginBase):
       topEventValue = self.mcsSolverProbability(inputForSolver)
     else:
       topEventValue = self.mcsSolverMargin(inputForSolver)
-
+      sensitivities = self.marginSensitivities(topEventValue, inputForSolver)
+      for key in sensitivities:
+        keyID = "sens_" + str(container.invMapping[key])
+        container.__dict__[keyID] = sensitivities[key]
+        
     container.__dict__[container.topEventID] = np.asarray(float(topEventValue))
+    print(container.__dict__)
 
 
   def runDynamic(self, container, inputs):
@@ -198,6 +211,10 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     topEventValue = np.zeros([self.timeDepData[container.timeID].shape[0]])
+    if self.solver['type'] == 'margin':
+      sensitivities = {}
+      for key in inputs:
+        sensitivities[key] = np.zeros([self.timeDepData[container.timeID].shape[0]])
 
     for index,t in enumerate(self.timeDepData[container.timeID]):
       inputForSolver = {}
@@ -211,15 +228,42 @@ class MCSSolver(ExternalModelPluginBase):
         topEventValue[index] = self.mcsSolverProbability(inputForSolver)
       else:
         topEventValue[index] = self.mcsSolverMargin(inputForSolver)
-
+        
+        sensValues = self.marginSensitivities(topEventValue, inputForSolver)
+        for key in sensitivities:
+          sensitivities[key][index] = sensValues[key]
+        
     if container.tdFromPS:
       for key in container.invMapping.keys():
         container.__dict__[key] = self.timeDepData[key][0].values
 
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = topEventValue
+    
+    if self.solver['type'] == 'margin':
+      for key in sensitivities:
+        keyID = "sens_" + str(container.invMapping[key])
+        container.__dict__[keyID] = sensitivities[key]
 
 
+  def marginSensitivities(self, MsysBase, inputDict):
+    """
+      This method calculates the sensitivity (derivative based) of the top event margin vs. basic event margin 
+      @ In, inputs, inputDict, dictionary containing the probability  value of all basic events
+      @ In, MsysBase, float, base top event margin
+      @ Out, sensDict, dict, dictionary containing the sensitivity values of all basic events
+    """
+    sensDict={}
+    epsilon = 0.01
+    for key in inputDict:
+      tempDict = copy.deepcopy(inputDict)
+      tempDict[key] = tempDict[key] * (1.-epsilon)
+      deltaMsys = self.mcsSolverMargin(tempDict)
+      sensDict[key] = (MsysBase - deltaMsys) / (inputDict[key] - tempDict[key])
+    
+    return sensDict
+    
+    
   def mcsSolverProbability(self, inputDict):
     """
       This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
@@ -249,12 +293,17 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, teMargin, float, margin value of the top event
     """
     mcsMargins = np.zeros(len(self.mcsList))
-
     for index,mcs in enumerate(self.mcsList):
       termValues = list(map(inputDict.get,mcs))
-      mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
-
-    teMargin = np.amin(mcsMargins)
+      if self.solver['setType']=='cut':
+        mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
+      else:
+        mcsMargins[index] = np.amin(termValues)
+    
+    if self.solver['setType']=='cut':
+      teMargin = np.amin(mcsMargins)
+    else:
+      teMargin = np.linalg.norm(mcsMargins, ord=self.solver['metric'])
 
     return teMargin
 

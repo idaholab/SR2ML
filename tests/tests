@@ -113,4 +113,10 @@
   input = 'test_MCSSolver_Saphire.xml'
   UnorderedCsv   = 'MCSSolverSaphire/Print_sim_PS.csv'
  [../]
+
+ [./TestMCSSolver_margin_paths]
+  type  = 'RavenFramework'
+  input = 'test_MCSSolver_margin_pathsets.xml'
+  UnorderedCsv   = 'MCSSolverMargin/Print_sim_PS_path.csv'
+ [../]
 []
