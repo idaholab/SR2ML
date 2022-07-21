@@ -41,7 +41,8 @@ Inside the \xmlNode{ExternalModel} block, the XML nodes that belong to this mode
                                                                            to be considered when evaluating the probability of their union
          \item \xmlNode{metric},\xmlDesc{string, required parameter}, metric used for margin calculations of the top event of $M(TE)$; it specifies the
                                                                       desired distance metric in terms of p values for the $L_p$ norm (allowed values
-                                                                      are: 0, 1, 2, inf).
+                                                                      are: 0, 1, 2, inf). 
+          \item \xmlNode{setType},\xmlDesc{string, required parameter}, type of provided sets : minimal path sets (path) or minimal cut sets (cut)                                                            
       \end{itemize}
   \item  \xmlNode{topEventID},\xmlDesc{string, required parameter}, the name of the alias variable for the Top Event
   \item  \xmlNode{map},\xmlDesc{string, required parameter}, the name ID of the ET branching variable
@@ -152,7 +153,7 @@ The format of the dataObject can be:
 \end{itemize}
 
 \subsection{MCSSolver model reference tests}
-The following is the provided analytic test:
+The following is the provided analytic tests:
 \begin{itemize}
   \item test\_MCSSolver.xml
   \item test\_MCSSolver\_TD.xml
