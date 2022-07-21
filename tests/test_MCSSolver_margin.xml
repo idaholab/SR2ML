@@ -27,7 +27,7 @@
       This model is designed to read from file a list of Minimal Cut Sets (MCSs) and
       to import such Boolean logic structure as a RAVEN model. Provided the sampled
       values of Basic Events (BEs) margin values, the MCSSolver determines the
-      margin of Top Event (TE) using the euclidean metrics
+      margin of Top Event (TE) using the Euclidean metrics
     </description>
   </TestInfo>
 

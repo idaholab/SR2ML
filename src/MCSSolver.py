@@ -45,7 +45,7 @@ class MCSSolver(ExternalModelPluginBase):
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
     self.mcsList = None        # List containing all the MCSs; each MCS is a list of basic events
-    self.solver['setType'] = None
+    self.solver['setType'] = None # Type of sets provided path sets (path) or cut sets (cut)
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
