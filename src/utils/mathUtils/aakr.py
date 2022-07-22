@@ -41,14 +41,13 @@ class AAKR():
   def fit(self, timeSeries, batchSize=None, **Kwargs):
     """
       This method performs partition the provided timeSeries in batches before performing the regression. 
-      This is usefull when training dataset and timeSeries are very big.
+      This is useful when training dataset and timeSeries are very big.
       @ In, timeSeries, pandas DataFrame, time series of actual recorded data
       @ In, Kwargs, dict, parameters for the chosen kernel
       @ In, batchSize, int, number of partitions of the timeSeries to perform the regression
       @ Out, reconstructedData, pandas DataFrame, reconstructed timeSeries
       @ Out, residual, pandas DataFrame, residual: timeSeries - reconstructedData
     """
-    #print(timeSeries)
     if batchSize is None:
       return self.reconstruct(timeSeries, **Kwargs)
     else:
@@ -86,12 +85,6 @@ class AAKR():
     distanceMatrix = pairwise_distances(X = self.trainingData, 
                                         Y = timeSeriesNorm, 
                                         metric = self.metric)
-    
-    #distanceMatrix = pairwise_kernels(X=self.trainingData, 
-    #                                  Y=timeSeriesNorm, 
-    #                                  metric=self.metric, 
-    #                                  **Kwargs)
-        
     
     weights = 1.0/np.sqrt(2.0*3.14159*Kwargs['bw']**2.0) * np.exp(-distanceMatrix**2.0/(2.0*Kwargs['bw']**2.0))
     weightSum = np.sum(weights,axis=0)
