@@ -22,6 +22,7 @@ import numpy as np
 import itertools
 import math
 import xarray as xr
+import pandas as pd
 import copy
 #External Modules End-----------------------------------------------------------
 
@@ -46,6 +47,7 @@ class MCSSolver(ExternalModelPluginBase):
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
     self.mcsList = None        # List containing all the MCSs; each MCS is a list of basic events
     self.solver['setType'] = None # Type of sets provided path sets (path) or cut sets (cut)
+    self.fullListBE = None
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -117,8 +119,8 @@ class MCSSolver(ExternalModelPluginBase):
         container.invMapping[child.text.strip()] = child.get('var')
       else:
         raise IOError("MCSSolver: xml node " + str(child.tag) + " is not allowed")
-
-
+  
+  
   def createNewInput(self, container, inputs, samplerType, **kwargs):
     """
       This function has been added for this model in order to generate the terms in each order
@@ -131,7 +133,6 @@ class MCSSolver(ExternalModelPluginBase):
     """
     if len(inputs) > 2:
       raise IOError("MCSSolver: More than one file has been passed to the MCS solver")
-
     for input in inputs:
       if input.type == 'HistorySet':
         self.timeDepData = input.asDataset()
@@ -139,7 +140,10 @@ class MCSSolver(ExternalModelPluginBase):
         self.timeDepData = self.generateHistorySetFromSchedule(container,input.asDataset())
         container.tdFromPS = True
       else:
-        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
+        if input.__getstate__()['type'] == 'MCSlist':
+          mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
+        elif input.__getstate__()['type'] == 'BElist':
+          self.fullListBE = beReader(input.getFilename())
 
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
@@ -272,13 +276,19 @@ class MCSSolver(ExternalModelPluginBase):
     """
     teProbability = 0.0
     multiplier = 1.0
+    print(inputDict)
 
+    if self.fullListBE is not None:
+      inputDict = {**self.fullListBE, **inputDict}
+      print(inputDict)
+    
     # perform probability calculation for each order level
     for order in range(1,self.solver['solverOrder']+1):
       orderProbability=0
       for term in self.topEventTerms[order]:
         # map the sampled values of the basic event probabilities to the MCS basic events ID
         termValues = list(map(inputDict.get,term))
+        print(termValues)
         orderProbability = orderProbability + np.prod(termValues)
       teProbability = teProbability + multiplier * orderProbability
       multiplier = -1.0 * multiplier
@@ -335,3 +345,9 @@ class MCSSolver(ExternalModelPluginBase):
       basicEventHistorySet[key][0][indexes] = 1.0
 
     return basicEventHistorySet
+
+  
+def beReader(fileID):
+  data = pd.read_csv(fileID)
+  BEdict = dict(data.values)
+  return BEdict
