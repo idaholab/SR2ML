@@ -162,7 +162,7 @@ def mcsReader(mcsListFile, type=None):
         elementsList.pop(0)
         probability=np.append(probability,float(elementsList[0]))
         elementsList.pop(0)
-        mcsList.append(list(element.rstrip('\n') for element in elementsList))
+        mcsList.append(list(element.rstrip('\n').strip() for element in elementsList))
         beList.update(elementsList)
     elif type.lower() == 'saphire':
       lines = lines[1:] # skip additional description line

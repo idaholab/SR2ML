@@ -119,7 +119,12 @@ class MCSSolver(ExternalModelPluginBase):
         container.invMapping[child.text.strip()] = child.get('var')
       else:
         raise IOError("MCSSolver: xml node " + str(child.tag) + " is not allowed")
-  
+    
+    if not bool(container.mapping):
+      variables.remove(container.topEventID)
+      for variable in (variables):
+        container.mapping[variable] = variable
+        container.invMapping[variable] = variable
   
   def createNewInput(self, container, inputs, samplerType, **kwargs):
     """
@@ -144,7 +149,10 @@ class MCSSolver(ExternalModelPluginBase):
           mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
         elif input.__getstate__()['type'] == 'BElist':
           self.fullListBE = beReader(input.getFilename())
-
+    # Check list of BEs
+    missingBEs = set(self.beList) - set(self.fullListBE)
+    if len(missingBEs)>0:
+      raise IOError("MCSSolver: there are BEs in the MCSs not defined in the BE file: " +str(missingBEs))
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
     #       then mcsList = [MCS1,MCS2,MCS3] =
@@ -203,7 +211,6 @@ class MCSSolver(ExternalModelPluginBase):
         container.__dict__[keyID] = sensitivities[key]
 
     container.__dict__[container.topEventID] = np.asarray(float(topEventValue))
-    print(container.__dict__)
 
 
   def runDynamic(self, container, inputs):
@@ -271,24 +278,21 @@ class MCSSolver(ExternalModelPluginBase):
   def mcsSolverProbability(self, inputDict):
     """
       This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
-      @ In, inputs, inputDict, dictionary containing the probability  value of all basic events
+      @ In, inputs, inputDict, dictionary containing the probability value of all basic events
       @ Out, teProbability, float, probability value of the top event
     """
     teProbability = 0.0
     multiplier = 1.0
-    print(inputDict)
 
     if self.fullListBE is not None:
       inputDict = {**self.fullListBE, **inputDict}
-      print(inputDict)
-    
     # perform probability calculation for each order level
     for order in range(1,self.solver['solverOrder']+1):
       orderProbability=0
       for term in self.topEventTerms[order]:
         # map the sampled values of the basic event probabilities to the MCS basic events ID
         termValues = list(map(inputDict.get,term))
-        print(termValues)
+        #print(term, termValues)
         orderProbability = orderProbability + np.prod(termValues)
       teProbability = teProbability + multiplier * orderProbability
       multiplier = -1.0 * multiplier
@@ -349,5 +353,14 @@ class MCSSolver(ExternalModelPluginBase):
   
 def beReader(fileID):
   data = pd.read_csv(fileID)
+  fromList = ['FALSE','TRUE']
+  toList   = [0.0,1.0]
+  data = data.replace(to_replace=fromList, value=toList)
+  pd.set_option('display.max_rows', None)
+  finalColumns = ['Name','Value']
+  data = data[data.columns.intersection(finalColumns)]
+  data = data[finalColumns]
+  data['Value'] = data['Value'].astype(float)
+  data['Name'] = data['Name'].str.replace(' ','')
   BEdict = dict(data.values)
   return BEdict
