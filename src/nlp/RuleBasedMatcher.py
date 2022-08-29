@@ -352,7 +352,8 @@ class RuleBasedMatcher(object):
       hsList.extend(hs)
       kwList.extend(kw)
     df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList})
-    df.to_csv('output_health_status.csv', columns=['entities', 'status keywords', 'health statuses'])
+    # df.to_csv('output_health_status.csv', columns=['entities', 'status keywords', 'health statuses'])
+    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses'])
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
