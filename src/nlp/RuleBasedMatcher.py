@@ -102,7 +102,7 @@ class RuleBasedMatcher(object):
     #   Then, check the dep_ of keyword, if it is "dobj", then causal entity --> keyword --> effect entity
     #   elif it is "nsubj" or "nsubjpass" or "attr", then effect entity <-- keyword <-- causal entity
     self._causalKeywords = self.getKeywords(self._causalFile)
-    self._statusFile = nlpConfig['files']['status_keywords_file']
+    self._statusFile = nlpConfig['files']['status_keywords_file']['all']
     # self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
     self._statusKeywords = self.getKeywords(self._statusFile)
     self._updateStatusKeywords = False

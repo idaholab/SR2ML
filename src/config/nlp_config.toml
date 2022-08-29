@@ -3,5 +3,10 @@
 text_file = "../nlp/raw_text.txt"
 opm_file = "../nlp/pump_opl.html"
 cause_effect_keywords_file = "../nlp/cause_effect_keywords.csv"
-status_keywords_file = "../nlp/health_status_keywords.csv"
+
+status_keywords_file.all = "../nlp/health_status_keywords.csv"
+status_keywords_file.negative = "../nlp/health_status_keywords_negative.csv"
+status_keywords_file.positive = "../nlp/health_status_keywords_positive.csv"
+status_keywords_file.neutral = "../nlp/health_status_keywords_neutral.csv"
+
 output_health_status_file = "../nlp/output_health_status.csv"
