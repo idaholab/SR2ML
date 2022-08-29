@@ -10,5 +10,6 @@
     <networkx/>
     <!-- pysbd is used for sentence boundary disambiguation -->
     <pysbd/>
+    <tomli source='pip'>
   </main>
 </dependencies>

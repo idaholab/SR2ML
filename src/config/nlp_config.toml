@@ -1,0 +1,5 @@
+
+[files]
+opm_file = "../nlp/pump_opl.html"
+cause_effect_keywords_file = "../nlp/cause_effect_keywords.csv"
+status_keywords_file = "../nlp/health_status_keywords.csv"
