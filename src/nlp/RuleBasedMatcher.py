@@ -26,6 +26,8 @@ from .CustomPipelineComponents import anaphorCoref
 from .CustomPipelineComponents import mergePhrase
 from .CustomPipelineComponents import pysbdSentenceBoundaries
 
+from config import nlpConfig
+
 
 import logging
 import os
@@ -58,6 +60,8 @@ except ModuleNotFoundError:
 
 if not Span.has_extension('health_status'):
   Span.set_extension("health_status", default=None)
+if not Span.has_extension('hs_keyword'):
+  Span.set_extension('hs_keyword', default=None)
 if not Span.has_extension('conjecture'):
   Span.set_extension('conjecture', default=False)
 
@@ -83,7 +87,8 @@ class RuleBasedMatcher(object):
     # pipeline 'merge_noun_chunks' can be used to merge phrases (see also displacy option)
     self.nlp = nlp
 
-    self._causalFile = os.path.join(os.path.dirname(__file__), 'cause_effect_keywords.csv') # header includes: VERB, NOUN, TRANSITION
+    # self._causalFile = os.path.join(os.path.dirname(__file__), 'cause_effect_keywords.csv') # header includes: VERB, NOUN, TRANSITION
+    self._causalFile = nlpConfig['files']['cause_effect_keywords_file']
     # SCONJ->Because, CCONJ->so, ADP->as, ADV->therefore
     self._causalPOS = {'VERB':['VERB'], 'NOUN':['NOUN'], 'TRANSITION':['SCONJ', 'CCONJ', 'ADP', 'ADV']}
     # current columns include: "VERB", "NOUN", "TRANSITION", "causal-relator", "effect-relator", "causal-noun", "effect-noun"
@@ -97,8 +102,8 @@ class RuleBasedMatcher(object):
     #   Then, check the dep_ of keyword, if it is "dobj", then causal entity --> keyword --> effect entity
     #   elif it is "nsubj" or "nsubjpass" or "attr", then effect entity <-- keyword <-- causal entity
     self._causalKeywords = self.getKeywords(self._causalFile)
-
-    self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
+    self._statusFile = nlpConfig['files']['status_keywords_file']
+    # self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
     self._statusKeywords = self.getKeywords(self._statusFile)
     self._updateStatusKeywords = False
     self._updateCausalKeywords = False
@@ -334,12 +339,20 @@ class RuleBasedMatcher(object):
     ## health status
     logger.info('Start to extract health status')
     self.extractHealthStatus(self._matchedSents)
-    ## Access health status
+    ## Access health status and output to an ordered csv file
+    entList = []
+    hsList = []
+    kwList = []
     for sent in self._matchedSents:
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-      for ent in ents:
-        # print(ent)
-        print(ent._.health_status)
+      elist = [ent.text for ent in ents]
+      hs = [ent._.health_status for ent in ents]
+      kw = [ent._.hs_keyword for ent in ents]
+      entList.extend(elist)
+      hsList.extend(hs)
+      kwList.extend(kw)
+    df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList})
+    df.to_csv('output_health_status.csv', columns=['entities', 'status keywords', 'health statuses'])
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
@@ -493,8 +506,10 @@ class RuleBasedMatcher(object):
           else:
             continue
           neg, negText = self.isNegation(healthStatus)
-          logger.debug(f'{ent} health status: {negText} {healthStatus.text}')
-          ent._.set('health_status', ' '.join([negText,healthStatus.text]))
+          if neg:
+            healthStatus = ' '.join([negText,healthStatus.text])
+          logger.debug(f'{ent} health status: {healthStatus}')
+          ent._.set('health_status', healthStatus)
           ent._.set('conjecture',conjecture)
       elif len(ents) == 1:
         healthStatus = None
@@ -540,8 +555,12 @@ class RuleBasedMatcher(object):
             neg, negText = self.isNegation(healthStatus)
         # TODO: may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
         # is not identified properly
-        logger.debug(f'{ents[0]} health status: {negText} {healthStatus.text}')
-        ents[0]._.set('health_status', ' '.join([negText,healthStatus.text]))
+        if neg:
+          healthStatus = ' '.join([negText,healthStatus.text])
+        logger.debug(f'{ents[0]} health status: {healthStatus}')
+        ents[0]._.set('health_status', healthStatus)
+        if root.pos_ == 'VERB':
+          ents[0]._.set('hs_keyword', root.lemma_)
         ents[0]._.set('conjecture', conjecture)
 
   def findLeftSubj(self, pred, passive):

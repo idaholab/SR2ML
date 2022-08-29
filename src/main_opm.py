@@ -11,8 +11,11 @@ from nlp.RuleBasedMatcher import RuleBasedMatcher
 import spacy
 import pandas as pd
 
+import config
+
 import os
 import sys
+import argparse
 # sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 # sys.path.append(sr2mlPath)
 
@@ -76,7 +79,8 @@ if __name__ == "__main__":
   # Parse OPM model
   # opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
   # some modifications, bearings --> pump bearings
-  opmFile = os.path.abspath("./nlp/pump_opl.html")
+  # opmFile = os.path.abspath("./nlp/pump_opl.html")
+  opmFile = config.nlpConfig['files']['opm_file']
   formList, functionList = OPLentityParser(opmFile)
   for elem in formList:
     print(elem)
@@ -94,7 +98,8 @@ if __name__ == "__main__":
   causalLabel = "causal_keywords"
   causalID = "causal"
   patternsCausal = []
-  causalFilename = os.path.join(os.path.dirname(__file__), 'nlp', 'cause_effect_keywords.csv')
+  # causalFilename = os.path.join(os.path.dirname(__file__), 'nlp', 'cause_effect_keywords.csv')
+  causalFilename = config.nlpConfig['files']['cause_effect_keywords_file']
   ds = pd.read_csv(causalFilename, skipinitialspace=True)
   for col in ds.columns:
     vars = set(ds[col].dropna())
