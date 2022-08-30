@@ -29,7 +29,7 @@ logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s'
 # logger = logging.getLogger(__name__)
 logger = logging.getLogger()
 # # create file handler which logs debug messages
-fh = logging.FileHandler(filename='main.log', mode='w')
+fh = logging.FileHandler(filename='main_nlp_opm.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
 fh.setFormatter(formatter)
@@ -74,12 +74,11 @@ def extractLemma(var):
 
 
 if __name__ == "__main__":
+  # load nlp model and matcher
   nlp = spacy.load("en_core_web_lg", exclude=[])
   ###################################################################
   # Parse OPM model
-  # opmFile = os.path.abspath("./utils/nlpUtils/pump_opl.html")
   # some modifications, bearings --> pump bearings
-  # opmFile = os.path.abspath("./nlp/pump_opl.html")
   opmFile = config.nlpConfig['files']['opm_file']
   formList, functionList = OPLentityParser(opmFile)
   for elem in formList:
@@ -108,48 +107,11 @@ if __name__ == "__main__":
       pattern = generatePattern(lemVar, label=causalLabel, id=causalID, attr="LEMMA")
       patternsCausal.append(pattern)
 
-  # text that needs to be processed.
-  # TODO: load text from external files
+  # text that needs to be processed. either load from file or direct assign
   textFile = config.nlpConfig['files']['text_file']
   with open(textFile, 'r') as ft:
     doc = ft.read()
-  # doc = r"""A leak was noticed from the RCP pump 1A.
-  #           RCP pump 1A pressure gauge was found not operating.
-  #           RCP pump 1A pressure gauge was found inoperative.
-  #           RCP pump 1A had signs of past leakage.
-  #           The Pump is not experiencing enough flow during test.
-  #           Slight Vibrations is noticed - likely from pump shaft deflection.
-  #           Pump flow meter was not responding.
-  #           Rupture of pump bearings caused pump shaft degradation.
-  #           Rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
-  #           Power supply has been found burnout.
-  #           Pump test failed due to power supply failure.
-  #           Pump inspection revealed excessive impeller degradation.
-  #           Pump inspection revealed excessive impeller degradation likely due to cavitation.
-  #           Oil puddle was found in proximity of RCP pump 1A.
-  #           Anomalous vibrations were observed for RCP pump 1A.
-  #           Several cracks on pump shaft were observed; they could have caused pump failure within few days.
-  #           RCP pump 1A was cavitating and vibrating to some degree during test.
-  #           This is most likely due to low flow conditions rather than mechanical issues.
-  #           Cavitation was noticed but did not seem severe.
-  #           The pump shaft vibration appears to be causing the motor to vibrate as well.
-  #           Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation.
-  #           The pump shaft deflection is causing the safety cage to rattle.
-  #           The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
-  #           Pump shaft made noise.
-  #           Vibration seems like it is coming from the pump shaft.
-  #           Visible pump shaft deflection in operation.
-  #           Pump bearings appear in acceptable condition.
-  #           Pump made noises - not enough to affect performance.
-  #           Pump shaft has a slight deflection.
-  #       """
-  # doc = """
-  #           Pump inspection revealed excessive impeller degradation.
-  #           Pump inspection revealed excessive impeller degradation likely due to cavitation.
-  #           Pump and pump shaft revealed excessive impeller degradation.
-  # """
-  # load nlp model and matcher
-  nlp = spacy.load("en_core_web_lg", exclude=[])
+
   name = 'ssc_entity_ruler'
   matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
   matcher.addEntityPattern(name, patternsOPM)

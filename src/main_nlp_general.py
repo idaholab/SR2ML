@@ -7,7 +7,7 @@ Created on March, 2022
 """
 
 import logging
-from RuleBasedMatcher import RuleBasedMatcher
+from nlp.RuleBasedMatcher import RuleBasedMatcher
 import spacy
 
 logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s'
 # logger = logging.getLogger(__name__)
 logger = logging.getLogger()
 # # create file handler which logs debug messages
-fh = logging.FileHandler(filename='main.log', mode='w')
+fh = logging.FileHandler(filename='main_nlp_general.log', mode='w')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message)s')
 fh.setFormatter(formatter)

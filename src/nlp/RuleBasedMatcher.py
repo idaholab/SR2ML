@@ -493,7 +493,10 @@ class RuleBasedMatcher(object):
     causalStatus = False
     for sent in matchedSents:
       conjecture = False
-      causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
+      if self._labelCausal in  self._entityLabels:
+        causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
+      else:
+        continue
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       # if len(ents) > 1 and [sent.root.lemma_] in self._causalKeywords['VERB']:
       causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
@@ -661,7 +664,10 @@ class RuleBasedMatcher(object):
     # 5. create causal keywords patterns, then use entity_ruler to identify them
 
     for sent in matchedSents:
-      causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
+      if self._labelCausal in self._entityLabels:
+        causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
+      else:
+        continue
       sscEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       sscEnts = self.getConjuncts(sscEnts)
       logger.debug(f'Conjuncts pairs: {sscEnts}')
