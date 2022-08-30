@@ -26,7 +26,7 @@ from .CustomPipelineComponents import anaphorCoref
 from .CustomPipelineComponents import mergePhrase
 from .CustomPipelineComponents import pysbdSentenceBoundaries
 
-from config import nlpConfig
+from .config import nlpConfig
 
 
 import logging
