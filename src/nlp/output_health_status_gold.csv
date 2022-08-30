@@ -1,0 +1,35 @@
+,entities,status keywords,health statuses
+0,pump,notice,A leak
+1,pump,find,not operating
+2,pump,find,inoperative
+3,pump,have,signs of past leakage
+4,Pump,experience,not enough flow
+5,pump shaft,notice,Slight Vibrations
+6,Pump,respond,not responding
+7,pump bearings,,Rupture
+8,pump shaft,,degradation
+9,pump bearings,,Rupture
+10,pump shaft,,degradation
+11,Power supply,find,burnout
+12,Pump,,test
+13,power supply,,failure
+14,Pump,,inspection
+15,impeller,,degradation
+16,Pump,,inspection
+17,impeller,,degradation
+18,pump,find,Oil puddle
+19,pump,observe,Anomalous vibrations
+20,pump shaft,,Several cracks
+21,pump,,failure
+22,pump,cavitate,some degree
+23,pump shaft,,vibration
+24,motor,,vibrate
+25,Pump,have,noise of cavitation
+26,pump shaft,,deflection
+27,Pump,experience,not enough flow
+28,Pump shaft,make,noise
+29,pump shaft,seem,Vibration
+30,pump shaft,,deflection
+31,Pump bearings,appear,acceptable condition
+32,Pump,make,noises
+33,Pump shaft,have,a slight deflection
