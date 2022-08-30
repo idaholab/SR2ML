@@ -11,7 +11,7 @@ from nlp.RuleBasedMatcher import RuleBasedMatcher
 import spacy
 import pandas as pd
 
-import config
+from nlp import config
 
 import os
 import sys
