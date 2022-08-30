@@ -155,6 +155,8 @@ class RuleBasedMatcher(object):
     self._entityLabels = {} # labels for rule-based entities
     self._labelSSC = 'SSC'
     self._labelCausal = 'causal'
+    self._causalNames = ['cause', 'cause health status', 'causal keyword', 'effect', 'effect health status', 'sentence']
+    self._extractedCausals = [] # list of tuples, each tuple represents one causal-effect, i.e., (cause, cause health status, cause keyword, effect, effect health status, sentence)
 
   def getKeywords(self, filename):
     """
@@ -358,6 +360,8 @@ class RuleBasedMatcher(object):
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
     self.extractRelDep(self._matchedSents)
+    dfCausals = pd.DataFrame(self._extractedCausals, columns=self._causalNames)
+    dfCausals.to_csv(nlpConfig['files']['output_causal_effect_file'], columns=self._causalNames)
     logger.info('End of causal relation extraction!')
     ## print extracted relation
     logger.info('Start to use general extraction method to extract causal relation')
@@ -662,6 +666,7 @@ class RuleBasedMatcher(object):
       sscEnts = self.getConjuncts(sscEnts)
       logger.debug(f'Conjuncts pairs: {sscEnts}')
 
+
       if len(causalEnts) == 0: #  no causal keyword is found, skipping
         continue
       elif len(causalEnts) == 1 and len(sscEnts) == 1: # single causal keyword, single entity, report missing causal relation
@@ -676,37 +681,47 @@ class RuleBasedMatcher(object):
           if root.pos_ == 'VERB':
             passive = self.isPassive(root)
             if passive:
-              logger.debug(f'({sscEnts[1]} health status: {sscEnts[1][0]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[1][0]._.health_status})')
+              logger.debug(f'({sscEnts[1]} health status: {sscEnts[1][0]._.health_status}) "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0][0]._.health_status})')
+              self._extractedCausals.append([sscEnts[1], sscEnts[1][0]._.health_status, causalEnts[0], sscEnts[0], sscEnts[0][0]._.health_status, sent])
             else:
               logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}) "{causalEnts[0]}" ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+              self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
           elif root.pos_ == 'NOUN':
             if causalEntLemma in self._causalKeywords['causal-noun']:
               if rootLoc > sscEnts[0][0].start and rootLoc < sscEnts[1][0].start:
                 # assert sscEnts[1].root in root.subtree
                 logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+                self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
               elif rootLoc < sscEnts[0][0].start:
                 # assert sscEnts[0].root in root.subtree
                 logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}) <--- ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+                self._extractedCausals.append([sscEnts[1], sscEnts[1][0]._.health_status, causalEnts[0], sscEnts[0], sscEnts[0][0]._.health_status, sent])
             elif causalEntLemma in self._causalKeywords['effect-noun']:
               if rootLoc > sscEnts[0][0].start and rootLoc < sscEnts[1][0].start:
                 # assert sscEnts[1].root in root.subtree
                 if root.dep_ in ['attr']:
                   logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}), <--- "{causalEnts[0]}", <--- ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+                  self._extractedCausals.append([sscEnts[1], sscEnts[1][0]._.health_status, causalEnts[0], sscEnts[0], sscEnts[0][0]._.health_status, sent])
                 elif root.dep_ in ['dobj']:
                   logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+                  self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
               elif rootLoc < sscEnts[0][0].start:
                 # assert sscEnts[0].root in root.subtree
                 logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+                self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
           elif causalEntLemma in self._causalKeywords['causal-relator']:
             if rootLoc > sscEnts[0][0].start and rootLoc < sscEnts[1][0].start:
               logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}), ---> "{causalEnts[0]}", ---> ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+              self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
             else:
               logger.debug(f'Not yet implemented! causal keyword {causalEntLemma}, sentence {sent}')
           elif causalEntLemma in self._causalKeywords['effect-relator']:
             if rootLoc > sscEnts[0][0].start and rootLoc < sscEnts[1][0].start:
               logger.debug(f'({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}), <--- "{causalEnts[0]}", <--- ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+              self._extractedCausals.append([sscEnts[1], sscEnts[1][0]._.health_status, causalEnts[0], sscEnts[0], sscEnts[0][0]._.health_status, sent])
             elif rootLoc < sscEnts[0][0].start:
               logger.debug(f' "{causalEnts[0]}" ({sscEnts[0]} health status: {sscEnts[0][0]._.health_status}) ---> ({sscEnts[1]} health status: {sscEnts[1][0]._.health_status})')
+              self._extractedCausals.append([sscEnts[0], sscEnts[0][0]._.health_status, causalEnts[0], sscEnts[1], sscEnts[1][0]._.health_status, sent])
         elif len(causalEnts) == 2:
           ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal].union(self._entityLabels[self._labelSSC]))
           ents = self.getConjuncts(ents)
