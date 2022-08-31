@@ -106,21 +106,21 @@ class RuleBasedMatcher(object):
     ## pipelines "merge_entities" and "merge_noun_chunks" can be used to merge noun phrases and entities
     ## for easier analysis
     if _corefAvail:
-      self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
+      self.pipelines = ['pysbdSentenceBoundaries',
                       'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver',
                       'coreferee','anaphorCoref']
     else:
-      self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
+      self.pipelines = ['pysbdSentenceBoundaries',
                       'mergePhrase','normEntities', 'initCoref', 'aliasResolver',
                       'anaphorCoref']
+    # ner pipeline is not needed since we are focusing on the keyword matching approach
+    if nlp.has_pipe("ner"):
+      nlp.remove_pipe("ner")
     nlp = resetPipeline(nlp, self.pipelines)
     self.nlp = nlp
     self._doc = None
+    self.entityRuler = None
     self._entityRuler = False
-    if nlp.has_pipe("entity_ruler"):
-      self.entityRuler = nlp.get_pipe("entity_ruler")
-    else:
-      self.entityRuler = nlp.add_pipe("entity_ruler")
     self._entityRulerMatches = []
     self._matchedSents = [] # collect data of matched sentences
     self._matchedSentsForVis = [] # collect data of matched sentences to be visualized
@@ -192,7 +192,8 @@ class RuleBasedMatcher(object):
         {"label": "GPE", "pattern": [{"LOWER": "san"}, {"LOWER": "francisco"}]}
     """
     if not self.nlp.has_pipe('entity_ruler'):
-      self.nlp.add_pipe('entity_ruler')
+      self.nlp.add_pipe('entity_ruler', before='mergePhrase')
+      self.entityRuler = self.nlp.get_pipe("entity_ruler")
     if not isinstance(patternList, list):
       patternList = [patternList]
     # TODO: able to check "id" and "label", able to use "name"
