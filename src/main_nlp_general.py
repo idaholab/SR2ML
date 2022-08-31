@@ -59,12 +59,13 @@ Pump shaft has a slight deflection.
   ## one span in entities, blocked, missing or outside. (https://github.com/explosion/spaCy/discussions/9993)
   ## In this case, we need to use "entity_ruler" to identify the matches
   # simple match
-  name = 'ssc_match'
-  rules = [{"LOWER":"pump"}, {"POS":"NOUN"}]
-  matcher.addPattern(name, rules, callback=None)
+  # name = 'ssc_match'
+  # rules = [{"LOWER":"pump"}, {"POS":"NOUN"}]
+  # matcher.addPattern(name, rules, callback=None)
   # phrase match
   name = 'ssc_phrase_match'
-  phraseList = ['pump 1A', 'pump bearings', 'Pump']
+  # phraseList = ["safety cage", 'pump 1A', 'pump bearings', 'Pump']
+  phraseList = ["safety cage", "cage"]
   matcher.addPhrase(name, phraseList, callback=None)
   # depency match
   name = 'ssc_dependency_match'
@@ -86,7 +87,7 @@ Pump shaft has a slight deflection.
       "RIGHT_ATTRS":{"DEP":"oprd"}
     }
   ]
-  matcher.addDependency(name, dependencyList, callback=None)
+  # matcher.addDependency(name, dependencyList, callback=None)
   # Entity rule-based match
   name = 'ssc_entity_ruler'
   patterns = [{"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"pump"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
@@ -97,6 +98,6 @@ Pump shaft has a slight deflection.
               {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"impeller"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
               {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"flow meter"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"},
               {"label":"pump_comp", "pattern":[{"POS":"NOUN", "OP":"*"}, {"LOWER":"motor"}, {"POS":"NOUN", "OP":"*"}], "id":"SSC"}]
-  matcher.addEntityPattern(name, patterns)
+  # matcher.addEntityPattern(name, patterns)
 
   matcher(doc)

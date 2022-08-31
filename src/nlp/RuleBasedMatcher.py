@@ -18,6 +18,7 @@ from collections import deque
 # It gives primacy to longer spans (entities)
 from spacy.util import filter_spans
 from .nlp_utils import displayNER, resetPipeline, printDepTree
+from .nlp_utils import extendEnt
 ## import pipelines
 from .CustomPipelineComponents import normEntities
 from .CustomPipelineComponents import initCoref
@@ -69,7 +70,6 @@ class RuleBasedMatcher(object):
   """
     Rule Based Matcher Class
   """
-
   def __init__(self, nlp, *args, **kwargs):
     """
       Construct
@@ -83,11 +83,8 @@ class RuleBasedMatcher(object):
     logger.info(f'Create instance of {self.name}')
     # orders of NLP pipeline: 'ner' --> 'normEntities' --> 'merge_entities' --> 'initCoref'
     # --> 'aliasResolver' --> 'coreferee' --> 'anaphorCoref'
-
     # pipeline 'merge_noun_chunks' can be used to merge phrases (see also displacy option)
     self.nlp = nlp
-
-    # self._causalFile = os.path.join(os.path.dirname(__file__), 'cause_effect_keywords.csv') # header includes: VERB, NOUN, TRANSITION
     self._causalFile = nlpConfig['files']['cause_effect_keywords_file']
     # SCONJ->Because, CCONJ->so, ADP->as, ADV->therefore
     self._causalPOS = {'VERB':['VERB'], 'NOUN':['NOUN'], 'TRANSITION':['SCONJ', 'CCONJ', 'ADP', 'ADV']}
@@ -103,22 +100,11 @@ class RuleBasedMatcher(object):
     #   elif it is "nsubj" or "nsubjpass" or "attr", then effect entity <-- keyword <-- causal entity
     self._causalKeywords = self.getKeywords(self._causalFile)
     self._statusFile = nlpConfig['files']['status_keywords_file']['all']
-    # self._statusFile = os.path.join(os.path.dirname(__file__), 'health_status_keywords.csv') # header includes: VERB, NOUN, ADJ
     self._statusKeywords = self.getKeywords(self._statusFile)
     self._updateStatusKeywords = False
     self._updateCausalKeywords = False
-
-    # TODO: right now, we are trying to use 'parser' and 'sentencizer' to parse the sentences,
-    # But the parse is not always accurate, especially for sentence which endswith "pump 1A."
-
-    # if _corefAvail:
-    #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'coreferee','anaphorCoref', 'expandEntities']
-    # else:
-    #   self.pipelines = ['entity_ruler','normEntities', 'merge_entities', 'initCoref', 'aliasResolver', 'anaphorCoref', 'expandEntities']
-
     ## pipelines "merge_entities" and "merge_noun_chunks" can be used to merge noun phrases and entities
     ## for easier analysis
-
     if _corefAvail:
       self.pipelines = ['pysbdSentenceBoundaries', 'entity_ruler',
                       'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver',
@@ -130,24 +116,12 @@ class RuleBasedMatcher(object):
     nlp = resetPipeline(nlp, self.pipelines)
     self.nlp = nlp
     self._doc = None
-    self._rules = {}
-    self._match = False
-    self._phraseMatch = False
-    self._dependencyMatch = False
     self._entityRuler = False
-    self.matcher = Matcher(nlp.vocab)
-    self.phraseMatcher = PhraseMatcher(nlp.vocab, attr="LOWER")
-    self.dependencyMatcher = DependencyMatcher(nlp.vocab)
     if nlp.has_pipe("entity_ruler"):
       self.entityRuler = nlp.get_pipe("entity_ruler")
     else:
       self.entityRuler = nlp.add_pipe("entity_ruler")
-    self._simpleMatches = []
-    self._phraseMatches = []
-    self._dependencyMatches = []
     self._entityRulerMatches = []
-    self._callbacks = {}
-    self._asSpans = True # When True, a list of Span objects using the match_id as the span label will be returned
     self._matchedSents = [] # collect data of matched sentences
     self._matchedSentsForVis = [] # collect data of matched sentences to be visualized
     self._visualizeMatchedSents = True
@@ -210,56 +184,6 @@ class RuleBasedMatcher(object):
         else:
           logger.warning('keyword "{}" cannot be accepted, valid keys for the keywords are "{}"'.format(key, ','.join(list(self._causalKeywords.keys()))))
 
-  def addPattern(self, name, rules, callback=None):
-    """
-      Add rules
-      @ In, name, str, the name for the pattern
-      @ In, rules, list, the rules used to match the entities, for example:
-        rules = [{"LOWER": "hello"}, {"IS_PUNCT": True}, {"LOWER": "world"}]
-    """
-    logger.debug('Add rules')
-    if not isinstance(rules, list):
-      rules = [rules]
-    if not isinstance(rules[0], list):
-      rules = [rules]
-    self._rules[name] = rules
-    self._callbacks[name] = callback
-    self.matcher.add(name, rules, on_match=callback)
-    if not self._match:
-      self._match = True
-
-  def addPhrase(self, name, phraseList, callback=None):
-    """
-      Add phrase patterns
-      @ In, name, str, the name for the phrase pattern
-      @ In, phraseList, list, the phrase list, for example:
-        phraseList = ["hello", "world"]
-    """
-    logger.debug(f'Add phrase pattern for {name}')
-    patterns = [self.nlp.make_doc(text) for text in phraseList]
-    self._callbacks[name] = callback
-    self._rules[name] = patterns
-    self.phraseMatcher.add(name, patterns, on_match=callback)
-    if not self._phraseMatch:
-      self._phraseMatch = True
-
-  def addDependency(self, name, patternList, callback=None):
-    """
-      Add dependency pattern
-      @ In, name, str, the name for the dependency pattern
-      @ In, patternList, list, the dependency pattern list
-    """
-    logger.debug(f'Add dependency pattern for {name}')
-    if not isinstance(patternList, list):
-      patternList = [patternList]
-    if not isinstance(patternList[0], list):
-      patternList = [patternList]
-    self._rules[name] = patternList
-    self._callbacks[name] = callback
-    self.dependencyMatcher.add(name, patternList, on_match=callback)
-    if not self._dependencyMatch:
-      self._dependencyMatch = True
-
   def addEntityPattern(self, name, patternList):
     """
       Add entity pattern, to extend doc.ents, similar function to self.extendEnt
@@ -280,7 +204,6 @@ class RuleBasedMatcher(object):
           self._entityLabels[id] = set([label]) if label is not None else set()
         else:
           self._entityLabels[id] = self._entityLabels[id].union(set([label])) if label is not None else set()
-
     # self._entityLabels += [pa.get('label') for pa in patternList if pa.get('label') is not None]
     self.entityRuler.add_patterns(patternList)
     if not self._entityRuler:
@@ -301,26 +224,6 @@ class RuleBasedMatcher(object):
     # self.nlp.add_pipe('merge_entities')
     doc = self.nlp(text)
     self._doc = doc
-
-    if self._match:
-      self._simpleMatches += self.matcher(doc, as_spans = self._asSpans) # <class 'list'>
-    if self._phraseMatch:
-      self._phraseMatches += self.phraseMatcher(doc, as_spans = self._asSpans) # <class 'list'>
-    if self._dependencyMatch:
-      self._dependencyMatches = self.dependencyMatcher(doc) # <class 'list'> [tuple(match_id, token_ids)]
-
-    if self._match:
-      self.printMatches(self._doc, self._simpleMatches, 'Simple Matches')
-    if self._phraseMatch:
-      self.printMatches(self._doc, self._phraseMatches, 'Phrase Matches')
-
-    # print dependency matches
-    if self._dependencyMatch:
-      for (id, tokenIDs) in self._dependencyMatches:
-        name = self.nlp.vocab.strings[id]
-        for i in range(len(tokenIDs)):
-          print(self._rules[name][0][i]["RIGHT_ID"] + ":",doc[tokenIDs[i]].text)
-
     ## use entity ruler to identify entity
     if self._entityRuler:
       logger.debug('Entity Ruler Matches:')
@@ -333,11 +236,6 @@ class RuleBasedMatcher(object):
     matchedSents, matchedSentsForVis = self.collectSents(self._doc)
     self._matchedSents += matchedSents
     self._matchedSentsForVis += matchedSentsForVis
-    # print(self._matchedSents)
-    # self.visualize()
-
-    ## TODO: collect and expand entities, then extract health status of the entities
-
     ## health status
     logger.info('Start to extract health status')
     self.extractHealthStatus(self._matchedSents)
@@ -354,7 +252,6 @@ class RuleBasedMatcher(object):
       hsList.extend(hs)
       kwList.extend(kw)
     df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList})
-    # df.to_csv('output_health_status.csv', columns=['entities', 'status keywords', 'health statuses'])
     df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses'])
     logger.info('End of health status extraction!')
     ## causal relation
@@ -367,24 +264,6 @@ class RuleBasedMatcher(object):
     logger.info('Start to use general extraction method to extract causal relation')
     print(*self.extract(self._matchedSents, predSynonyms=self._causalKeywords['VERB'], exclPrepos=[]), sep='\n')
     logger.info('End of causal relation extraction using general extraction method!')
-
-  def printMatches(self, doc, matches, matchType):
-    """
-      Print the matches
-      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
-      @ In, matches, list of matches
-      @ In, matchType, string, the type for matches
-    """
-    if not self._asSpans:
-      matchList = []
-      for id, start, end in matches:
-        strID = self.nlp.vocab.strings[id]
-        span = doc[start:end]
-        matchList.append(span)
-    else:
-      matchList = matches
-    matchText = ', '.join([span.text for span in matchList])
-    logger.debug(matchType + ': ' + matchText)
 
   def visualize(self):
     """
@@ -399,7 +278,6 @@ class RuleBasedMatcher(object):
       # use displacy.render instead)
       # displacy.render(self._matchedSentsForVis, style="ent", manual=True)
       displacy.serve(self._matchedSentsForVis, style="ent", manual=True)
-
 
   ##########################
   # methods for relation extraction
@@ -786,23 +664,7 @@ class RuleBasedMatcher(object):
     return conjunctList
 
 
-  ###############
-  # methods can be used for callback in "add" method
-  ###############
-  @staticmethod
-  def extendEnt(matcher, doc, i, matches):
-    """
-      Extend the doc's entity
-      @ In, matcher, spacy.Matcher, the spacy matcher instance
-      @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
-      @ In, i, int, index of the current match (matches[i])
-      @ In, matches, List[Tuple[int, int, int]], a list of (match_id, start, end) tuples, describing
-        the matches. A match tuple describes a span doc[start:end]
-    """
-    id, start, end = matches[i]
-    ent = Span(doc, start, end, label=id)
-    logger.debug(ent.text)
-    doc.ents = filter_spans(list(doc.ents) +[ent])
+
 
   ##TODO: how to extend it for entity ruler?
   # @staticmethod
