@@ -85,10 +85,10 @@ if __name__ == "__main__":
     print(elem)
   # convert opm formList into matcher patternsOPM
   label = "pump_component"
-  id = "SSC"
+  entId = "SSC"
   patternsOPM = []
   for form in formList:
-    pattern = generatePattern(form, label=label, id=id, attr="LOWER")
+    pattern = generatePattern(form, label=label, id=entId, attr="LOWER")
     patternsOPM.append(pattern)
 
   ########################################################################
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     doc = ft.read()
 
   name = 'ssc_entity_ruler'
-  matcher = RuleBasedMatcher(nlp, match=True, phraseMatch=True)
+  matcher = RuleBasedMatcher(nlp, entLabel=entId, causalKeywordLabel=causalID)
   matcher.addEntityPattern(name, patternsOPM)
 
   causalName = 'causal_keywords_entity_ruler'

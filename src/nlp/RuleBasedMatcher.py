@@ -70,7 +70,7 @@ class RuleBasedMatcher(object):
   """
     Rule Based Matcher Class
   """
-  def __init__(self, nlp, *args, **kwargs):
+  def __init__(self, nlp, entLabel='SSC', causalKeywordLabel='causal', *args, **kwargs):
     """
       Construct
       @ In, nlp, spacy.Language object, contains all components and data needed to process text
@@ -127,8 +127,8 @@ class RuleBasedMatcher(object):
     self._visualizeMatchedSents = True
     self._coref = _corefAvail # True indicate coreference pipeline is available
     self._entityLabels = {} # labels for rule-based entities
-    self._labelSSC = 'SSC'
-    self._labelCausal = 'causal'
+    self._labelSSC = entLabel
+    self._labelCausal = causalKeywordLabel
     self._causalNames = ['cause', 'cause health status', 'causal keyword', 'effect', 'effect health status', 'sentence']
     self._extractedCausals = [] # list of tuples, each tuple represents one causal-effect, i.e., (cause, cause health status, cause keyword, effect, effect health status, sentence)
 
