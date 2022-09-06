@@ -556,7 +556,7 @@ class RuleBasedMatcher(object):
         causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
         if causalStatus:
           logger.debug(f'missing causal relation: {sent}')
-      elif len(sscEnts) == 2: # Two entities and One causal keyword
+      elif len(sscEnts) == 2: # Two groups of entities and One causal keyword
         if len(causalEnts) == 1:
           root = causalEnts[0].root
           rootLoc = root.i
@@ -596,18 +596,26 @@ class RuleBasedMatcher(object):
             elif rootLoc < sscEnts[0][0].start:
               self.collectExtactedCausals(sscEnts[0], sscEnts[1], causalEnts[0], sent)
         elif len(causalEnts) == 2:
-          ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal].union(self._entityLabels[self._labelSSC]))
-          ents = self.getConjuncts(ents)
-          print(ents)
-          # TODO: extract more detailed information, the cause directions
+          ceLemma1 = [token.lemma_ for token in causalEnts[0] if token.lemma_ != "DET"]
+          ceLemma2 = [token.lemma_ for token in causalEnts[1] if token.lemma_ != "DET"]
+          logger.info(f'Not yet implemented! Multiple causal keywords "{causalEnts}" are found in the same sentence "{sent}"')
+          continue
+          # TODO: depend on the examples, extract more detailed information, the cause directions
         else:
           continue
-      # TODO, handle more than two entities
+      # TODO, handle more than two groups of entities, need examples
       elif len(causalEnts) == 1 and len(sscEnts) > 2:
+        logger.info(f'Not yet implemented! causal keyword "{causalEnts[0]}", entities list "{sscEnts}", and sentence "{sent}"')
         continue
 
   def collectExtactedCausals(self, cause, effect, causalKeyword, sent):
     """
+      Collect the extracted causal relations
+      @ In, cause, list, list of causes
+      @ In, effect, list, list of effects
+      @ In, causalKeyword, str, causal keyword
+      @ In, sent, spacy.tokens.Span, sentence with identified causal relations
+      @ Out, None
     """
     for c in cause:
       for e in effect:
@@ -636,9 +644,6 @@ class RuleBasedMatcher(object):
     if not collected:
       conjunctList.append(conjuncts)
     return conjunctList
-
-
-
 
   ##TODO: how to extend it for entity ruler?
   # @staticmethod
