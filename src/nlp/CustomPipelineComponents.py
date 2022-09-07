@@ -31,7 +31,10 @@ if Token.has_extension('ref_t_'):
   _ = Token.remove_extension('ref_t_')
 Token.set_extension('ref_n', default='')
 Token.set_extension('ref_t', default='')
+
 Span.set_extension("health_status", default=None)
+if not Token.has_extension('ref_ent'):
+  Token.set_extension("ref_ent", default='')
 
 customLabel = ['STRUCTURE', 'COMPONENT', 'SYSTEM']
 aliasLookup = {}
@@ -128,6 +131,37 @@ def anaphorCoref(doc):
             token._.ref_t = refToken._.ref_t
             break
   return doc
+
+@Language.component("anaphorEntCoref")
+def anaphorEntCoref(doc):
+  """
+    Anaphora resolution using coreferee for Entities
+    This pipeline need to be added after NER.
+    The assumption here is: The entities need to be recognized first, then call
+    pipeline "initCoref" to assign initial custom attribute "ref_n" and "ref_t",
+    then call pipeline "aliasResolver" to resolve all the aliases used in the text.
+    After all these pre-processes, we can use "anaphorEntCoref" pipeline to resolve the
+    coreference.
+    @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
+    @ Out, doc, spacy.tokens.doc.Doc, the document after the anaphora resolution using coreferee
+  """
+  if not Token.has_extension('coref_chains'):
+    return doc
+
+  for ent in doc.ents:
+    for token in ent:
+      coref = token._.coref_chains
+      if not coref:
+        continue
+      for chain in coref:
+        for ref in chain:
+          for index in ref:
+            refToken = doc[index]
+            if refToken._.ref_ent == '':
+              refToken._.ref_ent = ent
+  return doc
+
+
 
 @Language.component("expandEntities")
 def expandEntities(doc):
