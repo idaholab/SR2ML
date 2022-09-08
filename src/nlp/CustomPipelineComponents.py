@@ -195,6 +195,13 @@ def mergePhrase(doc):
     @ In, doc, spacy.tokens.doc.Doc, the processed document using nlp pipelines
     @ Out, doc, spacy.tokens.doc.Doc, the document after merge phrase
   """
+  def isNum(nounChunks):
+    for elem in nounChunks:
+      if elem.pos_ == 'NUM':
+        return True, elem
+        break
+    return False, None
+
   with doc.retokenize() as retokenizer:
     for np in doc.noun_chunks:
       # skip ents since ents are recognized by OPM model and entity_ruler
@@ -205,17 +212,36 @@ def mergePhrase(doc):
         if np.ents[0].label_ not in ['causal_keywords', 'ORG', 'DATE']:
           # print(np.ents[0].label_)
           continue
-      attrs = {
-          "tag": np.root.tag_,
-          "lemma": np.root.lemma_,
-          "ent_type": np.root.ent_type_,
-          "_": {
-                "ref_n": np.root._.ref_n,
-                "ref_t": np.root._.ref_t,
-                },
-      }
+      # When a number is provided, we will merge it, but keep the attributes from the number
+      num, elem = isNum(np)
+      if not num:
+        attrs = {
+            "tag": np.root.tag_,
+            "lemma": np.root.lemma_,
+            "pos": np.root.pos_,
+            "ent_type": np.root.ent_type_,
+            "_": {
+                  "ref_n": np.root._.ref_n,
+                  "ref_t": np.root._.ref_t,
+                  },
+        }
+      else:
+        attrs = {
+            "tag": elem.tag_,
+            "lemma": elem.lemma_,
+            "pos":elem.pos_,
+            "ent_type": np.root.ent_type_,
+            "_": {
+                  "ref_n": np.root._.ref_n,
+                  "ref_t": np.root._.ref_t,
+                  },
+        }
       retokenizer.merge(np, attrs=attrs)
   return doc
+
+
+
+
 
 @Language.component("pysbdSentenceBoundaries")
 def pysbdSentenceBoundaries(doc):
