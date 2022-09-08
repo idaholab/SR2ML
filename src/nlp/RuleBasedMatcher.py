@@ -24,6 +24,7 @@ from .CustomPipelineComponents import normEntities
 from .CustomPipelineComponents import initCoref
 from .CustomPipelineComponents import aliasResolver
 from .CustomPipelineComponents import anaphorCoref
+from .CustomPipelineComponents import anaphorEntCoref
 from .CustomPipelineComponents import mergePhrase
 from .CustomPipelineComponents import pysbdSentenceBoundaries
 
@@ -108,11 +109,11 @@ class RuleBasedMatcher(object):
     if _corefAvail:
       self.pipelines = ['pysbdSentenceBoundaries',
                       'mergePhrase', 'normEntities', 'initCoref', 'aliasResolver',
-                      'coreferee','anaphorCoref']
+                      'coreferee','anaphorCoref', 'anaphorEntCoref']
     else:
       self.pipelines = ['pysbdSentenceBoundaries',
                       'mergePhrase','normEntities', 'initCoref', 'aliasResolver',
-                      'anaphorCoref']
+                      'anaphorCoref', 'anaphorEntCoref']
     # ner pipeline is not needed since we are focusing on the keyword matching approach
     if nlp.has_pipe("ner"):
       nlp.remove_pipe("ner")
@@ -552,23 +553,29 @@ class RuleBasedMatcher(object):
         # handle coreference
         if self._coref:
           for token in sent:
-            if token._.ref_ent == '':
+            if token._.ref_ent is None:
               continue
             refEnt = token._.ref_ent
             refTok = token
             break
         if refEnt is not None:
-          if refTok.i > sscEnts[0]:
-            self.extractCausalForTwoEnts(causalEnts[0], refEnt, sscEnts[0], sent)
+          if refTok.i < sscEnts[0][0].start:
+            loc1 = refTok.i
+            loc2 = sscEnts[0][0]
+            self.extractCausalForTwoEnts(sent, causalEnts[0], [refEnt], sscEnts[0], loc1, loc2)
           else:
-            self.extractCausalForTwoEnts(causalEnts[0], sscEnts[0], refEnt, sent)
+            loc1 = sscEnts[0][0]
+            loc2 = refTok.i
+            self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], [refEnt], loc1, loc2)
         else: # single causal keyword, single entity, report missing causal relation
           causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
           if causalStatus:
             logger.debug(f'missing causal relation: {sent}')
       elif len(sscEnts) == 2: # Two groups of entities and One causal keyword
         if len(causalEnts) == 1:
-          self.extractCausalForTwoEnts(causalEnts[0], sscEnts[0], sscEnts[1], sent)
+          loc1 = sscEnts[0][0].start
+          loc2 = sscEnts[1][0].start
+          self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], sscEnts[1], loc1, loc2)
         elif len(causalEnts) == 2:
           ceLemma1 = [token.lemma_ for token in causalEnts[0] if token.lemma_ != "DET"]
           ceLemma2 = [token.lemma_ for token in causalEnts[1] if token.lemma_ != "DET"]
@@ -582,9 +589,13 @@ class RuleBasedMatcher(object):
         logger.info(f'Not yet implemented! causal keyword "{causalEnts[0]}", entities list "{sscEnts}", and sentence "{sent}"')
         continue
 
-  def extractCausalForTwoEnts(self, causalEnt, ent1, ent2, sent):
+  def extractCausalForTwoEnts(self, sent, causalEnt, ent1, ent2, loc1=None, loc2=None):
     """
     """
+    if loc1 is None:
+      loc1 = ent1[0].start
+    if loc2 is None:
+      loc2 = ent2[0].start
     root = causalEnt.root
     rootLoc = root.i
     causalEntLemma = [token.lemma_ for token in causalEnt if token.lemma_ != "DET"]
@@ -596,31 +607,31 @@ class RuleBasedMatcher(object):
         self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
     elif root.pos_ == 'NOUN':
       if causalEntLemma in self._causalKeywords['causal-noun']:
-        if rootLoc > ent1[0].start and rootLoc < ent2[0].start:
+        if rootLoc > loc1 and rootLoc < loc2:
           # assert sscEnts[1].root in root.subtree
           self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-        elif rootLoc < ent1[0].start:
+        elif rootLoc < loc1:
           # assert sscEnts[0].root in root.subtree
           self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
       elif causalEntLemma in self._causalKeywords['effect-noun']:
-        if rootLoc > ent1[0].start and rootLoc < ent2[0].start:
+        if rootLoc > loc1 and rootLoc < loc2:
           # assert sscEnts[1].root in root.subtree
           if root.dep_ in ['attr']:
             self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
           elif root.dep_ in ['dobj']:
             self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-        elif rootLoc < ent1[0].start:
+        elif rootLoc < loc1:
           # assert sscEnts[0].root in root.subtree
           self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
     elif causalEntLemma in self._causalKeywords['causal-relator']:
-      if rootLoc > ent1[0].start and rootLoc < ent2[0].start:
+      if rootLoc > loc1 and rootLoc < loc2:
         self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
       else:
         logger.debug(f'Not yet implemented! causal keyword {causalEntLemma}, sentence {sent}')
     elif causalEntLemma in self._causalKeywords['effect-relator']:
-      if rootLoc > ent1[0].start and rootLoc < ent2[0].start:
+      if rootLoc > loc1 and rootLoc < loc2:
         self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
-      elif rootLoc < ent1[0].start:
+      elif rootLoc < loc1:
         self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
 
   def collectExtactedCausals(self, cause, effect, causalKeyword, sent):
