@@ -34,7 +34,7 @@ Token.set_extension('ref_t', default='')
 
 Span.set_extension("health_status", default=None)
 if not Token.has_extension('ref_ent'):
-  Token.set_extension("ref_ent", default='')
+  Token.set_extension("ref_ent", default=None)
 
 customLabel = ['STRUCTURE', 'COMPONENT', 'SYSTEM']
 aliasLookup = {}
@@ -157,7 +157,7 @@ def anaphorEntCoref(doc):
         for ref in chain:
           for index in ref:
             refToken = doc[index]
-            if refToken._.ref_ent == '':
+            if refToken._.ref_ent is None:
               refToken._.ref_ent = ent
   return doc
 
