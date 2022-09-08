@@ -3,6 +3,7 @@
 text_file = "../data/raw_text.txt"
 opm_file = "../data/pump_opl.html"
 cause_effect_keywords_file = "../data/cause_effect_keywords.csv"
+conjecture_keywords_file = "../data/conjecture_keywords.csv"
 
 status_keywords_file.all = "../data/health_status_keywords.csv"
 status_keywords_file.negative = "../data/health_status_keywords_negative.csv"

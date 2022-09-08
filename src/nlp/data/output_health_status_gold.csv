@@ -1,35 +1,35 @@
-,entities,status keywords,health statuses
-0,pump,notice,A leak
-1,pump,find,not operating
-2,pump,find,inoperative
-3,pump,have,signs of past leakage
-4,Pump,experience,not enough flow
-5,pump shaft,notice,Slight Vibrations
-6,Pump,respond,not responding
-7,pump bearings,,Rupture
-8,pump shaft,,degradation
-9,pump bearings,,Rupture
-10,pump shaft,,degradation
-11,Power supply,find,burnout
-12,Pump,,test
-13,power supply,,failure
-14,Pump,,inspection
-15,impeller,,degradation
-16,Pump,,inspection
-17,impeller,,degradation
-18,pump,find,Oil puddle
-19,pump,observe,Anomalous vibrations
-20,pump shaft,,Several cracks
-21,pump,,failure
-22,pump,cavitate,some degree
-23,pump shaft,,vibration
-24,motor,,vibrate
-25,Pump,have,noise of cavitation
-26,pump shaft,,deflection
-27,Pump,experience,not enough flow
-28,Pump shaft,make,noise
-29,pump shaft,seem,Vibration
-30,pump shaft,,deflection
-31,Pump bearings,appear,acceptable condition
-32,Pump,make,noises
-33,Pump shaft,have,a slight deflection
+,entities,status keywords,health statuses,conjecture
+0,pump,notice,A leak,False
+1,pump,find,not operating,False
+2,pump,find,inoperative,False
+3,pump,have,signs of past leakage,False
+4,Pump,experience,not enough flow,False
+5,pump shaft,notice,Slight Vibrations,True
+6,Pump,respond,not responding,False
+7,pump bearings,,Rupture,False
+8,pump shaft,,degradation,False
+9,pump bearings,,Rupture,False
+10,pump shaft,,degradation,False
+11,Power supply,find,burnout,False
+12,Pump,,test,False
+13,power supply,,failure,False
+14,Pump,,inspection,False
+15,impeller,,degradation,False
+16,Pump,,inspection,True
+17,impeller,,degradation,True
+18,pump,find,Oil puddle,False
+19,pump,observe,Anomalous vibrations,False
+20,pump shaft,,Several cracks,False
+21,pump,,failure,True
+22,pump,cavitate,some degree,False
+23,pump shaft,,vibration,False
+24,motor,,vibrate,False
+25,Pump,have,noise of cavitation,False
+26,pump shaft,,deflection,False
+27,Pump,experience,not enough flow,False
+28,Pump shaft,make,noise,False
+29,pump shaft,seem,Vibration,True
+30,pump shaft,,deflection,False
+31,Pump bearings,appear,acceptable condition,False
+32,Pump,make,noises,False
+33,Pump shaft,have,a slight deflection,False

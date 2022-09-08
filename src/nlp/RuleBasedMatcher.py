@@ -104,6 +104,8 @@ class RuleBasedMatcher(object):
     self._statusKeywords = self.getKeywords(self._statusFile)
     self._updateStatusKeywords = False
     self._updateCausalKeywords = False
+    self._conjectureFile = nlpConfig['files']['conjecture_keywords_file']
+    self._conjectureKeywords = self.getKeywords(self._conjectureFile)
     ## pipelines "merge_entities" and "merge_noun_chunks" can be used to merge noun phrases and entities
     ## for easier analysis
     if _corefAvail:
@@ -130,7 +132,7 @@ class RuleBasedMatcher(object):
     self._entityLabels = {} # labels for rule-based entities
     self._labelSSC = entLabel
     self._labelCausal = causalKeywordLabel
-    self._causalNames = ['cause', 'cause health status', 'causal keyword', 'effect', 'effect health status', 'sentence']
+    self._causalNames = ['cause', 'cause health status', 'causal keyword', 'effect', 'effect health status', 'sentence', 'conjecture']
     self._extractedCausals = [] # list of tuples, each tuple represents one causal-effect, i.e., (cause, cause health status, cause keyword, effect, effect health status, sentence)
 
   def getKeywords(self, filename):
@@ -246,16 +248,19 @@ class RuleBasedMatcher(object):
     entList = []
     hsList = []
     kwList = []
+    cjList = []
     for sent in self._matchedSents:
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       elist = [ent.text for ent in ents]
       hs = [ent._.health_status for ent in ents]
       kw = [ent._.hs_keyword for ent in ents]
+      cj = [ent._.conjecture for ent in ents]
       entList.extend(elist)
       hsList.extend(hs)
       kwList.extend(kw)
-    df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList})
-    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses'])
+      cjList.extend(cj)
+    df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList})
+    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses', 'conjecture'])
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
@@ -310,6 +315,11 @@ class RuleBasedMatcher(object):
         return True
     if token.pos_ == 'VERB' and token.tag_ == 'VB': # If it is a verb, and there is no inflectional morphology for the verb
       return True
+    # check the keywords
+    # FIXME: should we use token.subtree or token.children here
+    for child in token.subtree:
+      if [child.lemma_] in self._conjectureKeywords['conjecture-keywords']:
+        return True
     return False
 
   def isNegation(self, token):
@@ -384,7 +394,7 @@ class RuleBasedMatcher(object):
       causalStatus = causalStatus and len(ents) == 1
       # if causalStatus and len(ents) > 1:
       if (len(ents) > 1 and len(causalEnts) > 0) or causalStatus:
-        conjecture = self.isConjecture(sent.root)
+        # conjecture = self.isConjecture(sent.root)
         for ent in ents:
           healthStatus = None
           root = ent.root
@@ -394,6 +404,8 @@ class RuleBasedMatcher(object):
             healthStatus = root.head
           else:
             continue
+          # determine the conjecture of health status
+          conjecture = self.isConjecture(healthStatus.head)
           neg, negText = self.isNegation(healthStatus)
           if neg:
             healthStatus = ' '.join([negText,healthStatus.text])
@@ -414,7 +426,7 @@ class RuleBasedMatcher(object):
           continue
         else:
           passive = self.isPassive(root)
-          conjecture = self.isConjecture(root)
+          # conjecture = self.isConjecture(root)
           # # last is punct, the one before last is the root
           # if root.nbor().pos_ in ['PUNCT']:
           #   healthStatus = root
@@ -437,6 +449,11 @@ class RuleBasedMatcher(object):
             healthStatus = self.findLeftSubj(root, passive)
         if healthStatus is None:
           continue
+        # determine the conjecture of health status
+        if isinstance(healthStatus, Span):
+          conjecture = self.isConjecture(healthStatus.root.head)
+        elif isinstance(healthStatus, Token):
+          conjecture = self.isConjecture(healthStatus.head)
         if not neg:
           if isinstance(healthStatus, Span):
             neg, negText = self.isNegation(healthStatus.root)
@@ -643,10 +660,12 @@ class RuleBasedMatcher(object):
       @ In, sent, spacy.tokens.Span, sentence with identified causal relations
       @ Out, None
     """
+    root = sent.root
+    conjecture = self.isConjecture(root)
     for c in cause:
       for e in effect:
-        logger.debug(f'({c} health status: {c._.health_status}) "{causalKeyword}" ({e} health status: {e._.health_status})')
-        self._extractedCausals.append([c, c._.health_status, causalKeyword, e, e._.health_status, sent])
+        logger.debug(f'({c} health status: {c._.health_status}) "{causalKeyword}" ({e} health status: {e._.health_status}), conjecture: "{conjecture}"')
+        self._extractedCausals.append([c, c._.health_status, causalKeyword, e, e._.health_status, sent, conjecture])
 
   def getConjuncts(self, entList):
     """
