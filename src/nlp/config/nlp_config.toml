@@ -2,6 +2,7 @@
 [files]
 text_file = "../data/raw_text.txt"
 opm_file = "../data/pump_opl.html"
+entity_file = "../data/entities.csv"
 cause_effect_keywords_file = "../data/cause_effect_keywords.csv"
 conjecture_keywords_file = "../data/conjecture_keywords.csv"
 
