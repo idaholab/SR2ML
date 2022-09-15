@@ -27,4 +27,3 @@ Visible pump shaft deflection in operation.
 Pump bearings appear in acceptable condition.
 Pump made noises - not enough to affect performance.
 Pump shaft has a slight deflection.
-The pressure of the pump is 5 psi.

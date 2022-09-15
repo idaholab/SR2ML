@@ -7,10 +7,10 @@ Created on March, 2022
 """
 
 import logging
-from nlp.RuleBasedMatcher import RuleBasedMatcher
 import spacy
 import pandas as pd
 
+from nlp.RuleBasedMatcher import RuleBasedMatcher
 from nlp import config
 
 import os
@@ -72,23 +72,28 @@ def extractLemma(var):
 
 #####################################################################
 
-
 if __name__ == "__main__":
   # load nlp model and matcher
   nlp = spacy.load("en_core_web_lg", exclude=[])
   ###################################################################
+  ents = []
   # Parse OPM model
   # some modifications, bearings --> pump bearings
-  opmFile = config.nlpConfig['files']['opm_file']
-  formList, functionList = OPLentityParser(opmFile)
-  for elem in formList:
-    print(elem)
+  if 'opm_file' in config.nlpConfig['files']:
+    opmFile = config.nlpConfig['files']['opm_file']
+    formList, functionList = OPLentityParser(opmFile)
+    ents.extend(formList)
+  if 'entity_file' in config.nlpConfig['files']:
+    entityFile = config.nlpConfig['files']['entity_file']
+    entityList = pd.read_csv(entityFile).values.ravel().tolist()
+    ents.extend(entityList)
+  ents = set(ents)
   # convert opm formList into matcher patternsOPM
   label = "pump_component"
   entId = "SSC"
   patternsOPM = []
-  for form in formList:
-    pattern = generatePattern(form, label=label, id=entId, attr="LOWER")
+  for ent in ents:
+    pattern = generatePattern(ent, label=label, id=entId, attr="LOWER")
     patternsOPM.append(pattern)
 
   ########################################################################
