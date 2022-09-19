@@ -12,7 +12,7 @@ import pandas as pd
 
 from nlp.RuleBasedMatcher import RuleBasedMatcher
 from nlp import config
-from nlp.nlp_utils import extractLemma, generatePattern
+from nlp.nlp_utils import generatePatternList
 
 import os
 import sys
@@ -58,10 +58,8 @@ if __name__ == "__main__":
   # convert opm formList into matcher patternsOPM
   label = "pump_component"
   entId = "SSC"
-  patternsOPM = []
-  for ent in ents:
-    pattern = generatePattern(ent, label=label, id=entId, attr="LOWER")
-    patternsOPM.append(pattern)
+
+  patternsOPM = generatePatternList(ents, label=label, id=entId, nlp=nlp, attr="LOWER")
 
   ########################################################################
   #  Parse causal keywords, and generate patterns for them
@@ -69,15 +67,11 @@ if __name__ == "__main__":
   causalLabel = "causal_keywords"
   causalID = "causal"
   patternsCausal = []
-  # causalFilename = os.path.join(os.path.dirname(__file__), 'nlp', 'cause_effect_keywords.csv')
   causalFilename = config.nlpConfig['files']['cause_effect_keywords_file']
   ds = pd.read_csv(causalFilename, skipinitialspace=True)
   for col in ds.columns:
     vars = set(ds[col].dropna())
-    for var in vars:
-      lemVar = extractLemma(var, nlp)
-      pattern = generatePattern(lemVar, label=causalLabel, id=causalID, attr="LEMMA")
-      patternsCausal.append(pattern)
+    patternsCausal.extend(generatePatternList(vars, label=causalLabel, id=causalID, nlp=nlp, attr="LEMMA"))
 
   # text that needs to be processed. either load from file or direct assign
   textFile = config.nlpConfig['files']['text_file']

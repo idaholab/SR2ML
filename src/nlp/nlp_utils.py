@@ -105,6 +105,16 @@ def plotDAG(edges, colors='k'):
   plt.axis("off")
   plot.show()
 
+def extractLemma(var, nlp):
+  """
+    Lammatize the variable list
+    @ In, var, str, string
+    @ In, nlp, object, preloaded nlp model
+    @ Out, lemVar, list, list of lammatized variables
+  """
+  var = ' '.join(var.split())
+  lemVar = [token.lemma_ for token in nlp(var)]
+  return lemVar
 
 def generatePattern(form, label, id, attr="LOWER"):
   """
@@ -127,16 +137,22 @@ def generatePattern(form, label, id, attr="LOWER"):
   pattern = {"label":label, "pattern":ptn, "id": id}
   return pattern
 
-def extractLemma(var, nlp):
+def generatePatternList(entList, label, id, nlp, attr="LOWER"):
   """
-    Lammatize the variable list
-    @ In, var, str, string
-    @ In, nlp, object, preloaded nlp model
-    @ Out, lemVar, list, list of lammatized variables
+    Generate a list of entity patterns
+    @ In, entList, list, list of entities
+    @ In, label, str, the label name for the pattern
+    @ In, id, str, the id name for the pattern
+    @ In, attr, str, attribute used for the pattern, either "LOWER" or "LEMMA"
+    @ Out, ptnList, list, list of patterns will be used by entity matcher
   """
-  var = ' '.join(var.split())
-  lemVar = [token.lemma_ for token in nlp(var)]
-  return lemVar
+  ptnList = []
+  for ent in entList:
+    if attr.lower() == "lemma":
+      ent = extractLemma(ent, nlp)
+    ptn = generatePattern(ent, label, id, attr)
+    ptnList.append(ptn)
+  return ptnList
 
 ###############
 # methods can be used for callback in "add" method
