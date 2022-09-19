@@ -12,6 +12,7 @@ import pandas as pd
 
 from nlp.RuleBasedMatcher import RuleBasedMatcher
 from nlp import config
+from nlp.nlp_utils import extractLemma, generatePattern
 
 import os
 import sys
@@ -35,40 +36,6 @@ formatter = logging.Formatter('%(asctime)s %(name)-20s %(levelname)-8s %(message
 fh.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(fh)
-
-#####################################################################
-# Utils functions
-
-def generatePattern(form, label, id, attr="LOWER"):
-  """
-    Generate entity pattern
-    @ In, form, str or list, the given str or list of lemmas that will be used to generate pattern
-    @ In, label, str, the label name for the pattern
-    @ In, id, str, the id name for the pattern
-    @ In, attr, str, attribute used for the pattern, either "LOWER" or "LEMMA"
-    @ Out, pattern, dict, pattern will be used by entity matcher
-  """
-  # if any of "!", "?", "+", "*" present in the provided string "form", we will treat it as determiter for the form
-  if attr.lower() == "lower":
-    attr = "LOWER"
-    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form.lower().split()]
-  elif attr.lower() == "lemma":
-    attr = "LEMMA"
-    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form]
-  else:
-    raise IOError(f"Incorrect 'attr={attr}' is provided, valid value for 'attr' is either 'LOWER' or 'LEMMA'")
-  pattern = {"label":label, "pattern":ptn, "id": id}
-  return pattern
-
-def extractLemma(var):
-  """
-    Lammatize the variable list
-    @ In, var, str, string
-    @ Out, lemVar, list, list of lammatized variables
-  """
-  var = ' '.join(var.split())
-  lemVar = [token.lemma_ for token in nlp(var)]
-  return lemVar
 
 #####################################################################
 
@@ -108,7 +75,7 @@ if __name__ == "__main__":
   for col in ds.columns:
     vars = set(ds[col].dropna())
     for var in vars:
-      lemVar = extractLemma(var)
+      lemVar = extractLemma(var, nlp)
       pattern = generatePattern(lemVar, label=causalLabel, id=causalID, attr="LEMMA")
       patternsCausal.append(pattern)
 

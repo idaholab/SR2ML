@@ -106,6 +106,38 @@ def plotDAG(edges, colors='k'):
   plot.show()
 
 
+def generatePattern(form, label, id, attr="LOWER"):
+  """
+    Generate entity pattern
+    @ In, form, str or list, the given str or list of lemmas that will be used to generate pattern
+    @ In, label, str, the label name for the pattern
+    @ In, id, str, the id name for the pattern
+    @ In, attr, str, attribute used for the pattern, either "LOWER" or "LEMMA"
+    @ Out, pattern, dict, pattern will be used by entity matcher
+  """
+  # if any of "!", "?", "+", "*" present in the provided string "form", we will treat it as determiter for the form
+  if attr.lower() == "lower":
+    attr = "LOWER"
+    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form.lower().split()]
+  elif attr.lower() == "lemma":
+    attr = "LEMMA"
+    ptn = [{attr:elem} if elem not in ["!", "?", "+", "*"] else {"POS":"DET", "OP":elem} for elem in form]
+  else:
+    raise IOError(f"Incorrect 'attr={attr}' is provided, valid value for 'attr' is either 'LOWER' or 'LEMMA'")
+  pattern = {"label":label, "pattern":ptn, "id": id}
+  return pattern
+
+def extractLemma(var, nlp):
+  """
+    Lammatize the variable list
+    @ In, var, str, string
+    @ In, nlp, object, preloaded nlp model
+    @ Out, lemVar, list, list of lammatized variables
+  """
+  var = ' '.join(var.split())
+  lemVar = [token.lemma_ for token in nlp(var)]
+  return lemVar
+
 ###############
 # methods can be used for callback in "add" method
 ###############
