@@ -3,10 +3,10 @@ import numpy as np
 import itertools
 
 ''' These methods are designed to process the file tag_keywords_lists.xlsx
-    This file contains several keywords grouped into classes (e.g., material, comnponents, etc) 
-    For each class, a tag is defined: during the NLP analysis, when these kewords are identified,
+    This file contains several keywords grouped into classes (e.g., material, components, etc) 
+    For each class, a tag is defined: during the NLP analysis, when these keywords are identified,
     this tag will be associated to such word.
-    These methods are designed to run in sequence just once at the beginiing of the NLP 
+    These methods are designed to run in sequence just once at the beginning of the NLP 
     pipeline), e.g.:
 			tags_dict = keyWordListGenerator('tag_keywords_lists.xlsx')
 			unit_dict = extractUnits('tag_keywords_lists.xlsx')
