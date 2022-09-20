@@ -23,7 +23,7 @@ def keyWordListGenerator(fileName):
   df = pd.read_excel(fileName, None)
   # retrieve list of sheets in excel file
   sheet_list = df.keys()
-  
+
   tagsDict = {}
   for sheet in sheet_list:
     # retrieve columns of each sheet
