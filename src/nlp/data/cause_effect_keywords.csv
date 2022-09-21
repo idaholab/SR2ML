@@ -2,7 +2,7 @@ VERB,NOUN,TRANSITION,effect-relator,causal-relator,causal-noun,effect-noun
 affect,actor,accordingly,on account of,hence,actor,consequence
 constitute ,consequence,consequently,due to,consequently,agent,impact
 create,end,hence,because,so,creation,product
-force,impact,on account of,because of,as ? result,event,influence 
+force,impact,on account of,because of,as ? result,event,influence
 initiate,product,so,since,result in,author,result
 restrain,agent,as a result,as,therefore,creator ,benefit
 benefit,creation,due to,,for ? reason,factor,outcome
@@ -128,3 +128,4 @@ Transform,,,,,,
 Trigger,,,,,,
 Turn on,,,,,,
 Upset,,,,,,
+render,,,,,,

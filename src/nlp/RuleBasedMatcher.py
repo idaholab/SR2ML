@@ -6,6 +6,7 @@ Created on March, 2022
 @author: wangc, mandd
 """
 import pandas as pd
+import copy
 import spacy
 from spacy.matcher import Matcher
 from spacy.tokens import Token
@@ -134,6 +135,9 @@ class RuleBasedMatcher(object):
     self._labelCausal = causalKeywordLabel
     self._causalNames = ['cause', 'cause health status', 'causal keyword', 'effect', 'effect health status', 'sentence', 'conjecture']
     self._extractedCausals = [] # list of tuples, each tuple represents one causal-effect, i.e., (cause, cause health status, cause keyword, effect, effect health status, sentence)
+    self._causalSentsNoEnts = []
+    self._rawCausalList = []
+    self._causalSentsOneEnt = []
 
   def getKeywords(self, filename):
     """
@@ -549,6 +553,34 @@ class RuleBasedMatcher(object):
       toVisit.extend(list(child.children))
     return None
 
+  def isValidCausalEnts(self, ent):
+    """
+      @ In, ent, list
+      @ Out, valid, bool
+    """
+    valid = False
+    validDep = ['nsubj', 'nsubjpass', 'nsubj:pass', 'pobj', 'dobj', 'iobj', 'obj', 'obl', 'oprd']
+    for e in ent:
+      root = e.root
+      if root.dep_ in validDep or root.head.dep_ in validDep:
+        valid = True
+        break
+    return valid
+
+  def getIndex(self, ent, entList):
+    """
+    """
+    idx = -1
+    for i, e in enumerate(entList):
+      if isinstance(e, list):
+        if ent in e:
+          idx = i
+      else:
+        if e == ent:
+          idx = i
+    return idx
+
+
   def extractRelDep(self, matchedSents):
     """
       @ In, matchedSents, list, the list of matched sentences
@@ -564,47 +596,142 @@ class RuleBasedMatcher(object):
       logger.debug(f'Conjuncts pairs: {sscEnts}')
       if len(causalEnts) == 0: #  no causal keyword is found, skipping
         continue
-      elif len(causalEnts) == 1 and len(sscEnts) == 1:
-        refEnt = None
-        refTok = None
-        # handle coreference
-        if self._coref:
-          for token in sent:
-            if token._.ref_ent is None:
-              continue
-            refEnt = token._.ref_ent
-            refTok = token
-            break
-        if refEnt is not None:
-          if refTok.i < sscEnts[0][0].start:
-            loc1 = refTok.i
-            loc2 = sscEnts[0][0]
-            self.extractCausalForTwoEnts(sent, causalEnts[0], [refEnt], sscEnts[0], loc1, loc2)
-          else:
-            loc1 = sscEnts[0][0]
-            loc2 = refTok.i
-            self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], [refEnt], loc1, loc2)
-        else: # single causal keyword, single entity, report missing causal relation
-          causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
-          if causalStatus:
-            logger.debug(f'missing causal relation: {sent}')
-      elif len(sscEnts) == 2: # Two groups of entities and One causal keyword
-        if len(causalEnts) == 1:
-          loc1 = sscEnts[0][0].start
-          loc2 = sscEnts[1][0].start
-          self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], sscEnts[1], loc1, loc2)
-        elif len(causalEnts) == 2:
-          ceLemma1 = [token.lemma_ for token in causalEnts[0] if token.lemma_ != "DET"]
-          ceLemma2 = [token.lemma_ for token in causalEnts[1] if token.lemma_ != "DET"]
-          logger.info(f'Not yet implemented! Multiple causal keywords "{causalEnts}" are found in the same sentence "{sent}"')
-          continue
-          # TODO: depend on the examples, extract more detailed information, the cause directions
-        else:
-          continue
-      # TODO, handle more than two groups of entities, need examples
-      elif len(causalEnts) == 1 and len(sscEnts) > 2:
-        logger.info(f'Not yet implemented! causal keyword "{causalEnts[0]}", entities list "{sscEnts}", and sentence "{sent}"')
+      if len(sscEnts) == 0:
+        logger.debug(f'No entity is identified in "{sent.text}"')
+        self._causalSentsNoEnts.append(sent)
         continue
+      if len(sscEnts) == 1:
+        logger.debug(f'Single entity is identified in "{sent.text}"')
+        self._causalSentsOneEnt.append(sent)
+        continue
+      # shows keywords can be used to identify the causal sentences, but there are some false positive cases
+      logger.debug(f'Sentence contains causal keywords: {causalEnts}. \n {sent.text}')
+
+      # grab all ents
+      labelList = self._entityLabels[self._labelCausal].union(self._entityLabels[self._labelSSC])
+      ents = self.getCustomEnts(sent.ents, labelList)
+      mEnts = copy.copy(ents)
+      root = sent.root
+      i = root.i
+      neg, negText = self.isNegation(root)
+      conjecture = self.isConjecture(root)
+      if neg:
+        if conjecture:
+          rootTuple = [('conjecture', conjecture), ('negation', neg), ('negation text',negText), root]
+        else:
+          rootTuple = [('negation', neg), ('negation text',negText), root]
+      else:
+        if conjecture:
+          rootTuple = [('conjecture', conjecture), root]
+        else:
+          rootTuple = [root]
+      idx = -1
+      for j, ent in enumerate(ents):
+        start = ent.start
+        if i < start:
+          idx = j
+          break
+        if i == start:
+          rootTuple[-1] = ent
+          mEnts[j] = rootTuple
+          break
+      if idx != -1:
+        mEnts.insert(j, rootTuple)
+      logger.debug(f'Causal Info: {mEnts}')
+      self._rawCausalList.append(mEnts)
+
+      entTuples = [(ent[0].start, ent) for ent in sscEnts] + [(ent.start, ent) for ent in causalEnts]
+      orderedEnts = sorted(entTuples, key = lambda x:x[0])
+      orderedEnts = [ent[1] for ent in orderedEnts]
+
+      # assume no punct in sents
+      for cEnt in causalEnts:
+        cIdx = self.getIndex(cEnt, orderedEnts)
+        if cIdx == -1:
+          continue
+        if cIdx == 0:
+          ent1 = orderedEnts[cIdx+1]
+          ent2 = orderedEnts[cIdx+2]
+          if ent1 in sscEnts and ent2 in sscEnts:
+            loc1 = ent1[0].start
+            loc2 = ent2[0].start
+            self.extractCausalForTwoEnts(sent, cEnt, ent1, ent2, loc1, loc2)
+          else:
+            # skip
+            self._causalSentsOneEnt.append(sent)
+            continue
+        ent1 = None
+        ent2 = None
+        ent = orderedEnts[cIdx-1]
+        # check the root of ent
+        entRoot = ent[0].root
+        if entRoot in cEnt.root.subtree or entRoot in cEnt.root.head.subtree or entRoot in cEnt.root.head.head.subtree:
+          ent1 = ent
+        if ent1 is None:
+          if len(orderedEnts) - cIdx - 1 < 2:
+            # skip
+            self._causalSentsOneEnt.append(sent)
+            continue
+          ent1 = orderedEnts[cIdx+1]
+          ent2 = orderedEnts[cIdx+2]
+        else:
+          if len(orderedEnts) - cIdx - 1 < 1:
+            # skip
+            self._causalSentsOneEnt.append(sent)
+            continue
+          ent2 = orderedEnts[cIdx+1]
+          loc1 = ent1[0].start
+          loc2 = ent2[0].start
+          self.extractCausalForTwoEnts(sent, cEnt, ent1, ent2, loc1, loc2)
+
+
+      # for ent in sscEnts:
+      #   valid = self.isValidCausalEnts(ent)
+      #   if not valid:
+      #     continue
+
+      ######### The following algorithm has been tested and is only working for simple sentence structure
+      # if len(causalEnts) == 1 and len(sscEnts) == 1:
+      #   refEnt = None
+      #   refTok = None
+      #   # handle coreference
+      #   if self._coref:
+      #     for token in sent:
+      #       if token._.ref_ent is None:
+      #         continue
+      #       refEnt = token._.ref_ent
+      #       refTok = token
+      #       break
+      #   if refEnt is not None:
+      #     if refTok.i < sscEnts[0][0].start:
+      #       loc1 = refTok.i
+      #       loc2 = sscEnts[0][0]
+      #       self.extractCausalForTwoEnts(sent, causalEnts[0], [refEnt], sscEnts[0], loc1, loc2)
+      #     else:
+      #       loc1 = sscEnts[0][0]
+      #       loc2 = refTok.i
+      #       self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], [refEnt], loc1, loc2)
+      #   else: # single causal keyword, single entity, report missing causal relation
+      #     causalStatus = [sent.root.lemma_] in self._causalKeywords['VERB'] and [sent.root.lemma_] not in self._statusKeywords['VERB']
+      #     if causalStatus:
+      #       logger.debug(f'missing causal relation: {sent}')
+      # elif len(sscEnts) == 2: # Two groups of entities and One causal keyword
+      #   if len(causalEnts) == 1:
+      #     loc1 = sscEnts[0][0].start
+      #     loc2 = sscEnts[1][0].start
+      #     self.extractCausalForTwoEnts(sent, causalEnts[0], sscEnts[0], sscEnts[1], loc1, loc2)
+      #   elif len(causalEnts) == 2:
+      #     ceLemma1 = [token.lemma_ for token in causalEnts[0] if token.lemma_ != "DET"]
+      #     ceLemma2 = [token.lemma_ for token in causalEnts[1] if token.lemma_ != "DET"]
+      #     logger.info(f'Not yet implemented! Multiple causal keywords "{causalEnts}" are found in the same sentence "{sent}"')
+      #     continue
+      #     # TODO: depend on the examples, extract more detailed information, the cause directions
+      #   else:
+      #     continue
+      # # TODO, handle more than two groups of entities, need examples
+      # elif len(causalEnts) == 1 and len(sscEnts) > 2:
+      #   logger.info(f'Not yet implemented! causal keyword "{causalEnts[0]}", entities list "{sscEnts}", and sentence "{sent}"')
+      #   continue
 
   def extractCausalForTwoEnts(self, sent, causalEnt, ent1, ent2, loc1=None, loc2=None):
     """

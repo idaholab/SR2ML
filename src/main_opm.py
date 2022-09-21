@@ -17,7 +17,7 @@ from nlp.nlp_utils import generatePatternList
 import os
 import sys
 import argparse
-# sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+# sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # sys.path.append(sr2mlPath)
 
 # OPL parser to generate object and process lists
@@ -60,7 +60,6 @@ if __name__ == "__main__":
   entId = "SSC"
 
   patternsOPM = generatePatternList(ents, label=label, id=entId, nlp=nlp, attr="LOWER")
-
   ########################################################################
   #  Parse causal keywords, and generate patterns for them
   #  The patterns can be used to identify the causal relationships
