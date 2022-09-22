@@ -15,7 +15,7 @@ Needed:
 #   https://stackoverflow.com/questions/42446521/check-whether-there-is-any-synonyms-between-two-word-sets
 
 
-from nltk.corpus import wordnet
+from nltk.corpus import wordnet as wn
 
 def findNyms(word):
   '''
@@ -36,9 +36,10 @@ def findNyms(word):
   nymsDict['meronyms']  = []
   nymsDict['holonyms']  = []
 
-  for synset in wordnet.synsets(word):
+  for synset in wn.synsets(word):
     for lemma in synset.lemmas():
-      nymsDict['synonyms'].append(lemma.name())
+      if lemma.name()!=word:
+        nymsDict['synonyms'].append(lemma.name())
       if lemma.antonyms():
         for ant in lemma.antonyms():
           nymsDict['antonyms'].append(ant.name())
@@ -58,3 +59,17 @@ def findNyms(word):
   for key in nymsDict:
     nymsDict[key] = set(nymsDict[key])
   return nymsDict
+
+def findSimilarity(word1, word2):
+  '''
+  This method is designed to find similarity between two words.
+  The returned value is in [0,1] interval; if the returned value 
+  is 1 then two words are direct synonyms. TIf the returned value 
+  i sNone this implies that no connecting path can be determined.
+  '''
+  synset1 = wn.synsets(word1)
+  synset2 = wn.synsets(word2)
+  
+  distance = wn.path_similarity(synset1[0],synset2[0])
+  
+  return distance
