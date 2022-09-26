@@ -60,7 +60,6 @@ if __name__ == "__main__":
   entId = "SSC"
 
   patternsOPM = generatePatternList(ents, label=label, id=entId, nlp=nlp, attr="LEMMA")
-  print(patternsOPM)
   ########################################################################
   #  Parse causal keywords, and generate patterns for them
   #  The patterns can be used to identify the causal relationships

@@ -442,6 +442,8 @@ class RuleBasedMatcher(object):
                 healthStatus = root
           else:
             continue
+          if healthStatus is None:
+            continue
           # determine the conjecture of health status
           if isinstance(healthStatus, Span):
             conjecture = self.isConjecture(healthStatus.root.head)
