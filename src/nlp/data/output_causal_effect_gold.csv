@@ -7,7 +7,9 @@
 ",False
 3,Pump,inspection,revealed,impeller,degradation,"Pump inspection revealed excessive impeller degradation.
 ",False
-4,pump shaft,Several cracks,caused,pump,failure,"Several cracks on pump shaft were observed; they could have caused pump failure within few days.
+4,Pump,inspection,revealed,impeller,degradation,"Pump inspection revealed excessive impeller degradation likely due to cavitation.
 ",True
-5,Pump shaft,noise,made,Pump shaft,noise,"Pump shaft made noise.
+5,pump shaft,Several cracks,caused,pump,failure,"Several cracks on pump shaft were observed; they could have caused pump failure within few days.
+",True
+6,pump shaft,vibration,causing,motor,vibrate,"The pump shaft vibration appears to be causing the motor to vibrate as well.
 ",False

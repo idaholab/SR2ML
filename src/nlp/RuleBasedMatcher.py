@@ -580,6 +580,25 @@ class RuleBasedMatcher(object):
           idx = i
     return idx
 
+  def getSSCEnt(self, entList, index, direction='left'):
+    """
+    """
+    ent = None
+    if direction.lower() == 'left':
+      for i in range(index, -1, -1):
+        ent = entList[i]
+        if isinstance(ent, list):
+          # we may check the ent label here
+          return ent
+    elif direction.lower() == 'right':
+      maxInd = len(entList)
+      for i in range(index, maxInd):
+        ent = entList[i]
+        if isinstance(ent, list):
+          # we may check the ent label here
+          return ent
+    return ent
+
 
   def extractRelDep(self, matchedSents):
     """
@@ -652,7 +671,8 @@ class RuleBasedMatcher(object):
         if cIdx == 0:
           ent1 = orderedEnts[cIdx+1]
           ent2 = orderedEnts[cIdx+2]
-          if ent1 in sscEnts and ent2 in sscEnts:
+          if isinstance(ent1, list) and isinstance(ent2, list):
+          # if ent1 in sscEnts and ent2 in sscEnts:
             loc1 = ent1[0].start
             loc2 = ent2[0].start
             self.extractCausalForTwoEnts(sent, cEnt, ent1, ent2, loc1, loc2)
@@ -663,10 +683,11 @@ class RuleBasedMatcher(object):
         ent1 = None
         ent2 = None
         ent = orderedEnts[cIdx-1]
-        # check the root of ent
-        entRoot = ent[0].root
-        if entRoot in cEnt.root.subtree or entRoot in cEnt.root.head.subtree or entRoot in cEnt.root.head.head.subtree:
-          ent1 = ent
+        if isinstance(ent, list):
+          # check the root of ent
+          entRoot = ent[0].root
+          if entRoot in cEnt.root.subtree or entRoot in cEnt.root.head.subtree or entRoot in cEnt.root.head.head.subtree:
+            ent1 = ent
         if ent1 is None:
           if len(orderedEnts) - cIdx - 1 < 2:
             # skip
@@ -680,9 +701,15 @@ class RuleBasedMatcher(object):
             self._causalSentsOneEnt.append(sent)
             continue
           ent2 = orderedEnts[cIdx+1]
+        if isinstance(ent1, list) and isinstance(ent2, list):
           loc1 = ent1[0].start
           loc2 = ent2[0].start
           self.extractCausalForTwoEnts(sent, cEnt, ent1, ent2, loc1, loc2)
+        else:
+          # skip
+          self._causalSentsOneEnt.append(sent)
+          continue
+
 
 
       # for ent in sscEnts:
