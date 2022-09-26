@@ -59,7 +59,8 @@ if __name__ == "__main__":
   label = "pump_component"
   entId = "SSC"
 
-  patternsOPM = generatePatternList(ents, label=label, id=entId, nlp=nlp, attr="LOWER")
+  patternsOPM = generatePatternList(ents, label=label, id=entId, nlp=nlp, attr="LEMMA")
+  print(patternsOPM)
   ########################################################################
   #  Parse causal keywords, and generate patterns for them
   #  The patterns can be used to identify the causal relationships
@@ -76,6 +77,8 @@ if __name__ == "__main__":
   textFile = config.nlpConfig['files']['text_file']
   with open(textFile, 'r') as ft:
     doc = ft.read()
+
+  # doc = "The Pump is not experiencing enough flow for the pumps to keep the check valves open during test."
 
   name = 'ssc_entity_ruler'
   matcher = RuleBasedMatcher(nlp, entLabel=entId, causalKeywordLabel=causalID)

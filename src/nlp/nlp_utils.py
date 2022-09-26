@@ -148,11 +148,15 @@ def generatePatternList(entList, label, id, nlp, attr="LOWER"):
   """
   ptnList = []
   for ent in entList:
+    # if default is LEMMA, we should also add LOWER to the pattern, since the lemma for "Cooling System"
+    # will be "cool System", which can not capture "cool system".
+    ptn = generatePattern(ent, label, id, attr="LOWER")
+    ptnList.append(ptn)
     if attr.lower() == "lemma":
       ent = extractLemma(ent, nlp)
       # print('ent lemma: --->', ent)
-    ptn = generatePattern(ent, label, id, attr)
-    ptnList.append(ptn)
+      ptnLemma = generatePattern(ent, label, id, attr)
+      ptnList.append(ptnLemma)
   return ptnList
 
 ###############

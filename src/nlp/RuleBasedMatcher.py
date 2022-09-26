@@ -402,15 +402,58 @@ class RuleBasedMatcher(object):
         for ent in ents:
           healthStatus = None
           root = ent.root
+          neg = False
           if root.dep_ in ['pobj']:
             healthStatus = root.head.head
-          elif root.dep_ in ['compound', 'nsubj']:
+          elif root.dep_ in ['compound']:
             healthStatus = root.head
+          elif root.dep_ in ['nsubj']:
+            root = root.head
+            neg, negText = self.isNegation(root)
+            if [root.lemma_] not in predSynonyms and root.pos_ != 'VERB':
+              if root.pos_ in ['NOUN', 'ADJ']:
+                healthStatus = root
+                if self._updateStatusKeywords:
+                  self.addKeywords({root.pos_:[root]}, 'status')
+            elif root.pos_ != 'VERB':
+              print('--- root not verb', root.text, root.pos_)
+              continue
+            else:
+              ent._.set('hs_keyword', root.lemma_)
+              passive = self.isPassive(root)
+              # # last is punct, the one before last is the root
+              # if root.nbor().pos_ in ['PUNCT']:
+              #   healthStatus = root
+              healthStatus = self.findRightObj(root)
+              if healthStatus and healthStatus.dep_ == 'pobj':
+                # include 'dobj' 'prep' and 'pobj'
+                # examples
+                # Pump had noise of cavitation
+                # RCP pump 1A had signs of past leakage
+                if healthStatus.head.head.dep_ == 'dobj':
+                  healthStatus = healthStatus.doc[healthStatus.head.head.i:healthStatus.i+1]
+              # no object is found
+              if not healthStatus:
+                healthStatus = self.findRightKeyword(root)
+              # last is punct, the one before last is the root
+              if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+                healthStatus = root
+              if healthStatus is None:
+                healthStatus = root
           else:
             continue
           # determine the conjecture of health status
-          conjecture = self.isConjecture(healthStatus.head)
-          neg, negText = self.isNegation(healthStatus)
+          if isinstance(healthStatus, Span):
+            conjecture = self.isConjecture(healthStatus.root.head)
+          elif isinstance(healthStatus, Token):
+            conjecture = self.isConjecture(healthStatus.head)
+          if not neg:
+            if isinstance(healthStatus, Span):
+              neg, negText = self.isNegation(healthStatus.root)
+            else:
+              neg, negText = self.isNegation(healthStatus)
+          # conjecture = self.isConjecture(healthStatus.head)
+          # neg, negText = self.isNegation(healthStatus)
           if neg:
             healthStatus = ' '.join([negText,healthStatus.text])
           logger.debug(f'{ent} health status: {healthStatus}')

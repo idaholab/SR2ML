@@ -23,13 +23,14 @@
 21,pump,,failure,True
 22,pump,cavitate,some degree,False
 23,pump shaft,,vibration,False
-24,motor,,vibrate,False
+24,motor,vibrate,vibrate,False
 25,Pump,have,noise of cavitation,False
 26,pump shaft,,deflection,False
 27,Pump,experience,not enough flow,False
-28,Pump shaft,make,noise,False
-29,pump shaft,seem,Vibration,True
-30,pump shaft,,deflection,False
-31,Pump bearings,appear,acceptable condition,False
-32,Pump,make,noises,False
-33,Pump shaft,have,a slight deflection,False
+28,pumps,,enough flow,False
+29,Pump shaft,make,noise,False
+30,pump shaft,seem,Vibration,True
+31,pump shaft,,deflection,False
+32,Pump bearings,appear,acceptable condition,False
+33,Pump,make,noises,False
+34,Pump shaft,have,a slight deflection,False
