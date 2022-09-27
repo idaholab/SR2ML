@@ -52,7 +52,7 @@ def extractUnits(fileName):
   measures = df['operands'][['Properties [prop]','units [unit]']]
   for index,elem in measures.iterrows():
     if not pd.isnull(elem['units [unit]']):
-      measuresDict[elem['Properties [prop]']] = elem['units [unit]'].split(',')
+      measuresDict[elem['Properties [prop]']] = elem['units [unit]'].replace(" ", "").split(',')
   return measuresDict
 
 def cleanTagDict(tagsDict):
