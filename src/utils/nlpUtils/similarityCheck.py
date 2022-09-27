@@ -64,8 +64,8 @@ def findSimilarity(word1, word2):
   '''
   This method is designed to find similarity between two words.
   The returned value is in [0,1] interval; if the returned value 
-  is 1 then two words are direct synonyms. TIf the returned value 
-  i sNone this implies that no connecting path can be determined.
+  is 1 then two words are direct synonyms. If no connecting path 
+  between the two words can be determined, None is returned,.
   '''
   synset1 = wn.synsets(word1)
   synset2 = wn.synsets(word2)
