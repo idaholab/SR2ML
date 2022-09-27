@@ -44,7 +44,7 @@ def keyWordListGenerator(fileName):
 def extractUnits(fileName):
   '''
   Method designed to extract measure units from provided file.
-  It returns a dictionary which contain, for each quantity, a list of common used units, e.g.,
+  It returns a dictionary which contains, for each quantity, a list of common used units, e.g.,
     {'Pressure': ['pa', ' torr', ' barr', ' atm', ' psi']}
   '''
   measuresDict = {}

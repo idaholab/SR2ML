@@ -8,9 +8,12 @@ import tagKeywordListReader as tklr
 
 def patternCreator(tagDict):
   """
-    
-    @ In, tagDict, dict, []
-    @ Out, patterns, [], []
+    This method is designed to create patterns from the tags and the corresponding list of
+    keywords.
+    @ In, tagDict, dict, dictionary containing tags and keywords. This dictionary is generated
+                         by keyWordListGenerator() located in tagKeywordListReader.py from the
+                         file nlp/data/tag_keywords_lists.xlsx
+    @ Out, patterns, list, list of patterns: {"label": label_ID, "pattern": keyword}
   """
   patterns = []
   for tag in tagDict:
@@ -20,10 +23,17 @@ def patternCreator(tagDict):
   return patterns
 
 def unitPatternCreator(measureDict):
+  """
+    This method is designed to to create patterns in order to identify unit of measures
+    @ In, measureDict, dict, dictionary which contains, for each quantity, a list of commonly
+                       used units, e.g.,
+                            {'Pressure': ['pa', ' torr', ' barr', ' atm', ' psi']}
+    @ Out, patterns, list, list of patterns: {"label": "unit", "pattern": unitID}
+  """
   unitPatterns = []
   for measure in measureDict:
     for elem in measureDict[measure]:
-      listElem ={"label": 'unit', "pattern": elem}
+      listElem ={"label": "unit", "pattern": elem}
       unitPatterns.append(listElem)
   return unitPatterns
 
@@ -44,5 +54,5 @@ Example of usage:
 > doc = nlp('Pump shaft temperature was measured at about 45 Pa')
 > print([(ent.text, ent.label_) for ent in doc.ents])
   [('shaft', 'comp_mech_rot'), ('temperature', 'prop'), ('Pa', 'unit')]
-  
+
 '''
