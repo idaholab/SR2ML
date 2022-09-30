@@ -755,7 +755,14 @@ class RuleBasedMatcher(object):
           self._causalSentsOneEnt.append(sent)
           continue
 
-
+      # How to handle multiple causal keywords in one sentence?
+      # for any token, we can check
+      # token.ent_type_ : label for the entity
+      # token.ent_iob: 3 means the token begins an entity, 2 means it outside an entity, 1 means it is inside and 0 means no entity tag is set
+      # token.ent_iob_: "B" token begins an entity, "I" means it is inside an entity, "O" means it is outside an entity, and "" means no entity tag is set
+      # Loop over causal keywords, make functions, for each of [verb, noun, transition]
+      # Define rules for each functions
+      
 
       # for ent in sscEnts:
       #   valid = self.isValidCausalEnts(ent)
