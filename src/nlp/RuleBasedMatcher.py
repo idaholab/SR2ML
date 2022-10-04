@@ -763,15 +763,20 @@ class RuleBasedMatcher(object):
       # Loop over causal keywords, make functions, for each of [verb, noun, transition]
       # Define rules for each functions
       causeEffectPair = []
+      skipCEnts = []
+      rootCause = None
       for i, cEnt in enumerate(causalEnts):
+        if cEnt in skipCEnts:
+          continue
         cRoot = cEnt.root
         cRootLoc = cRoot.i
         cEntLemma = [token.lemma_ for token in cEnt if token.lemma_ != "DET"]
-        rootCause = None
         rightSSCEnts = self.getRightSSCEnts(cEnt, orderedEnts)
         leftSSCEnts = self.getLeftSSCEnts(cEnt, orderedEnts)
         validLeftSSCEnts = self.selectValidEnts(leftSSCEnts, cEnt)
         validRightSSCEnts = self.selectValidEnts(rightSSCEnts, cEnt)
+        if validLeftSSCEnts is None and validRightSSCEnts is None:
+          continue
         if cRoot.pos_ == 'VERB' and cRoot == sent.root:
           passive = self.isPassive(root)
           conjecture = self.isConjecture(cRoot)
@@ -849,6 +854,8 @@ class RuleBasedMatcher(object):
                 if subj is None:
                   continue
                 causeEffectPair.append((subj, validRightSSCEnts, conjecture))
+              if rootCause is None:
+                rootCause = causeEffectPair[-1]
             elif cRoot.dep_ in ['nsubj']:
               nounCauseList = None
               nounEffectList = None
@@ -874,6 +881,7 @@ class RuleBasedMatcher(object):
                         continue
                       nounCauseList = [obj]
                       causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+                    skipCEnts.append(nextCEnt)
                 else:
                   obj = self.findObj(cRoot.head)
                   if obj is None:
@@ -882,6 +890,8 @@ class RuleBasedMatcher(object):
                   causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
               else:
                 causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+              if rootCause is None:
+                rootCause = causeEffectPair[-1]
           elif causalEntLemma in self._causalKeywords['effect-noun']:
             cRootHead = cRoot.head
             conjecture = self.isConjecture(cRootHead)
@@ -910,6 +920,8 @@ class RuleBasedMatcher(object):
                 if subj is None:
                   continue
                 causeEffectPair.append((validRightSSCEnts, subj, conjecture))
+                if rootCause is None:
+                  rootCause = causeEffectPair[-1]
             elif cRoot.dep_ in ['nsubj']:
               nounCauseList = None
               nounEffectList = None
@@ -935,6 +947,7 @@ class RuleBasedMatcher(object):
                         continue
                       nounEffectList = [obj]
                       causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+                    skipCEnts.append(nextCEnt)
                 else:
                   obj = self.findObj(cRoot.head)
                   if obj is None:
@@ -943,42 +956,55 @@ class RuleBasedMatcher(object):
                   causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
               else:
                 causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+              if rootCause is None:
+                rootCause = causeEffectPair[-1]
         elif causalEntLemma in self._causalKeywords['causal-relator']:
-          pass
-        elif causalEntLemma in self._causalKeywords['effect-relator']:
-          pass
-
-
-        elif cRoot.pos_ == 'NOUN':
-          if causalEntLemma in self._causalKeywords['causal-noun']:
-            if rootLoc > loc1 and rootLoc < loc2:
-              # assert sscEnts[1].root in root.subtree
-              self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-            elif rootLoc < loc1:
-              # assert sscEnts[0].root in root.subtree
-              self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
-          elif causalEntLemma in self._causalKeywords['effect-noun']:
-            if rootLoc > loc1 and rootLoc < loc2:
-              # assert sscEnts[1].root in root.subtree
-              if root.dep_ in ['attr']:
-                self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
-              elif root.dep_ in ['dobj']:
-                self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-            elif rootLoc < loc1:
-              # assert sscEnts[0].root in root.subtree
-              self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-        elif causalEntLemma in self._causalKeywords['causal-relator']:
-          if rootLoc > loc1 and rootLoc < loc2:
-            self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
+          if validLeftSSCEnts is None:
+            if rootCause is None:
+              continue
+            causeEffectPair.append((rootCause, validRightSSCEnts, conjecture))
+          elif validRightSSCEnts is not None:
+            causeEffectPair.append((validLeftSSCEnts, validRightSSCEnts, conjecture))
           else:
-            logger.debug(f'Not yet implemented! causal keyword {causalEntLemma}, sentence {sent}')
+            continue
         elif causalEntLemma in self._causalKeywords['effect-relator']:
-          if rootLoc > loc1 and rootLoc < loc2:
-            self.collectExtactedCausals(ent2, ent1, causalEnt, sent)
-          elif rootLoc < loc1:
-            self.collectExtactedCausals(ent1, ent2, causalEnt, sent)
-
-
+          if validLeftSSCEnts is not None and validRightSSCEnts is not None:
+            causeEffectPair.append((validRightSSCEnts, validLeftSSCEnts, conjecture))
+          elif validLeftSSCEnts is None and validRightSSCEnts is not None:
+            nounCauseList, nounEffectList = self.splitEntsFollowingNounCausal(cRoot, validRightSSCEnts)
+            if nounCauseList is None:
+              obj = self.findObj(cRoot)
+              if obj is None:
+                continue
+              nounCauseList = [obj]
+            if nounEffectList is None:
+              if i < len(causalEnts) - 1:
+                nextCEnt = causalEnts[i+1]
+                nextCEntLemma = [token.lemma_ for token in nextCEnt if token.lemma_ != "DET"]
+                if nextCEntLemma in self._causalKeywords['causal-relator']:
+                  ents = self.getRightSSCEnts(nextCEnt, orderedEnts)
+                  validEnts = self.selectValidEnts(ents, nextCEnt)
+                  if validEnts is not None:
+                    causeEffectPair.append((nounCauseList, validEnts, conjecture))
+                  else:
+                    obj = self.findObj(nextCEnt.root)
+                    if obj is None:
+                      continue
+                    nounEffectList = [obj]
+                    causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+                  skipCEnts.append(nextCEnt)
+              else:
+                obj = self.findObj(cRoot.head)
+                if obj is None:
+                  continue
+                nounEffectList = [obj]
+                causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+            else:
+              causeEffectPair.append((nounCauseList, nounEffectList, conjecture))
+            if rootCause is None:
+              rootCause = causeEffectPair[-1]
+          else:
+            continue
 
 
       # for ent in sscEnts:
