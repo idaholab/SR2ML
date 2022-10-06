@@ -303,7 +303,7 @@ class ETStructure(object):
     seqID        = []
 
     for node in root.findall('define-sequence'):
-      for child in node.getiterator():
+      for child in node.iter():
         if 'event-tree' in child.tag:
           dependencies.append(child.get('name'))
           seqID.append(node.get('name'))
