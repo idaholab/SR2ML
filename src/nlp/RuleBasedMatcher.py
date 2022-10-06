@@ -735,59 +735,30 @@ class RuleBasedMatcher(object):
           passive = self.isPassive(root)
           conjecture = self.isConjecture(cRoot)
           if validLeftSSCEnts is not None and validRightSSCEnts is not None:
-            if not passive:
-              causeList = validLeftSSCEnts
-              effectList = validRightSSCEnts
-            else:
-              causeList = validRightSSCEnts
-              effectList = validLeftSSCEnts
+            causeList = validLeftSSCEnts
+            effectList = validRightSSCEnts
           elif validLeftSSCEnts is None and validRightSSCEnts is not None:
             subj = self.findSubj(cRoot, passive)
             if subj is None:
               continue
-            if not passive:
-              causeList = [[subj]]
-              effectList = validRightSSCEnts
-            else:
-              causeList = validRightSSCEnts
-              effectList = [[subj]]
+            causeList = [[subj]]
+            effectList = validRightSSCEnts
           elif validLeftSSCEnts is not None and validRightSSCEnts is None:
             obj = self.findObj(cRoot)
             if obj is None:
               continue
-            if not passive:
-              causeList = validLeftSSCEnts
-              effectList = [[obj]]
-            else:
-              causeList = [[obj]]
-              effectList = validLeftSSCEnts
+            causeList = validLeftSSCEnts
+            effectList = [[obj]]
           else:
             continue
+          if passive:
+            causeList, effectList = effectList, causeList
           rootCause = (causeList, effectList, conjecture)
         elif cRoot.pos_ == 'VERB' and cRoot != sent.root:
-          # xcomp: open clausal complement i.e., rendering ..., causing ...
-          # advcl: adverbial clause modifier i.e., ... which disabled ...
-          # relcl: relative clause modifier i.e. ..., which disabled ...
           conjecture = self.isConjecture(cRoot)
-          if cRoot.dep_ in ['xcomp', 'advcl', 'relcl']:
-            if rightSSCEnts is None:
-              continue
-            if rootCause is not None:
-              # using rootCause as the cause
-              causeList = rootCause
-              effectList = validRightSSCEnts
-            else:
-              if validLeftSSCEnts is not None:
-                causeList = validLeftSSCEnts
-                effectList = validRightSSCEnts
-              else:
-                head = cRoot.head
-                passive = self.isPassive(head)
-                subj = self.findSubj(head, passive)
-                if subj is None:
-                  continue
-                causeList = [[subj]]
-                effectList = validRightSSCEnts
+          if rightSSCEnts is None:
+            continue
+          causeList, effectList = self.identifyCauseEffectForClauseModifier(cRoot, rootCause, validLeftSSCEnts, validRightSSCEnts)
         elif cRoot.pos_ == 'NOUN':
           if causalEntLemma in self._causalKeywords['causal-noun']:
             cRootHead = cRoot.head
@@ -795,65 +766,14 @@ class RuleBasedMatcher(object):
             if validRightSSCEnts is None:
               continue
             if cRootHead.dep_ in ['xcomp', 'advcl', 'relcl']:
-              if rootCause is not None:
-                # using rootCause as the cause
-                causeList = rootCause
-                effectList = validRightSSCEnts
-              else:
-                if validLeftSSCEnts is not None:
-                  causeList = validLeftSSCEnts
-                  effectList = validRightSSCEnts
-                else:
-                  head = cRootHead.head
-                  passive = self.isPassive(head)
-                  subj = self.findSubj(head, passive)
-                  if subj is None:
-                    continue
-                  causeList = [[subj]]
-                  effectList = validRightSSCEnts
+              causeList, effectList = self.identifyCauseEffectForClauseModifier(cRootHead, rootCause, validLeftSSCEnts, validRightSSCEnts)
             elif cRoot.dep_ in ['attr']:
-              if validLeftSSCEnts is not None:
-                causeList = validLeftSSCEnts
-                effectList = validRightSSCEnts
-              else:
-                passive = self.isPassive(cRootHead)
-                subj = self.findSubj(cRootHead, passive)
-                if subj is None:
-                  continue
-                causeList = [[subj]]
-                effectList = validRightSSCEnts
+              causeList, effectList = self.identifyCauseEffectForAttr(self, cRootHead, validLeftSSCEnts, validRightSSCEnts)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
             elif cRoot.dep_ in ['nsubj']:
-              causeList = None
-              effectList = None
-              if validRightSSCEnts is not None:
-                effectList, causeList  = self.splitEntsFollowingNounCausal(cRoot, validRightSSCEnts)
-              if validRightSSCEnts is None or effectList is None:
-                obj = self.findObj(cRoot)
-                if obj is None:
-                  continue
-                effectList = [[obj]]
-              if causeList is None:
-                if i < len(causalEnts) - 1:
-                  nextCEnt = causalEnts[i+1]
-                  nextCEntLemma = [token.lemma_.lower() for token in nextCEnt if token.lemma_ != "DET"]
-                  if nextCEntLemma in self._causalKeywords['effect-relator']:
-                    ents = self.getRightSSCEnts(nextCEnt, orderedEnts)
-                    validEnts = self.selectValidEnts(ents, nextCEnt)
-                    if validEnts is not None:
-                      causeList = validEnts
-                    else:
-                      obj = self.findObj(nextCEnt.root)
-                      if obj is None:
-                        continue
-                      causeList = [[obj]]
-                    skipCEnts.append(nextCEnt)
-                else:
-                  obj = self.findObj(cRoot.head)
-                  if obj is None:
-                    continue
-                  causeList = [[obj]]
+              causeList, effectList, skip = self.identifyCauseEffectForNsuj(cRoot, i, causalEnts, orderedEnts, validRightSSCEnts, reverse=True)
+              skipCEnts.extend(skip)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
           elif causalEntLemma in self._causalKeywords['effect-noun']:
@@ -862,63 +782,14 @@ class RuleBasedMatcher(object):
             if validRightSSCEnts is None:
               continue
             if cRootHead.dep_ in ['xcomp', 'advcl', 'relcl']:
-              if rootCause is not None:
-                # using rootCause as the effect
-                effectList = rootCause
-                causeList = validRightSSCEnts
-              else:
-                if validLeftSSCEnts is not None:
-                  causeList = validRightSSCEnts
-                  effectList = validLeftSSCEnts
-                else:
-                  head = cRootHead.head
-                  passive = self.isPassive(head)
-                  subj = self.findSubj(head, passive)
-                  if subj is None:
-                    continue
-                  causeList = validRightSSCEnts
-                  effectList = [[subj]]
+              causeList, effectList = self.identifyCauseEffectForClauseModifier(cRootHead, rootCause, validLeftSSCEnts, validRightSSCEnts, reverse=True)
             elif cRoot.dep_ in ['attr']:
-              if validLeftSSCEnts is not None:
-                causeList = validRightSSCEnts
-                effectList = validLeftSSCEnts
-              else:
-                passive = self.isPassive(cRootHead)
-                subj = self.findSubj(cRootHead, passive)
-                if subj is None:
-                  continue
-                causeList = validRightSSCEnts
-                effectList = [[subj]]
+              causeList, effectList = self.identifyCauseEffectForAttr(self, cRootHead, validLeftSSCEnts, validRightSSCEnts, reverse=True)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
             elif cRoot.dep_ in ['nsubj']:
-              if validRightSSCEnts is not None:
-                causeList, effectList = self.splitEntsFollowingNounCausal(cRoot, validRightSSCEnts)
-              if validRightSSCEnts is None or causeList is None:
-                obj = self.findObj(cRoot)
-                if obj is None:
-                  continue
-                causeList = [[obj]]
-              if effectList is None:
-                if i < len(causalEnts) - 1:
-                  nextCEnt = causalEnts[i+1]
-                  nextCEntLemma = [token.lemma_.lower() for token in nextCEnt if token.lemma_ != "DET"]
-                  if nextCEntLemma in self._causalKeywords['causal-relator']:
-                    ents = self.getRightSSCEnts(nextCEnt, orderedEnts)
-                    validEnts = self.selectValidEnts(ents, nextCEnt)
-                    if validEnts is not None:
-                      effectList = validEnts
-                    else:
-                      obj = self.findObj(nextCEnt.root)
-                      if obj is None:
-                        continue
-                      effectList = [[obj]]
-                    skipCEnts.append(nextCEnt)
-                else:
-                  obj = self.findObj(cRoot.head)
-                  if obj is None:
-                    continue
-                  effectList = [obj]
+              causeList, effectList, skip = self.identifyCauseEffectForNsuj(cRoot, i, causalEnts, orderedEnts, validRightSSCEnts, reverse=False)
+              skipCEnts.extend(skip)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
         elif causalEntLemma in self._causalKeywords['causal-relator']:
@@ -937,32 +808,8 @@ class RuleBasedMatcher(object):
             causeList = validRightSSCEnts
             effectList = validLeftSSCEnts
           elif validLeftSSCEnts is None and validRightSSCEnts is not None:
-            causeList, effectList = self.splitEntsFollowingNounCausal(cRoot, validRightSSCEnts)
-            if causeList is None:
-              obj = self.findObj(cRoot)
-              if obj is None:
-                continue
-              causeList = [[obj]]
-            if effectList is None:
-              if i < len(causalEnts) - 1:
-                nextCEnt = causalEnts[i+1]
-                nextCEntLemma = [token.lemma_.lower() for token in nextCEnt if token.lemma_ != "DET"]
-                if nextCEntLemma in self._causalKeywords['causal-relator']:
-                  ents = self.getRightSSCEnts(nextCEnt, orderedEnts)
-                  validEnts = self.selectValidEnts(ents, nextCEnt)
-                  if validEnts is not None:
-                    effectList = validEnts
-                  else:
-                    obj = self.findObj(nextCEnt.root)
-                    if obj is None:
-                      continue
-                    effectList = [[obj]]
-                  skipCEnts.append(nextCEnt)
-              else:
-                obj = self.findObj(cRoot.head)
-                if obj is None:
-                  continue
-                effectList = [[obj]]
+            causeList, effectList, skip = self.identifyCauseEffectForNsuj(cRoot, i, causalEnts, orderedEnts, validRightSSCEnts, reverse=False)
+            skipCEnts.extend(skip)
             if rootCause is None:
               rootCause = (causeList, effectList, conjecture)
           else:
@@ -986,12 +833,99 @@ class RuleBasedMatcher(object):
       for i in elem:
         print(i)
 
+  def identifyCauseEffectForNsuj(self, cRoot, cEntsIndex, causalEnts, orderedEnts, validRightSSCEnts, reverse=False):
+    """
+    """
+    causeList = None
+    effectList = None
+    skipCEnts = []
+    if reverse:
+      cKey = 'effect-relator'
+    else:
+      cKey = 'causal-relator'
+    causeList, effectList = self.splitEntsFollowingNounCausal(cRoot, validRightSSCEnts)
+    if causeList is None:
+      obj = self.findObj(cRoot)
+      if obj is not None:
+        causeList = [[obj]]
+    if effectList is None:
+      if cEntsIndex < len(causalEnts) - 1:
+        nextCEnt = causalEnts[cEntsIndex+1]
+        nextCEntLemma = [token.lemma_.lower() for token in nextCEnt if token.lemma_ != "DET"]
+        if nextCEntLemma in self._causalKeywords[cKey]:
+          ents = self.getRightSSCEnts(nextCEnt, orderedEnts)
+          validEnts = self.selectValidEnts(ents, nextCEnt)
+          if validEnts is not None:
+            effectList = validEnts
+          else:
+            obj = self.findObj(nextCEnt.root)
+            if obj is not None:
+              effectList = [[obj]]
+          skipCEnts.append(nextCEnt)
+      else:
+        obj = self.findObj(cRoot.head)
+        if obj is not None:
+          effectList = [[obj]]
+    if reverse:
+      causeList, effectList = effectList, causeList
+    return causeList, effectList, skipCEnts
+
+  def identifyCauseEffectForAttr(self, cRoot, validLeftSSCEnts, validRightSSCEnts, reverse=False):
+    """
+    """
+    causeList = None
+    effectList = None
+    if validLeftSSCEnts is not None:
+      causeList = validLeftSSCEnts
+      effectList = validRightSSCEnts
+    else:
+      passive = self.isPassive(cRoot)
+      subj = self.findSubj(cRoot, passive)
+      if subj is not None:
+        causeList = [[subj]]
+        effectList = validRightSSCEnts
+    if reverse:
+      return effectList, causeList
+    else:
+      return causeList, effectList
+
+  def identifyCauseEffectForClauseModifier(self, cRoot, rootCause, validLeftSSCEnts, validRightSSCEnts, reverse=False):
+    """
+    """
+    causeList = None
+    effectList = None
+    # xcomp: open clausal complement i.e., rendering ..., causing ...
+    # advcl: adverbial clause modifier i.e., ... which disabled ...
+    # relcl: relative clause modifier i.e. ..., which disabled ...
+    if cRoot.dep_ not in ['xcomp', 'advcl', 'relcl']:
+      return causeList, effectList
+    if rootCause is not None:
+      # using rootCause as the cause
+      causeList = rootCause
+      effectList = validRightSSCEnts
+    else:
+      if validLeftSSCEnts is not None:
+        causeList = validLeftSSCEnts
+        effectList = validRightSSCEnts
+      else:
+        head = cRoot.head
+        passive = self.isPassive(head)
+        subj = self.findSubj(head, passive)
+        if subj is not None:
+          causeList = [[subj]]
+          effectList = validRightSSCEnts
+    if reverse:
+      return effectList, causeList
+    else:
+      return causeList, effectList
 
   def splitEntsFollowingNounCausal(self, cRoot, validRightSSCEnts):
     """
     """
     cause = []
     effect = []
+    if validRightSSCEnts is None:
+      return None, None
     for ents in validRightSSCEnts:
       root = ents[0].root
       if root in cRoot.subtree:
