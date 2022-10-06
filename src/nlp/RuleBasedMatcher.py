@@ -727,36 +727,29 @@ class RuleBasedMatcher(object):
         leftSSCEnts = self.getLeftSSCEnts(cEnt, orderedEnts)
         validLeftSSCEnts = self.selectValidEnts(leftSSCEnts, cEnt)
         validRightSSCEnts = self.selectValidEnts(rightSSCEnts, cEnt)
-        causeList = None
-        effectList = None
+        # initial assignment
+        causeList = validLeftSSCEnts
+        effectList = validRightSSCEnts
         if validLeftSSCEnts is None and validRightSSCEnts is None:
+          logger.debug(f'No causal/effect entities exist in "{sent}"')
           continue
         if cRoot.pos_ == 'VERB' and cRoot == sent.root:
           passive = self.isPassive(root)
           conjecture = self.isConjecture(cRoot)
-          if validLeftSSCEnts is not None and validRightSSCEnts is not None:
-            causeList = validLeftSSCEnts
-            effectList = validRightSSCEnts
-          elif validLeftSSCEnts is None and validRightSSCEnts is not None:
+          if causeList is None:
             subj = self.findSubj(cRoot, passive)
-            if subj is None:
-              continue
-            causeList = [[subj]]
-            effectList = validRightSSCEnts
-          elif validLeftSSCEnts is not None and validRightSSCEnts is None:
+            if subj is not None:
+              causeList = [[subj]]
+          if effectList is None:
             obj = self.findObj(cRoot)
-            if obj is None:
-              continue
-            causeList = validLeftSSCEnts
-            effectList = [[obj]]
-          else:
-            continue
+            if obj is not None:
+              effectList = [[obj]]
           if passive:
             causeList, effectList = effectList, causeList
           rootCause = (causeList, effectList, conjecture)
         elif cRoot.pos_ == 'VERB' and cRoot != sent.root:
           conjecture = self.isConjecture(cRoot)
-          if rightSSCEnts is None:
+          if validRightSSCEnts is None:
             continue
           causeList, effectList = self.identifyCauseEffectForClauseModifier(cRoot, rootCause, validLeftSSCEnts, validRightSSCEnts)
         elif cRoot.pos_ == 'NOUN':
@@ -776,6 +769,8 @@ class RuleBasedMatcher(object):
               skipCEnts.extend(skip)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
+            else:
+              continue
           elif causalEntLemma in self._causalKeywords['effect-noun']:
             cRootHead = cRoot.head
             conjecture = self.isConjecture(cRootHead)
@@ -792,21 +787,14 @@ class RuleBasedMatcher(object):
               skipCEnts.extend(skip)
               if rootCause is None:
                 rootCause = (causeList, effectList, conjecture)
-        elif causalEntLemma in self._causalKeywords['causal-relator']:
-          if validLeftSSCEnts is None:
-            if rootCause is None:
+            else:
               continue
+        elif causalEntLemma in self._causalKeywords['causal-relator']:
+          if causeList is None:
             causeList = rootCause
-            effectList = validRightSSCEnts
-          elif validRightSSCEnts is not None:
-            causeList = validLeftSSCEnts
-            effectList = validRightSSCEnts
-          else:
-            continue
         elif causalEntLemma in self._causalKeywords['effect-relator']:
           if validLeftSSCEnts is not None and validRightSSCEnts is not None:
-            causeList = validRightSSCEnts
-            effectList = validLeftSSCEnts
+            causeList, effectList = effectList, causeList
           elif validLeftSSCEnts is None and validRightSSCEnts is not None:
             causeList, effectList, skip = self.identifyCauseEffectForNsuj(cRoot, i, causalEnts, orderedEnts, validRightSSCEnts, reverse=False)
             skipCEnts.extend(skip)
@@ -816,6 +804,8 @@ class RuleBasedMatcher(object):
             continue
         if causeList is None or effectList is None:
           logger.warning(f"Issue found: 'cause list': {causeList}, and 'effect list': {effectList} were identified in sentence '{sent}'")
+          continue
+        if causeList is None or effectList is None:
           continue
         causeEffectPair.append((causeList, effectList, conjecture))
         if isinstance(causeList, tuple):
