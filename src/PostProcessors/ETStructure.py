@@ -458,7 +458,7 @@ class ETStructure(object):
         ## fill in the details under this branch, later iterations will
         ## correct lower rows if a path does change
         X[rowCounter, col] = val
-        for fork in path.getchildren():
+        for fork in iter(path):
           newCounter = self.constructPointDFS(fork, inputMap, stateMap, outputMap, X, rowCounter)
           for i in range(newCounter-rowCounter):
             X[rowCounter+i, col] = val
