@@ -1,0 +1,76 @@
+,entities,status keywords,health statuses,conjecture
+0,Atmospheric Steam Dump Valves,,Inoperable,False
+1,Relay,,Failure,False
+2,control room,identify,operations,False
+3,steam dump control relay,fail,failed,False
+4,atmospheric steam dump valves,,inoperable,False
+5,relay,,,False
+6,ASDVs,,,False
+7,control room,identify,operators,False
+8,steam dump control relay,fail,valves,False
+9,atmospheric steam dump valves,,,False
+10,steam dump and bypass system,consist,ASDVs,False
+11,ASDVs,,consists,False
+12,turbine,,bypass,False
+13,valve,,,False
+14,condenser,,exhausts,False
+15,ASDVs,,,False
+16,turbine,,,False
+17,valves,,,False
+18,steam flow with reactor,,,False
+19,ASDVs,,The capacity,False
+20,steam safety valves,,lifting,True
+21,turbine,,,False
+22,turbine,,,False
+23,condenser,,,False
+24,steam dump system,,,False
+25,ASDVs,,,False
+26,control room,,controlled,True
+27,control panels,,,False
+28,ASDVs,have,a back-up nitrogen supply,False
+29,steam generator,,control,True
+30,circuit,,,False
+31,fuse,,1,False
+32,IM13-1,,,False
+33,FNM-5,,,False
+34,steam dump control relay coil,,failure,False
+35,fuse,,The opening,False
+36,IM13 scheme,,resulted,False
+37,ASDVs,,the manual operation,False
+38,SDCR,find,have,False
+39,SDCR coil,,failure,False
+40,relay coil,,the age,False
+41,relay,,recommended,False
+42,relay,classify,not 2005,False
+43,relay,,The duty cycle,False
+44,relay,,the normally energized state,False
+45,relay,manufacture,General Electric,False
+46,fuse,,,False
+47,relay,,,False
+48,ASDVs,,,False
+49,ASDVs,,,False
+50,Fuse,,1,False
+51,IM13-1,open,the automatic fast-open function,False
+52,ASDVs,,the manual operation,False
+53,fuse,open,coil,False
+54,SDCR,,relay,False
+55,relay,fail,coil,False
+56,electrical coil,,an internal failure,False
+57,relay coil,,failure,False
+58,relay coil,,the age,False
+59,relay coil,,,False
+60,relay,,the duty cycle,False
+61,relay,,the normally energized state,False
+62,SDCR,,the failure,False
+63,circuit,,,False
+64,relay coil,,circuit,False
+65,IM13 circuit,,was,False
+66,fuse,,FUZ,False
+67,IM13-1,,opening,False
+68,IM13 scheme,,loss,False
+69,ASDVs,,the automatic fast-open function,False
+70,ASDVs,,manual operation,False
+71,fuse,,,False
+72,relay,,,False
+73,relay,revise,The preventive maintenance optimization code,False
+74,relay,prioritize,This action,True
