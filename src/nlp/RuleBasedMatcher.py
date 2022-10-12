@@ -405,7 +405,8 @@ class RuleBasedMatcher(object):
     if root.dep_ not in ['pobj']:
       return healthStatus
     grandparent = root.head.head
-    if grandparent.dep_ in ['dobj']:
+    parent = root.head
+    if grandparent.dep_ in ['dobj', 'nsubj', 'nsubjpass', 'pobj']:
       if not include:
         healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
       else:
@@ -429,10 +430,12 @@ class RuleBasedMatcher(object):
     healthStatus = None
     deps = [tk.dep_ in ['amod'] for tk in ent.lefts]
     if any(deps):
-      self.getPhrase(ent, start, end, include)
+      healthStatus = self.getPhrase(ent, start, end, include)
+    elif include:
+      healthStatus = ent
     return healthStatus
 
-  def getHealthStatusForSubj(self, ent, sent, causalStatus, predSynonyms):
+  def getHealthStatusForSubj(self, ent, sent, causalStatus, predSynonyms, include=False):
     """
     """
     healthStatus = None
@@ -470,14 +473,14 @@ class RuleBasedMatcher(object):
         if not healthStatus and root.nbor().pos_ in ['PUNCT']:
           healthStatus = root
         if healthStatus is None:
-          healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+          healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
         if healthStatus is None:
           healthStatus = root
       else:
-        healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+        healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
     return healthStatus, neg, negText
 
-  def getHealthStatusForObj(self, ent, sent, causalStatus, predSynonyms):
+  def getHealthStatusForObj(self, ent, sent, causalStatus, predSynonyms, include=False):
     """
     """
     healthStatus = None
@@ -506,9 +509,9 @@ class RuleBasedMatcher(object):
           healthStatus = self.getAmod(healthStatus, healthStatus.i, healthStatus.i+1, include=True)
       else:
         if entRoot.dep_ in ['pobj']:
-          healthStatus = self.getHealthStatusForPobj(ent, include=False)
+          healthStatus = self.getHealthStatusForPobj(ent, include=include)
         else:
-          healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+          healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
     return healthStatus, neg, negText
 
 
@@ -570,14 +573,49 @@ class RuleBasedMatcher(object):
         elif entRoot.dep_ in ['compound']:
           if len(ents) == 1:
             head = entRoot.head
+            if head.dep_ in ['compound']:
+              head = head.head
             headEnt = head.doc[head.i:head.i+1]
             if head.dep_ in ['nsubj', 'nsubjpass']:
-              healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, sent, causalStatus, predSynonyms)
+              healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, sent, causalStatus, predSynonyms, include=True)
             elif head.dep_ in ['dobj', 'pobj']:
-              healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, sent, causalStatus, predSynonyms)
+              healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, sent, causalStatus, predSynonyms, include=True)
           if healthStatus is None:
             healthStatus = entRoot.head
-        # if healthStatus is None:
+        else:
+          logger.warning(f'Entity "{ent}" dep_ is "{entRoot.dep_}" is not among valid list "[nsubj, nsubjpass, pobj, dobj, compound]"')
+          if entRoot.head == root:
+            headEnt = root.doc[root.i:root.i+1]
+            if ent.start < root.i:
+              if [root.lemma_.lower()] in predSynonyms:
+                ent._.set('hs_keyword', root.lemma_)
+              neg, negText = self.isNegation(root)
+              passive = self.isPassive(root)
+              # # last is punct, the one before last is the root
+              # if root.nbor().pos_ in ['PUNCT']:
+              #   healthStatus = root
+              healthStatus = self.findRightObj(root)
+              if healthStatus and healthStatus.dep_ == 'pobj':
+                healthStatus = self.getHealthStatusForPobj(healthStatus, include=True)
+              # no object is found
+              if not healthStatus:
+                healthStatus = self.findRightKeyword(root)
+              # last is punct, the one before last is the root
+              if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+                healthStatus = root
+              if healthStatus is None:
+                healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+              if healthStatus is None:
+                healthStatus = root
+            else:
+              if [root.lemma_.lower()] in predSynonyms:
+                ent._.set('hs_keyword', root.lemma_)
+              passive = self.isPassive(root)
+              neg, negText = self.isNegation(root)
+              healthStatus = self.findLeftSubj(root, passive)
+              if healthStatus is not None:
+                healthStatus = self.getAmod(healthStatus, healthStatus.i, healthStatus.i+1, include=True)
+
 
         if healthStatus is None:
           continue
