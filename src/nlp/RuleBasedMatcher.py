@@ -442,7 +442,8 @@ class RuleBasedMatcher(object):
     neg = False
     negText = ''
     entRoot = ent.root
-    root = sent.root
+    # root = sent.root
+    root = entRoot.head
     if entRoot.dep_ not in ['nsubj', 'nsubjpass']:
       return healthStatus, neg, negText
     if root.pos_ != 'VERB':
@@ -569,7 +570,10 @@ class RuleBasedMatcher(object):
         if entRoot.dep_ in ['nsubj', 'nsubjpass']:
           healthStatus, neg, negText = self.getHealthStatusForSubj(ent, sent, causalStatus, predSynonyms)
         elif entRoot.dep_ in ['pobj', 'dobj']:
-          healthStatus, neg, negText = self.getHealthStatusForObj(ent, sent, causalStatus, predSynonyms)
+          if len(ents) == 1:
+            healthStatus, neg, negText = self.getHealthStatusForObj(ent, sent, causalStatus, predSynonyms)
+          else:
+            healthStatus = self.getHealthStatusForPobj(ent, include=False)
         elif entRoot.dep_ in ['compound']:
           if len(ents) == 1:
             head = entRoot.head
