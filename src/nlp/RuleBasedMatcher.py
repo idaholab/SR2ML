@@ -435,7 +435,7 @@ class RuleBasedMatcher(object):
       healthStatus = ent
     return healthStatus
 
-  def getHealthStatusForSubj(self, ent, sent, causalStatus, predSynonyms, include=False):
+  def getHealthStatusForSubj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
     """
     healthStatus = None
@@ -458,7 +458,7 @@ class RuleBasedMatcher(object):
     else:
       if not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
-          ent._.set('hs_keyword', root.lemma_)
+          entHS._.set('hs_keyword', root.lemma_)
         neg, negText = self.isNegation(root)
         passive = self.isPassive(root)
         # # last is punct, the one before last is the root
@@ -481,7 +481,7 @@ class RuleBasedMatcher(object):
         healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
     return healthStatus, neg, negText
 
-  def getHealthStatusForObj(self, ent, sent, causalStatus, predSynonyms, include=False):
+  def getHealthStatusForObj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
     """
     healthStatus = None
@@ -502,7 +502,7 @@ class RuleBasedMatcher(object):
     else:
       if not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
-          ent._.set('hs_keyword', root.lemma_)
+          entHS._.set('hs_keyword', root.lemma_)
         passive = self.isPassive(root)
         neg, negText = self.isNegation(root)
         healthStatus = self.findLeftSubj(root, passive)
@@ -568,10 +568,10 @@ class RuleBasedMatcher(object):
         root = sent.root
         neg = False
         if entRoot.dep_ in ['nsubj', 'nsubjpass']:
-          healthStatus, neg, negText = self.getHealthStatusForSubj(ent, sent, causalStatus, predSynonyms)
+          healthStatus, neg, negText = self.getHealthStatusForSubj(ent, ent, sent, causalStatus, predSynonyms)
         elif entRoot.dep_ in ['pobj', 'dobj']:
           if len(ents) == 1:
-            healthStatus, neg, negText = self.getHealthStatusForObj(ent, sent, causalStatus, predSynonyms)
+            healthStatus, neg, negText = self.getHealthStatusForObj(ent, ent, sent, causalStatus, predSynonyms)
           else:
             healthStatus = self.getHealthStatusForPobj(ent, include=False)
         elif entRoot.dep_ in ['compound']:
@@ -581,9 +581,9 @@ class RuleBasedMatcher(object):
               head = head.head
             headEnt = head.doc[head.i:head.i+1]
             if head.dep_ in ['nsubj', 'nsubjpass']:
-              healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, sent, causalStatus, predSynonyms, include=True)
+              healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
             elif head.dep_ in ['dobj', 'pobj']:
-              healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, sent, causalStatus, predSynonyms, include=True)
+              healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
           if healthStatus is None:
             healthStatus = entRoot.head
         else:
