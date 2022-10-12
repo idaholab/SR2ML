@@ -51,8 +51,7 @@ Example of usage:
 > ruler = nlp.add_pipe("entity_ruler")
 > ruler.add_patterns(patterns)
 > ruler.add_patterns(unitPatterns)
-> doc = nlp('Pump shaft temperature was measured at about 45 Pa')
+> doc = nlp('Pump shaft temperature was measured at about 45 C')
 > print([(ent.text, ent.label_) for ent in doc.ents])
-  [('shaft', 'comp_mech_rot'), ('temperature', 'prop'), ('Pa', 'unit')]
-
+  [('shaft', 'comp_mech_rot'), ('temperature', 'prop'), ('C', 'unit')]
 '''
