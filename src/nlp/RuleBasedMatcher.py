@@ -456,7 +456,9 @@ class RuleBasedMatcher(object):
       else:
         logger.waring(f'No status identified for "{ent}" in "{sent}"')
     else:
-      if not causalStatus:
+      if root.nbor().dep_ in ['cc']:
+        healthStatus = root
+      elif not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
           entHS._.set('hs_keyword', root.lemma_)
         neg, negText = self.isNegation(root)
@@ -586,6 +588,18 @@ class RuleBasedMatcher(object):
               healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
           if healthStatus is None:
             healthStatus = entRoot.head
+        elif entRoot.dep_ in ['conj']:
+          # TODO: recursive function to retrieve non-conj
+          head = entRoot.head
+          if head.dep_ in ['conj']:
+            head = head.head
+          headEnt = head.doc[head.i:head.i+1]
+          if head.dep_ in ['nsubj', 'nsubjpass']:
+            healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, ent, sent, causalStatus, predSynonyms)
+          elif head.dep_ in ['pobj', 'dobj']:
+            healthStatus = self.getHealthStatusForPobj(headEnt, include=False)
+            if healthStatus is None:
+              healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms)
         else:
           logger.warning(f'Entity "{ent}" dep_ is "{entRoot.dep_}" is not among valid list "[nsubj, nsubjpass, pobj, dobj, compound]"')
           if entRoot.head == root:
