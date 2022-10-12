@@ -19,6 +19,8 @@ def keyWordListGenerator(fileName):
   Method designed to read the file and generate a dictionary which contains, for each tag,
   the set of keywords that should be associate to such tag.
   '''
+  # TODO: ==> check if lower, and lemma (e.g. for plural)!!!
+  # TODO: subsets of words
   # read excel file .xlsx
   df = pd.read_excel(fileName, None)
   # retrieve list of sheets in excel file
@@ -98,5 +100,14 @@ def cleanTagDict(tagsDict):
   for tag in tagsDict:
     n_keywords = n_keywords + len(tagsDict[tag])
   print("Number of listed keywords: " + str(n_keywords))
+  tagsDictChecker(tagsDict)
   return tagsDict, acronymsDict
+
+def tagsDictChecker(tagsDict):
+  for key1 in tagsDict.keys():
+    for key2 in tagsDict.keys():
+      commonElements = list(set(tagsDict[key1]).intersection(tagsDict[key2]))
+      if key1!=key2 and commonElements:
+        print('Elements in common between ' +str(key1)+ ' and ' +str(key2)+ ' are:' + str(commonElements))
+    
 
