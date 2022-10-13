@@ -5,7 +5,7 @@
 3,pump,have,signs of past leakage,False,RCP pump 1A had signs of past leakage.
 4,Pump,experience,not enough flow,False,The Pump is not experiencing enough flow during test.
 5,pump shaft,notice,Slight Vibrations,True,Slight Vibrations is noticed - likely from pump shaft deflection.
-6,Pump,respond,not responding,False,Pump flow meter was not responding.
+6,Pump,,not responding,False,Pump flow meter was not responding.
 7,pump bearings,,Rupture,False,Rupture of pump bearings caused pump shaft degradation.
 8,pump shaft,,degradation,False,Rupture of pump bearings caused pump shaft degradation.
 9,pump bearings,,Rupture,False,Rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
@@ -21,7 +21,7 @@
 19,pump,observe,Anomalous vibrations,False,Anomalous vibrations were observed for RCP pump 1A.
 20,pump shaft,,Several cracks,False,Several cracks on pump shaft were observed; they could have caused pump failure within few days.
 21,pump,,failure,True,Several cracks on pump shaft were observed; they could have caused pump failure within few days.
-22,pump,cavitate,some degree,False,RCP pump 1A was cavitating and vibrating to some degree during test.
+22,pump,,cavitating,False,RCP pump 1A was cavitating and vibrating to some degree during test.
 23,pump shaft,,vibration,False,The pump shaft vibration appears to be causing the motor to vibrate as well.
 24,motor,vibrate,vibrate,False,The pump shaft vibration appears to be causing the motor to vibrate as well.
 25,Pump,have,noise of cavitation,False,Pump had noise of cavitation which became faint after OPS bled off the air.
