@@ -21,7 +21,7 @@
 19,turbine,,,False,The capacity of the ASDVs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
 20,turbine,,bypass,False,The turbine bypass to the main condenser provides for removal of reactor decay heat following reactor shutdown.
 21,condenser,,The turbine bypass,False,The turbine bypass to the main condenser provides for removal of reactor decay heat following reactor shutdown.
-22,steam dump system,,,False,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels."
+22,steam dump system,arrange,automatic operation,False,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels."
 23,ASDVs,,,False,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels."
 24,control room,,,False,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels."
 25,control panels,,,False,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels."

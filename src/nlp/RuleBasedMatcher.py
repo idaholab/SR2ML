@@ -444,6 +444,7 @@ class RuleBasedMatcher(object):
     entRoot = ent.root
     # root = sent.root
     root = entRoot.head
+    causalStatus = [root.lemma_.lower()] in self._causalKeywords['VERB'] and [root.lemma_.lower()] not in self._statusKeywords['VERB']
     if entRoot.dep_ not in ['nsubj', 'nsubjpass']:
       return healthStatus, neg, negText
     if root.pos_ != 'VERB':
