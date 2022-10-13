@@ -65,7 +65,7 @@
 63,IM13 circuit,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
 64,fuse,,FUZ,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
 65,IM13-1,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
-66,IM13 scheme,,loss,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
+66,IM13 scheme,,loss of power,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 67,ASDVs,,the automatic fast-open function,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 68,ASDVs,,manual operation,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 69,fuse,,replaced,False,The fuse and relay were replaced.

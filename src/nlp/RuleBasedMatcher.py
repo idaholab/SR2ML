@@ -408,7 +408,11 @@ class RuleBasedMatcher(object):
     parent = root.head
     if grandparent.dep_ in ['dobj', 'nsubj', 'nsubjpass', 'pobj']:
       if not include:
-        healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
+        rights = list(grandparent.rights)
+        if grandparent.n_rights > 1 and rights[-1] == parent:
+          healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:rights[-1].i]
+        else:
+          healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
       else:
         healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:end]
     else: # search lefts for amod
