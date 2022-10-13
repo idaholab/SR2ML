@@ -507,6 +507,8 @@ class RuleBasedMatcher(object):
           healthStatus = root
       else:
         healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
+      if healthStatus is None:
+        healthStatus = root
     return healthStatus, neg, negText
 
   def getHealthStatusForObj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
