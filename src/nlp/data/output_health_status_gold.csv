@@ -3,7 +3,7 @@
 1,pump,find,not operating,False,RCP pump 1A pressure gauge was found not operating.
 2,pump,find,inoperative,False,RCP pump 1A pressure gauge was found inoperative.
 3,pump,have,signs of past leakage,False,RCP pump 1A had signs of past leakage.
-4,Pump,experience,not enough flow,False,The Pump is not experiencing enough flow during test.
+4,Pump,experience,not enough flow during test,False,The Pump is not experiencing enough flow during test.
 5,pump shaft,notice,Slight Vibrations,True,Slight Vibrations is noticed - likely from pump shaft deflection.
 6,Pump,,not responding,False,Pump flow meter was not responding.
 7,pump bearings,,Rupture,False,Rupture of pump bearings caused pump shaft degradation.
@@ -24,9 +24,9 @@
 22,pump,,cavitating,False,RCP pump 1A was cavitating and vibrating to some degree during test.
 23,pump shaft,,vibration,False,The pump shaft vibration appears to be causing the motor to vibrate as well.
 24,motor,vibrate,vibrate,False,The pump shaft vibration appears to be causing the motor to vibrate as well.
-25,Pump,have,noise of cavitation,False,Pump had noise of cavitation which became faint after OPS bled off the air.
+25,Pump,have,noise of cavitation which became faint after OPS bled off the air,False,Pump had noise of cavitation which became faint after OPS bled off the air.
 26,pump shaft,,deflection,False,The pump shaft deflection is causing the safety cage to rattle.
-27,Pump,experience,not enough flow,False,The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
+27,Pump,experience,not enough flow for the pumps,False,The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
 28,pumps,,enough flow,False,The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
 29,Pump shaft,make,noise,False,Pump shaft made noise.
 30,pump shaft,,Vibration,True,Vibration seems like it is coming from the pump shaft.
