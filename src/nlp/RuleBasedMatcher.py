@@ -423,6 +423,11 @@ class RuleBasedMatcher(object):
         healthStatus = grandparent.doc[healthStatus.i:subtree[-1].i+1]
       elif healthStatus is not None and healthStatus.i >= root.i:
         healthStatus = None
+    elif grandparent.pos_ in ['NOUN']:
+      grandEnt = grandparent.doc[grandparent.i:grandparent.i+1]
+      healthStatus = self.getAmod(grandEnt, grandparent.i, grandparent.i+1, include=True)
+    elif grandparent.pos_ in ['AUX']:
+      healthStatus = grandparent.doc[grandparent.i+1:parent.i]
     else: # search lefts for amod
       healthStatus = self.getAmod(ent, start, end, include)
     return healthStatus
@@ -507,7 +512,12 @@ class RuleBasedMatcher(object):
     neg = False
     negText = ''
     entRoot = ent.root
-    root = sent.root
+    head = entRoot.head
+    if head.pos_ in ['VERB']:
+      root = head
+    elif head.dep_ in ['prep']:
+      root = head.head.head
+    causalStatus = [root.lemma_.lower()] in self._causalKeywords['VERB'] and [root.lemma_.lower()] not in self._statusKeywords['VERB']
     if entRoot.dep_ not in ['pobj', 'dobj']:
       return healthStatus, neg, negText
     if root.pos_ != 'VERB':
@@ -517,7 +527,7 @@ class RuleBasedMatcher(object):
       elif root.pos_ in ['AUX']:
         healthStatus = root.doc[root.i-root.n_lefts:root.i]
       else:
-        logger.waring(f'No status identified for "{ent}" in "{sent}"')
+        logger.warning(f'No status identified for "{ent}" in "{sent}"')
     else:
       if not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:

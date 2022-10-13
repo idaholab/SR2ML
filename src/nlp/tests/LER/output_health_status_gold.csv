@@ -15,7 +15,7 @@
 13,ASDVs,,The total capacities,False,"The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power."
 14,turbine,,bypass,False,"The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power."
 15,valves,,The total capacities,False,"The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power."
-16,steam flow with reactor,,,False,"The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power."
+16,steam flow with reactor,,"30% and 4.5%, respectively,",False,"The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power."
 17,ASDVs,,The capacity,False,The capacity of the ASDVs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
 18,steam safety valves,,lifting,True,The capacity of the ASDVs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
 19,turbine,,,False,The capacity of the ASDVs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
@@ -34,8 +34,8 @@
 32,steam dump control relay coil,,failure,False,"Troubleshooting the circuit identified that the Bussmann fuse FUZ/IM13-1, model number FNM-5, was found opened due to the steam dump control relay coil failure."
 33,fuse,,The opening,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 34,IM13 scheme,,loss of power,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-35,ASDVs,,,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-36,SDCR,find,have,False,"Upon further examination, the SDCR was found to have signs of overheating."
+35,ASDVs,,the manual operation,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
+36,SDCR,find,signs of overheating,True,"Upon further examination, the SDCR was found to have signs of overheating."
 37,SDCR coil,,failure,False,The cause of the SDCR coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
 38,relay coil,,the age,False,The cause of the SDCR coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
 39,relay,,normally energized,False,The cause of the SDCR coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
@@ -49,10 +49,10 @@
 47,ASDVs,,service,False,The elapsed time from the discovery of the failure until the ASDVs were returned to service was approximately 12 hours.
 48,Fuse,,1,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 49,IM13-1,,opened,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-50,ASDVs,,,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-51,fuse,,an internal failure of the electrical coil,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
+50,ASDVs,,the manual operation,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
+51,fuse,,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 52,SDCR,,relay,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
-53,relay,fail,an internal failure of the electrical coil,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
+53,relay,fail,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 54,electrical coil,,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 55,relay coil,,failure,False,The cause of the relay coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life.
 56,relay coil,,the age,False,The cause of the relay coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life.
@@ -61,16 +61,16 @@
 59,relay,,the normally energized state,False,"The relay coil was beyond the vendor recommended life because the duty cycle of the relay was set at ""low duty cycle"" when it should have been ""high duty cycle"" due to the normally energized state of the relay."
 60,SDCR,,the failure,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
 61,circuit,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
-62,relay coil,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
-63,IM13 circuit,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
+62,relay coil,,a short-circuit,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
+63,IM13 circuit,,overcurrent,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
 64,fuse,,FUZ,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
-65,IM13-1,,,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
+65,IM13-1,,opening,False,"The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1."
 66,IM13 scheme,,loss of power,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 67,ASDVs,,the automatic fast-open function,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 68,ASDVs,,manual operation,False,"This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs."
 69,fuse,,replaced,False,The fuse and relay were replaced.
 70,relay,,replaced,False,The fuse and relay were replaced.
-71,relay,,The preventive maintenance optimization code,False,The preventive maintenance optimization code is being revised to show the relay as high duty cycle as it is continuously energized.
+71,relay,show,,False,The preventive maintenance optimization code is being revised to show the relay as high duty cycle as it is continuously energized.
 72,relay,,This action,True,This action will appropriately prioritize maintenance for the relay and prevent recurrence of this failure.
 73,Atmospheric Steam Dump Valves,,Inoperable,False,Atmospheric Steam Dump Valves Inoperable Due to Relay Failure.
 74,Relay,,Failure,False,Atmospheric Steam Dump Valves Inoperable Due to Relay Failure.
