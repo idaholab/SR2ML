@@ -456,7 +456,7 @@ class RuleBasedMatcher(object):
       else:
         logger.waring(f'No status identified for "{ent}" in "{sent}"')
     else:
-      if root.nbor().dep_ in ['cc']:
+      if root.nbor().dep_ in ['cc'] or root.nbor().pos_ in ['PUNCT']:
         healthStatus = root
       elif not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
@@ -473,8 +473,8 @@ class RuleBasedMatcher(object):
         if not healthStatus:
           healthStatus = self.findRightKeyword(root)
         # last is punct, the one before last is the root
-        if not healthStatus and root.nbor().pos_ in ['PUNCT']:
-          healthStatus = root
+        # if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+        #   healthStatus = root
         if healthStatus is None:
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
         if healthStatus is None:
@@ -576,6 +576,14 @@ class RuleBasedMatcher(object):
             healthStatus, neg, negText = self.getHealthStatusForObj(ent, ent, sent, causalStatus, predSynonyms)
           else:
             healthStatus = self.getHealthStatusForPobj(ent, include=False)
+          if healthStatus is None:
+            head = entRoot.head
+            if head.dep_ in ['xcomp', 'advcl', 'relcl']:
+              for child in head.rights:
+                if child.dep_ in ['ccomp']:
+                  healthStatus = child
+                  break
+
         elif entRoot.dep_ in ['compound']:
           if len(ents) == 1:
             head = entRoot.head
@@ -654,142 +662,6 @@ class RuleBasedMatcher(object):
         ent._.set('health_status', healthStatus)
         ent._.set('conjecture',conjecture)
 
-    # Validated old approach
-    # predSynonyms = self._statusKeywords['VERB']
-    # statusNoun = self._statusKeywords['NOUN']
-    # statusAdj = self._statusKeywords['ADJ']
-    # causalStatus = False
-    # for sent in matchedSents:
-    #   conjecture = False
-    #   if self._labelCausal in self._entityLabels:
-    #     causalEnts = self.getCustomEnts(sent.ents, self._entityLabels[self._labelCausal])
-    #   else:
-    #     continue
-    #   ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
-    #   # if len(ents) > 1 and [sent.root.lemma_] in self._causalKeywords['VERB']:
-    #   causalStatus = [sent.root.lemma_.lower()] in self._causalKeywords['VERB'] and [sent.root.lemma_.lower()] not in self._statusKeywords['VERB']
-    #   causalStatus = causalStatus and len(ents) == 1
-    #   # if causalStatus and len(ents) > 1:
-    #   if (len(ents) > 1 and len(causalEnts) > 0) or causalStatus:
-    #     # conjecture = self.isConjecture(sent.root)
-    #     for ent in ents:
-    #       healthStatus = None
-    #       root = ent.root
-    #       neg = False
-    #       if root.dep_ in ['pobj']:
-    #         healthStatus = root.head.head
-    #       elif root.dep_ in ['compound']:
-    #         healthStatus = root.head
-    #       elif root.dep_ in ['nsubj']:
-    #         root = root.head
-    #         neg, negText = self.isNegation(root)
-    #         if [root.lemma_.lower()] not in predSynonyms and root.pos_ != 'VERB':
-    #           if root.pos_ in ['NOUN', 'ADJ']:
-    #             healthStatus = root
-    #             if self._updateStatusKeywords:
-    #               self.addKeywords({root.pos_:[root]}, 'status')
-    #         elif root.pos_ != 'VERB':
-    #           print('--- root not verb', root.text, root.pos_)
-    #           continue
-    #         else:
-    #           ent._.set('hs_keyword', root.lemma_)
-    #           passive = self.isPassive(root)
-    #           # # last is punct, the one before last is the root
-    #           # if root.nbor().pos_ in ['PUNCT']:
-    #           #   healthStatus = root
-    #           healthStatus = self.findRightObj(root)
-    #           if healthStatus and healthStatus.dep_ == 'pobj':
-    #             # include 'dobj' 'prep' and 'pobj'
-    #             # examples
-    #             # Pump had noise of cavitation
-    #             # RCP pump 1A had signs of past leakage
-    #             if healthStatus.head.head.dep_ == 'dobj':
-    #               healthStatus = healthStatus.doc[healthStatus.head.head.i:healthStatus.i+1]
-    #           # no object is found
-    #           if not healthStatus:
-    #             healthStatus = self.findRightKeyword(root)
-    #           # last is punct, the one before last is the root
-    #           if not healthStatus and root.nbor().pos_ in ['PUNCT']:
-    #             healthStatus = root
-    #           if healthStatus is None:
-    #             healthStatus = root
-    #       else:
-    #         continue
-    #       if healthStatus is None:
-    #         continue
-    #       # determine the conjecture of health status
-    #       if isinstance(healthStatus, Span):
-    #         conjecture = self.isConjecture(healthStatus.root.head)
-    #       elif isinstance(healthStatus, Token):
-    #         conjecture = self.isConjecture(healthStatus.head)
-    #       if not neg:
-    #         if isinstance(healthStatus, Span):
-    #           neg, negText = self.isNegation(healthStatus.root)
-    #         else:
-    #           neg, negText = self.isNegation(healthStatus)
-    #       # conjecture = self.isConjecture(healthStatus.head)
-    #       # neg, negText = self.isNegation(healthStatus)
-    #       if neg:
-    #         healthStatus = ' '.join([negText,healthStatus.text])
-    #       logger.debug(f'{ent} health status: {healthStatus}')
-    #       ent._.set('health_status', healthStatus)
-    #       ent._.set('conjecture',conjecture)
-    #   elif len(ents) == 1:
-    #     healthStatus = None
-    #     root = sent.root
-    #     neg, negText = self.isNegation(root)
-    #     if [root.lemma_.lower()] not in predSynonyms and root.pos_ != 'VERB':
-    #       if root.pos_ in ['NOUN', 'ADJ']:
-    #         healthStatus = root
-    #         if self._updateStatusKeywords:
-    #           self.addKeywords({root.pos_:[root]}, 'status')
-    #     elif root.pos_ != 'VERB':
-    #       print('--- root not verb', root.text, root.pos_)
-    #       continue
-    #     else:
-    #       passive = self.isPassive(root)
-    #       # conjecture = self.isConjecture(root)
-    #       # # last is punct, the one before last is the root
-    #       # if root.nbor().pos_ in ['PUNCT']:
-    #       #   healthStatus = root
-    #       if ents[0].start < root.i:
-    #         healthStatus = self.findRightObj(root)
-    #         if healthStatus and healthStatus.dep_ == 'pobj':
-    #           # include 'dobj' 'prep' and 'pobj'
-    #           # examples
-    #           # Pump had noise of cavitation
-    #           # RCP pump 1A had signs of past leakage
-    #           if healthStatus.head.head.dep_ == 'dobj':
-    #             healthStatus = healthStatus.doc[healthStatus.head.head.i:healthStatus.i+1]
-    #         # no object is found
-    #         if not healthStatus:
-    #           healthStatus = self.findRightKeyword(root)
-    #         # last is punct, the one before last is the root
-    #         if not healthStatus and root.nbor().pos_ in ['PUNCT']:
-    #           healthStatus = root
-    #       else:
-    #         healthStatus = self.findLeftSubj(root, passive)
-    #     if healthStatus is None:
-    #       continue
-    #     # determine the conjecture of health status
-    #     if isinstance(healthStatus, Span):
-    #       conjecture = self.isConjecture(healthStatus.root.head)
-    #     elif isinstance(healthStatus, Token):
-    #       conjecture = self.isConjecture(healthStatus.head)
-    #     if not neg:
-    #       if isinstance(healthStatus, Span):
-    #         neg, negText = self.isNegation(healthStatus.root)
-    #       else:
-    #         neg, negText = self.isNegation(healthStatus)
-    #     # TODO: may be also report the verb, for example 'RCP pump 1A was cavitating and vibrating to some degree during test.'
-    #     # is not identified properly
-    #     if neg:
-    #       healthStatus = ' '.join([negText,healthStatus.text])
-    #     logger.debug(f'{ents[0]} health status: {healthStatus}')
-    #     ents[0]._.set('health_status', healthStatus)
-    #     if root.pos_ == 'VERB':
-    #       ents[0]._.set('hs_keyword', root.lemma_)
-    #     ents[0]._.set('conjecture', conjecture)
 
   def findLeftSubj(self, pred, passive):
     """

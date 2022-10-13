@@ -1,12 +1,12 @@
 ,entities,status keywords,health statuses,conjecture,sentence
 0,control room,identify,operations,False,"At the Palisades Nuclear Plant, on June 16, 2021, at 1550 EDT, with the plant in Mode 1, at 100% power, operations identified an acrid odor in the control room."
-1,steam dump control relay,fail,failed,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable."
+1,steam dump control relay,,failed,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable."
 2,atmospheric steam dump valves,,inoperable,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable."
 3,relay,,replaced,False,The relay was replaced and the ASDVs were returned to service.
 4,ASDVs,,service,False,The relay was replaced and the ASDVs were returned to service.
 5,control room,identify,operators,False,"At the Palisades Nuclear Plant, on June 16, 2021, at 1550 EDT, with the plant in Mode 1, at 100% power, operators identified an acrid odor in the control room, suggesting that an electrical component may have failed."
-6,steam dump control relay,fail,valves,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4."
-7,atmospheric steam dump valves,,,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4."
+6,steam dump control relay,,failed,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4."
+7,atmospheric steam dump valves,,inoperable,False,"Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4."
 8,steam dump and bypass system,,automatically actuated ASDVs,False,"The main steam dump and bypass system consists of four automatically actuated ASDVs which exhaust to atmosphere, and a turbine bypass valve which exhausts to the main condenser."
 9,ASDVs,,automatically actuated,False,"The main steam dump and bypass system consists of four automatically actuated ASDVs which exhaust to atmosphere, and a turbine bypass valve which exhausts to the main condenser."
 10,turbine,,bypass,False,"The main steam dump and bypass system consists of four automatically actuated ASDVs which exhaust to atmosphere, and a turbine bypass valve which exhausts to the main condenser."
@@ -48,7 +48,7 @@
 46,ASDVs,,service,False,The fuse and relay were replaced and the ASDVs were returned to service.
 47,ASDVs,,service,False,The elapsed time from the discovery of the failure until the ASDVs were returned to service was approximately 12 hours.
 48,Fuse,,1,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-49,IM13-1,,the automatic fast-open function,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
+49,IM13-1,,opened,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 50,ASDVs,,,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 51,fuse,,an internal failure of the electrical coil,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 52,SDCR,,relay,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
