@@ -474,7 +474,11 @@ class RuleBasedMatcher(object):
       else:
         logger.waring(f'No status identified for "{ent}" in "{sent}"')
     else:
+      rights = root.rights
+      valid = [tk.dep_ in ['advcl', 'relcl'] for tk in rights if tk.pos_ not in ['PUNCT', 'SPACE']]
       if root.nbor().dep_ in ['cc'] or root.nbor().pos_ in ['PUNCT']:
+        healthStatus = root
+      elif all(valid):
         healthStatus = root
       elif not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
