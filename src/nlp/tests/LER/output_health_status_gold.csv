@@ -50,7 +50,7 @@
 48,Fuse,,1,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 49,IM13-1,,opened,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 50,ASDVs,,the manual operation,False,"Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-51,fuse,,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
+51,fuse,,opened,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 52,SDCR,,relay,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 53,relay,fail,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
 54,electrical coil,,an internal failure,False,The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
