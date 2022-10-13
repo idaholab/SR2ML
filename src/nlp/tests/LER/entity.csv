@@ -26,6 +26,7 @@ FU
 FNM-5
 steam dump control relay
 SDCR
+SDCR relay
 coil
 CL
 fuse
@@ -37,3 +38,8 @@ steam dump control relay coil
 relay coil
 IM13-1
 electrical coil
+turbine bypass valve
+bypass system
+Bussmann fuse Fuz/IM13-1
+fuse FUZ/IM13-1
+main condenser
