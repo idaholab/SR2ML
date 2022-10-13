@@ -406,6 +406,7 @@ class RuleBasedMatcher(object):
       return healthStatus
     grandparent = root.head.head
     parent = root.head
+    causalStatus = [grandparent.lemma_.lower()] in self._causalKeywords['VERB'] and [grandparent.lemma_.lower()] not in self._statusKeywords['VERB']
     if grandparent.dep_ in ['dobj', 'nsubj', 'nsubjpass', 'pobj']:
       if not include:
         rights = list(grandparent.rights)
@@ -415,6 +416,13 @@ class RuleBasedMatcher(object):
           healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
       else:
         healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:end]
+    elif grandparent.pos_ in ['VERB'] and causalStatus:
+      healthStatus = self.findRightObj(grandparent)
+      subtree = list(healthStatus.subtree)
+      if healthStatus is not None and healthStatus.nbor().dep_ in ['prep'] and subtree[-1].i < root.i:
+        healthStatus = grandparent.doc[healthStatus.i:subtree[-1].i+1]
+      elif healthStatus is not None and healthStatus.i >= root.i:
+        healthStatus = None
     else: # search lefts for amod
       healthStatus = self.getAmod(ent, start, end, include)
     return healthStatus
@@ -474,6 +482,10 @@ class RuleBasedMatcher(object):
         healthStatus = self.findRightObj(root)
         if healthStatus and healthStatus.dep_ == 'pobj':
           healthStatus = self.getHealthStatusForPobj(healthStatus, include=True)
+        elif healthStatus and healthStatus.dep_ == 'dobj':
+          subtree = list(healthStatus.subtree)
+          if healthStatus.nbor().dep_ in ['prep']:
+            healthStatus = healthStatus.doc[healthStatus.i:subtree[-1].i+1]
         # no object is found
         if not healthStatus:
           healthStatus = self.findRightKeyword(root)
@@ -628,6 +640,10 @@ class RuleBasedMatcher(object):
               healthStatus = self.findRightObj(root)
               if healthStatus and healthStatus.dep_ == 'pobj':
                 healthStatus = self.getHealthStatusForPobj(healthStatus, include=True)
+              elif healthStatus and healthStatus.dep_ == 'dobj':
+                subtree = list(healthStatus.subtree)
+                if healthStatus.nbor().dep_ in ['prep']:
+                  healthStatus = healthStatus.doc[healthStatus.i:subtree[-1].i+1]
               # no object is found
               if not healthStatus:
                 healthStatus = self.findRightKeyword(root)
@@ -739,8 +755,8 @@ class RuleBasedMatcher(object):
         nbor = child.nbor()
         # TODO, what else need to be added
         # can not use the first check only, since is nbor is 'during', it will also satisfy the check condition
-        if nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of']:
-          return self.findRightObj(nbor, deps=['pobj'])
+        # if (nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of', 'in']) or nbor.pos_ in ['VERB']:
+        #   return self.findRightObj(nbor, deps=['pobj'])
         return child
       elif child.dep_ == 'compound' and \
          child.head.dep_ in deps: # check if contained in compound

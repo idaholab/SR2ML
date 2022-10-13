@@ -33,7 +33,7 @@
 31,FNM-5,,,False,"Troubleshooting the circuit identified that the Bussmann fuse FUZ/IM13-1, model number FNM-5, was found opened due to the steam dump control relay coil failure."
 32,steam dump control relay coil,,failure,False,"Troubleshooting the circuit identified that the Bussmann fuse FUZ/IM13-1, model number FNM-5, was found opened due to the steam dump control relay coil failure."
 33,fuse,,The opening,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
-34,IM13 scheme,,,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
+34,IM13 scheme,,loss of power,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 35,ASDVs,,,False,"The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs."
 36,SDCR,find,have,False,"Upon further examination, the SDCR was found to have signs of overheating."
 37,SDCR coil,,failure,False,The cause of the SDCR coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
