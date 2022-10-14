@@ -383,15 +383,12 @@ class RuleBasedMatcher(object):
       customEnts = None
     return customEnts
 
-  # def getHealthStatusForNounOrAdj(self,):
-  #   """
-  #   """
-  #
-  # def getHealthStatusForVerb(self,):
-  #   """
-  #   """
   def getHealthStatusForPobj(self, ent, include=False):
     """
+      Get the status for ent root pos_ 'pobj'
+      @ In, ent, Span, the span of entity
+      @ In, include, bool, ent will be included in returned status if True
+      @ Out, healthStatus, Span or Token, the identified status
     """
     healthStatus = None
     if isinstance(ent, Token):
@@ -434,6 +431,12 @@ class RuleBasedMatcher(object):
 
   def getPhrase(self, ent, start, end, include=False):
     """
+      Get the phrase for ent with all left children
+      @ In, ent, Span, the ent to amend with all left children
+      @ In, start, int, the start index of ent
+      @ In, end, int, the end index of ent
+      @ In, include, bool, include ent in the returned expression if True
+      @ Out, healthStatus, Span or Token, the identified status
     """
     if not include:
       healthStatus = ent.doc[start-ent.n_lefts:start]
@@ -443,6 +446,12 @@ class RuleBasedMatcher(object):
 
   def getAmod(self, ent, start, end, include = False):
     """
+      Get amod tokens for ent
+      @ In, ent, Span, the ent to amend with all left children
+      @ In, start, int, the start index of ent
+      @ In, end, int, the end index of ent
+      @ In, include, bool, include ent in the returned expression if True
+      @ Out, healthStatus, Span or Token, the identified status
     """
     healthStatus = None
     deps = [tk.dep_ in ['amod'] for tk in ent.lefts]
@@ -454,6 +463,14 @@ class RuleBasedMatcher(object):
 
   def getHealthStatusForSubj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
+      Get the status for nsubj/nsubjpass ent
+      @ In, ent, Span, the nsubj/nsubjpass ent that will be used to search status
+      @ In, entHS, Span, the entHS that the status will be associated with
+      @ In, sent, Span, the sent that includes the ent, entHS and status
+      @ In, causalStatus, bool, the causal status for the ent
+      @ In, predSynonyms, list, predicate synonyms
+      @ In, include, bool, include ent in the returned expression if True
+      @ Out, healthStatus, Span or Token, the identified status
     """
     healthStatus = None
     neg = False
@@ -513,6 +530,14 @@ class RuleBasedMatcher(object):
 
   def getHealthStatusForObj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
+      Get the status for pobj/dobj ent
+      @ In, ent, Span, the pobj/dobj ent that will be used to search status
+      @ In, entHS, Span, the entHS that the status will be associated with
+      @ In, sent, Span, the sent that includes the ent, entHS and status
+      @ In, causalStatus, bool, the causal status for the ent
+      @ In, predSynonyms, list, predicate synonyms
+      @ In, include, bool, include ent in the returned expression if True
+      @ Out, healthStatus, Span or Token, the identified status
     """
     healthStatus = None
     neg = False
@@ -558,30 +583,23 @@ class RuleBasedMatcher(object):
       @ In, predSynonyms, list, predicate synonyms
       @ In, exclPrepos, list, exclude the prepositions
     """
-
     #  first search degradation keywords,
     #  if pobj, then if head.head
-
     # Ex. 1: an acrid odor in the control room --> entRoot.dep_ in ['pobj'], HS: entRoot.head.head i.e.,
     # let i = entRoot.head.head.i, start = sent.start, nlefts = entRoot.head.head.n_lefts
     # healthStatus = sent[i-start-nlefts:i-start+1]
     # or entRoot.head in 'amod', checking the n_lefts, as above
-
     # Ex. 2: shaft degradation --> entRoot.dep_ in ['compound'], HS: entRoot.head and entRoot.head.pos_ in in ['NUM']
-
     # Ex. 3: entRoot.dep_ in ['nsubj', 'nsubjpass']
-
     # sent.root before ent, search left for nsubj or nsubjpass and any 'amod', 'compound', 'det'
     # sent.root after ent, search right for pobj, and check head.head.dep_ in ['dobj', 'nsubjpass', 'nsubj'], amend it with any 'amod', 'compound', 'det' in its lefts
     # should report both dobj and pobj for the health status
-
     # if sent.root, check right for 'cc' and 'conj', if next is 'cc', return the root
-
     #  if entRoot.dep_ in ['conj'], if entRoot.head.dep_ in ['nmod'], return entRoot.head.head
     #  entRoot.dep_ in ['dobj'] and entRoot.head.pos_ in ['VERB'], return the entRoot.head
-
     # dobj: left children (amod, compound, det) and right childrend, (have signs of overheating)
     # nsubj -- VERB -- pobj :  if pobj is NUM, then everything between VERB and pobj
+
     predSynonyms = self._statusKeywords['VERB']
     statusNoun = self._statusKeywords['NOUN']
     statusAdj = self._statusKeywords['ADJ']
@@ -616,7 +634,6 @@ class RuleBasedMatcher(object):
                 if child.dep_ in ['ccomp']:
                   healthStatus = child
                   break
-
         elif entRoot.dep_ in ['compound']:
           if len(ents) == 1:
             head = entRoot.head
@@ -678,8 +695,6 @@ class RuleBasedMatcher(object):
               healthStatus = self.findLeftSubj(root, passive)
               if healthStatus is not None:
                 healthStatus = self.getAmod(healthStatus, healthStatus.i, healthStatus.i+1, include=True)
-
-
         if healthStatus is None:
           continue
         if isinstance(healthStatus, Span):
@@ -698,7 +713,6 @@ class RuleBasedMatcher(object):
         logger.debug(f'{ent} health status: {healthStatus}')
         ent._.set('health_status', healthStatus)
         ent._.set('conjecture',conjecture)
-
 
   def findLeftSubj(self, pred, passive):
     """
@@ -782,8 +796,8 @@ class RuleBasedMatcher(object):
 
   def isValidCausalEnts(self, ent):
     """
-      @ In, ent, list
-      @ Out, valid, bool
+      @ In, ent, list, list of entities
+      @ Out, valid, bool, valid cansual ent if True
     """
     valid = False
     validDep = ['nsubj', 'nsubjpass', 'nsubj:pass', 'pobj', 'dobj', 'iobj', 'obj', 'obl', 'oprd']
@@ -796,6 +810,10 @@ class RuleBasedMatcher(object):
 
   def getIndex(self, ent, entList):
     """
+      Get index for ent in entList
+      @ In, ent, Span, ent that is used to get index
+      @ In, entList, list, list of entities
+      @ Out, idx, int, the index for ent
     """
     idx = -1
     for i, e in enumerate(entList):
@@ -809,6 +827,11 @@ class RuleBasedMatcher(object):
 
   def getSSCEnt(self, entList, index, direction='left'):
     """
+      Get the closest group of SSC entities
+      @ In, entList, list, list of entities
+      @ In, index, int, the start location of entity
+      @ In, direction, str, 'left' or 'right', the search direction
+      @ Out, ent,
     """
     ent = None
     if direction.lower() == 'left':
@@ -825,7 +848,6 @@ class RuleBasedMatcher(object):
           # we may check the ent label here
           return ent
     return ent
-
 
   def extractRelDep(self, matchedSents):
     """
@@ -890,8 +912,6 @@ class RuleBasedMatcher(object):
       entTuples = [(ent[0].start, ent) for ent in sscEnts] + [(ent.start, ent) for ent in causalEnts]
       orderedEnts = sorted(entTuples, key = lambda x:x[0])
       orderedEnts = [ent[1] for ent in orderedEnts]
-
-
       # Loop over causal keywords, make functions, for each of [verb, noun, transition]
       # Define rules for each functions
       causeEffectPair = []
@@ -997,7 +1017,6 @@ class RuleBasedMatcher(object):
       if len(causeEffectPair) != 0:
         allCauseEffectPairs.append(causeEffectPair)
 
-
     print("Identified Cause-Effect Pairs:")
     for elem in allCauseEffectPairs:
       for i in elem:
@@ -1005,6 +1024,14 @@ class RuleBasedMatcher(object):
 
   def identifyCauseEffectForNsuj(self, cRoot, cEntsIndex, causalEnts, orderedEnts, validRightSSCEnts, reverse=False):
     """
+      Identify the cause effect pairs for nsubj
+      @ In, cRoot, Token, the root of causal entity
+      @ In, cEntsIndex, int, the index for the causal entity
+      @ In, causalEnts, list, the list of causal entities
+      @ In, orderedEnts, list, the entities ordered by their locations in the Doc
+      @ In, validRightSSCEnts, list, the valid list of entities on the right of given causal entity
+      @ In, reverse, bool, reverse the cause effect relation if True
+      @ Out, cause effect pairs, tuple, (causeList, effectList, skipCEnts)
     """
     causeList = None
     effectList = None
@@ -1042,6 +1069,12 @@ class RuleBasedMatcher(object):
 
   def identifyCauseEffectForAttr(self, cRoot, validLeftSSCEnts, validRightSSCEnts, reverse=False):
     """
+      Identify the cause effect pairs for attr
+      @ In, cRoot, Token, the root of causal entity
+      @ In, validLeftSSCEnts, list, the valid list of entities on the left of given causal entity
+      @ In, validRightSSCEnts, list, the valid list of entities on the right of given causal entity
+      @ In, reverse, bool, reverse the cause effect relation if True
+      @ Out, cause effect pairs, tuple, (causeList, effectList)
     """
     causeList = None
     effectList = None
@@ -1061,6 +1094,13 @@ class RuleBasedMatcher(object):
 
   def identifyCauseEffectForClauseModifier(self, cRoot, rootCause, validLeftSSCEnts, validRightSSCEnts, reverse=False):
     """
+      Identify the cause effect pairs for clause modifier
+      @ In, cRoot, Token, the root of causal entity
+      @ In, rootCause, tuple,
+      @ In, validLeftSSCEnts, list, the valid list of entities on the left of given causal entity
+      @ In, validRightSSCEnts, list, the valid list of entities on the right of given causal entity
+      @ In, reverse, bool, reverse the cause effect relation if True
+      @ Out, cause effect pairs, tuple, (causeList, effectList)
     """
     causeList = None
     effectList = None
@@ -1091,6 +1131,10 @@ class RuleBasedMatcher(object):
 
   def splitEntsFollowingNounCausal(self, cRoot, validRightSSCEnts):
     """
+      Spit the entities into cause, effect
+      @ In, cRoot, Token, the root of causal entity
+      @ In, validRightSSCEnts, list, the valid list of entities on the right of given causal entity
+      @ Out, cause effect pairs, tuple, (cause, effect)
     """
     cause = []
     effect = []
@@ -1110,6 +1154,10 @@ class RuleBasedMatcher(object):
 
   def getRightSSCEnts(self, cEnt, orderedEnts):
     """
+      Get the SSC ents on the right of causal entity
+      @ In, cEnt, Span, causal entity
+      @ In, orderedEnts, list, the entities ordered by their locations in the Doc
+      @ Out, selEnts, list, list of SSC entities
     """
     cIdx = self.getIndex(cEnt, orderedEnts)
     maxInd = len(orderedEnts)-1
@@ -1128,6 +1176,10 @@ class RuleBasedMatcher(object):
 
   def getLeftSSCEnts(self, cEnt, orderedEnts):
     """
+      Get the SSC ents on the left of causal entity
+      @ In, cEnt, Span, causal entity
+      @ In, orderedEnts, list, the entities ordered by their locations in the Doc
+      @ Out, selEnts, list, list of SSC entities
     """
     cIdx = self.getIndex(cEnt, orderedEnts)
     maxInd = len(orderedEnts)-1
@@ -1146,6 +1198,10 @@ class RuleBasedMatcher(object):
 
   def selectValidEnts(self, ents, cEnt):
     """
+      Select the valide ents that are within subtree of causal entity
+      @ In, ents, list, the list of entities
+      @ In, cEnt, Span, causal entity
+      @ Out, validEnts, list, list of valid entities
     """
     if ents is None:
       return None
