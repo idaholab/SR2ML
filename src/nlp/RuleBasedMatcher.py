@@ -1010,8 +1010,11 @@ class RuleBasedMatcher(object):
         causeEffectPair.append((causeList, effectList, conjecture))
         if isinstance(causeList, tuple):
           self.collectExtactedCausals(causeList[0], effectList, cEnt, sent, conjecture)
+          # effect can be cause for next effect
+          self.collectExtactedCausals(causeList[1], effectList, cEnt, sent, conjecture)
         elif isinstance(effectList, tuple):
           self.collectExtactedCausals(causeList, effectList[0], cEnt, sent, conjecture)
+          self.collectExtactedCausals(causeList, effectList[1], cEnt, sent, conjecture)
         else:
           self.collectExtactedCausals(causeList, effectList, cEnt, sent, conjecture)
       if len(causeEffectPair) != 0:
