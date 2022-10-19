@@ -109,5 +109,5 @@ def tagsDictChecker(tagsDict):
       commonElements = list(set(tagsDict[key1]).intersection(tagsDict[key2]))
       if key1!=key2 and commonElements:
         print('Elements in common between ' +str(key1)+ ' and ' +str(key2)+ ' are:' + str(commonElements))
-    
+
 
