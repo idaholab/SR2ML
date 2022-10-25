@@ -1,0 +1,41 @@
+
+At the Palisades Nuclear Plant, on June 16, 2021, at 1550 EDT, with the plant in Mode 1, at 100% power, operations identified an acrid odor in the control room.
+Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable.
+The relay was replaced and the ASDVs were returned to service.
+The plant remained stable in Mode 1 at 100% power throughout the event.
+The safety significance of this event was minimal.
+This event is reportable in accordance with 10 CFR 50.73(a)(2)(v)(D) as an event or condition that at the time of discovery could have prevented the fulfillment of the safety function of structures or systems that are needed to mitigate the consequences of an accident.
+
+At the Palisades Nuclear Plant, on June 16, 2021, at 1550 EDT, with the plant in Mode 1, at 100% power, operators identified an acrid odor in the control room, suggesting that an electrical component may have failed.
+Investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4.
+The main steam dump and bypass system consists of four automatically actuated ASDVs which exhaust to atmosphere, and a turbine bypass valve which exhausts to the main condenser.
+The total capacities of the ASDVs and turbine bypass valves are 30% and 4.5%, respectively, of steam flow with reactor at full power.
+The capacity of the ASDVs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
+The turbine bypass to the main condenser provides for removal of reactor decay heat following reactor shutdown.
+Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
+The ASDVs have a back-up nitrogen supply to allow steam generator pressure control during station blackout.
+Troubleshooting the circuit identified that the Bussmann fuse FUZ/IM13-1, model number FNM-5, was found opened due to the steam dump control relay coil failure.
+The opening of the fuse resulted in loss of power to the IM13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs.
+Upon further examination, the SDCR was found to have signs of overheating.
+The cause of the SDCR coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
+The subject relay was not classified properly in 2005 when all safety systems and component classifications were validated.
+The duty cycle of the relay was set at "low duty cycle" when it should have been "high duty cycle" due to the normally energized state of the relay.
+The relay is manufactured by General Electric and is model HFA 12HFA51A49H.
+The fuse and relay were replaced and the ASDVs were returned to service.
+The elapsed time from the discovery of the failure until the ASDVs were returned to service was approximately 12 hours.
+There were no structures, systems, or components that were inoperable at the start of the event that contributed to the event.
+
+Fuse IM13-1 opened, which disabled the automatic fast-open function, as well as the manual operation, of the ASDVs.
+The fuse opened because the SDCR relay failed due to an internal failure of the electrical coil.
+The cause of the relay coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life.
+The relay coil was beyond the vendor recommended life because the duty cycle of the relay was set at "low duty cycle" when it should have been "high duty cycle" due to the normally energized state of the relay.
+
+The actual consequence of the failure of the SDCR, which was a short-circuit in the relay coil, was overcurrent in the IM13 circuit and opening of fuse FUZ/IM13-1.
+This resulted in loss of power to the IM13 scheme, which disables the automatic fast-open function of the ASDVs and disables manual operation of the ASDVs.
+There were no other actual consequences to the general safety of the public, nuclear safety, industrial safety, or radiological safety for this event as the plant remained in steady-state full power operation.
+
+The fuse and relay were replaced.
+The preventive maintenance optimization code is being revised to show the relay as high duty cycle as it is continuously energized.
+This action will appropriately prioritize maintenance for the relay and prevent recurrence of this failure.
+
+Atmospheric Steam Dump Valves Inoperable Due to Relay Failure.
