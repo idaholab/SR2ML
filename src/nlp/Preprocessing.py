@@ -15,26 +15,26 @@ from contextualSpellCheck.contextualSpellCheck import ContextualSpellCheck
 import autocorrect
 
 # list of available preprocessors in textacy.preprocessing.normalize
-textacy_normalize = ['bullet_points',
-                     'hyphenated_words',
-                     'quotation_marks',
-                     'repeating_chars',
-                     'unicode',
-                     'whitespace']
+textacyNormalize = ['bullet_points',
+                    'hyphenated_words',
+                    'quotation_marks',
+                    'repeating_chars',
+                    'unicode',
+                    'whitespace']
 # list of available preprocessors in textacy.preprocessing.remove
-textacy_remove = ['accents',
-                  'brackets',
-                  'html_tags',
-                  'punctuation']
+textacyRemove = ['accents',
+                 'brackets',
+                 'html_tags',
+                 'punctuation']
 # list of available preprocessors in textacy.preprocessing.replace
-textacy_replace = ['currency_symbols',
-                   'emails',
-                   'emojis',
-                   'hashtags',
-                   'numbers',
-                   'phone_numbers',
-                   'urls',
-                   'user_handles']
+textacyReplace = ['currency_symbols',
+                  'emails',
+                  'emojis',
+                  'hashtags',
+                  'numbers',
+                  'phone_numbers',
+                  'urls',
+                  'user_handles']
 # list of available preprocessors from numerizer
 numerizer = ['numerize']
 
@@ -52,7 +52,7 @@ class Preprocessing(object):
       @ Out, None
     """
     self.functionList = [] # list of preprocessor functions
-    self.preprocessorNames = textacy_normalize + textacy_remove + textacy_replace + numerizer
+    self.preprocessorNames = textacyNormalize + textacyRemove + textacyReplace + numerizer
 
     # collect preprocessor functions in a list
     for name in preprocessorList:
@@ -62,11 +62,11 @@ class Preprocessing(object):
       else:
         options = {}
       # build the function to do the preprocessing
-      if name in textacy_normalize:
+      if name in textacyNormalize:
         self.createTextacyNormalizeFunction(name, options)
-      elif name in textacy_remove:
+      elif name in textacyRemove:
         self.createTextacyRemoveFunction(name, options)
-      elif name in textacy_replace:
+      elif name in textacyReplace:
         self.createTextacyReplaceFunction(name, options)
       elif name in numerizer:
         # create function to store in functionList
