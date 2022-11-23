@@ -1,3 +1,6 @@
+# Copyright 2020, Battelle Energy Alliance, LLC
+# ALL RIGHTS RESERVED
+
 import pandas as pd
 import numpy as np
 import itertools
