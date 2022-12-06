@@ -489,7 +489,7 @@ class RuleBasedMatcher(object):
       elif root.pos_ in ['AUX']:
         healthStatus = root.doc[root.i+1:root.i+root.n_rights+1]
       else:
-        logger.waring(f'No status identified for "{ent}" in "{sent}"')
+        logger.warning(f'No status identified for "{ent}" in "{sent}"')
     else:
       rights = root.rights
       valid = [tk.dep_ in ['advcl', 'relcl'] for tk in rights if tk.pos_ not in ['PUNCT', 'SPACE']]
@@ -548,6 +548,8 @@ class RuleBasedMatcher(object):
       root = head
     elif head.dep_ in ['prep']:
       root = head.head.head
+    else:
+      root = head
     causalStatus = [root.lemma_.lower()] in self._causalKeywords['VERB'] and [root.lemma_.lower()] not in self._statusKeywords['VERB']
     if entRoot.dep_ not in ['pobj', 'dobj']:
       return healthStatus, neg, negText
