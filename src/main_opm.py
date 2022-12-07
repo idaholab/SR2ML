@@ -86,4 +86,4 @@ if __name__ == "__main__":
   causalName = 'causal_keywords_entity_ruler'
   matcher.addEntityPattern(causalName, patternsCausal)
 
-  matcher(doc)
+  matcher(doc.lower())
