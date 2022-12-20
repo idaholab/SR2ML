@@ -11,5 +11,11 @@
     <!-- pysbd is used for sentence boundary disambiguation -->
     <pysbd/>
     <tomli source='pip'/>
+    <numerizer source='pip' optional='True'/>
+    <autocorrect source='pip' optional='True'/>
+    <contextualSpellCheck source='pip' optional='True'/>
+    <!-- <recognizers-text-number source='pip'>
+    <recognizers-text-number-with-unit source='pip'>
+    <recognizers-text-date-time source='pip'> -->
   </main>
 </dependencies>

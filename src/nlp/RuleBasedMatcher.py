@@ -235,9 +235,9 @@ class RuleBasedMatcher(object):
     doc = self.nlp(text)
     self._doc = doc
     ## use entity ruler to identify entity
-    if self._entityRuler:
-      logger.debug('Entity Ruler Matches:')
-      print([(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents if ent.label_ in self._entityLabels[self._labelSSC]])
+    # if self._entityRuler:
+    #   logger.debug('Entity Ruler Matches:')
+    #   print([(ent.text, ent.label_, ent.ent_id_) for ent in doc.ents if ent.label_ in self._entityLabels[self._labelSSC]])
 
     # First identify coreference through coreferee, then filter it through doc.ents
     if self._coref:
@@ -1064,10 +1064,10 @@ class RuleBasedMatcher(object):
       if len(causeEffectPair) != 0:
         allCauseEffectPairs.append(causeEffectPair)
 
-    print("Identified Cause-Effect Pairs:")
-    for elem in allCauseEffectPairs:
-      for i in elem:
-        print(i)
+    # print("Identified Cause-Effect Pairs:")
+    # for elem in allCauseEffectPairs:
+    #   for i in elem:
+    #     print(i)
 
   def identifyCauseEffectForNsuj(self, cRoot, cEntsIndex, causalEnts, orderedEnts, validRightSSCEnts, reverse=False):
     """
