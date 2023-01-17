@@ -67,6 +67,8 @@ if not Token.has_extension('health_status'):
   Token.set_extension("health_status", default=None)
 if not Span.has_extension('hs_keyword'):
   Span.set_extension('hs_keyword', default=None)
+if not Span.has_extension('ent_status_verb'):
+  Span.set_extension('ent_status_verb', default=None)
 if not Span.has_extension('conjecture'):
   Span.set_extension('conjecture', default=False)
 
@@ -253,24 +255,27 @@ class RuleBasedMatcher(object):
     ## Access health status and output to an ordered csv file
     entList = []
     hsList = []
+    svList = []
     kwList = []
     cjList = []
     sentList = []
     for sent in self._matchedSents:
       ents = self.getCustomEnts(sent.ents, self._entityLabels[self._labelSSC])
       elist = [ent.text for ent in ents]
+      statusVerb = [ent._.ent_status_verb for ent in ents]
       hs = [ent._.health_status for ent in ents]
       kw = [ent._.hs_keyword for ent in ents]
       cj = [ent._.conjecture for ent in ents]
       sl = [sent.text.strip('\n') for ent in ents]
       entList.extend(elist)
       hsList.extend(hs)
+      svList.extend(statusVerb)
       kwList.extend(kw)
       cjList.extend(cj)
       sentList.extend(sl)
 
-    df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
-    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses', 'conjecture', 'sentence'])
+    df = pd.DataFrame({'entities':entList, 'root':svList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
+    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'root','status keywords', 'health statuses', 'conjecture', 'sentence'])
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
@@ -465,6 +470,16 @@ class RuleBasedMatcher(object):
       healthStatus = ent
     return healthStatus
 
+  def getAmodOnly(self, ent):
+    """
+      Get amod tokens texts for ent
+      @ In, ent, Span, the ent to amend with all left children
+      @ Out, amod, list, the list of amods for ent
+    """
+    amod = [tk.text for tk in ent.lefts if tk.dep_ in ['amod']]
+    return amod
+
+
   def getHealthStatusForSubj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
       Get the status for nsubj/nsubjpass ent
@@ -504,6 +519,8 @@ class RuleBasedMatcher(object):
       elif not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
           entHS._.set('hs_keyword', root.lemma_)
+        else:
+          entHS._.set('ent_status_verb', root.lemma_)
         neg, negText = self.isNegation(root)
         passive = self.isPassive(root)
         # # last is punct, the one before last is the root
@@ -569,6 +586,8 @@ class RuleBasedMatcher(object):
       if not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
           entHS._.set('hs_keyword', root.lemma_)
+        else:
+          entHS._.set('ent_status_verb', root.lemma_)
         passive = self.isPassive(root)
         neg, negText = self.isNegation(root)
         healthStatus = self.findLeftSubj(root, passive)
@@ -651,7 +670,7 @@ class RuleBasedMatcher(object):
           if entRoot.dep_ in ['nsubj', 'nsubjpass']:
             healthStatus, neg, negText = self.getHealthStatusForSubj(ent, ent, sent, causalStatus, predSynonyms)
           elif entRoot.dep_ in ['pobj', 'dobj']:
-            if len(ents) == 1:
+            if len(ents) == 1 or entRoot.dep_ in ['dobj']:
               healthStatus, neg, negText = self.getHealthStatusForObj(ent, ent, sent, causalStatus, predSynonyms)
             else:
               healthStatus = self.getHealthStatusForPobj(ent, include=False)
@@ -674,6 +693,9 @@ class RuleBasedMatcher(object):
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
             if healthStatus is None:
               healthStatus = entRoot.head
+              amod = self.getAmodOnly(healthStatus)
+              if len(amod) != 0:
+                healthStatus = (amod, healthStatus)
           elif entRoot.dep_ in ['conj']:
             # TODO: recursive function to retrieve non-conj
             head = entRoot.head
@@ -686,6 +708,8 @@ class RuleBasedMatcher(object):
               healthStatus = self.getHealthStatusForPobj(headEnt, include=False)
               if healthStatus is None:
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms)
+          elif entRoot.dep_ in ['ROOT']:
+            healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
           else:
             logger.warning(f'Entity "{ent}" dep_ is "{entRoot.dep_}" is not among valid list "[nsubj, nsubjpass, pobj, dobj, compound]"')
             if entRoot.head == root:
@@ -693,6 +717,8 @@ class RuleBasedMatcher(object):
               if ent.start < root.i:
                 if [root.lemma_.lower()] in predSynonyms:
                   ent._.set('hs_keyword', root.lemma_)
+                else:
+                  ent._.set('ent_status_verb', root.lemma_)
                 neg, negText = self.isNegation(root)
                 passive = self.isPassive(root)
                 # # last is punct, the one before last is the root
@@ -718,6 +744,8 @@ class RuleBasedMatcher(object):
               else:
                 if [root.lemma_.lower()] in predSynonyms:
                   ent._.set('hs_keyword', root.lemma_)
+                else:
+                  ent._.set('ent_status_verb', root.lemma_)
                 passive = self.isPassive(root)
                 neg, negText = self.isNegation(root)
                 healthStatus = self.findLeftSubj(root, passive)
@@ -738,9 +766,20 @@ class RuleBasedMatcher(object):
                   break
               if end is not None:
                 healthStatus = sent.doc[start:end]
-
+          # handle conjuncts
+          if healthStatus is None and len(ent.conjuncts) > 0:
+            conjunct = sent.doc[ent.conjuncts[0].i: ent.conjuncts[0].i+1]
+            healthStatus = self.getAmod(conjunct, conjunct.start, conjunct.end, include=False)
+            if healthStatus is None:
+              ent._.set('health_status',conjunct._.health_status)
+              ent._.set('hs_keyword',conjunct._.hs_keyword)
+              ent._.set('ent_status_verb',conjunct._.ent_status_verb)
+              ent._.set('conjecture',conjunct._.conjecture)
         if healthStatus is None:
           continue
+        amod = None
+        if isinstance(healthStatus, tuple):
+          amod, healthStatus = healthStatus[0], healthStatus[1]
         if isinstance(healthStatus, Span):
           conjecture = self.isConjecture(healthStatus.root.head)
         elif isinstance(healthStatus, Token):
@@ -752,10 +791,15 @@ class RuleBasedMatcher(object):
             neg, negText = self.isNegation(healthStatus)
         # conjecture = self.isConjecture(healthStatus.head)
         # neg, negText = self.isNegation(healthStatus)
+        if amod is not None:
+          amodText = ' '.join(amod)
+          healthStatusText = ' '.join([amodText, healthStatus.text])
+        else:
+          healthStatusText = healthStatus.text
         if neg:
-          healthStatus = ' '.join([negText,healthStatus.text])
-        logger.debug(f'{ent} health status: {healthStatus}')
-        ent._.set('health_status', healthStatus)
+          healthStatusText = ' '.join([negText,healthStatusText])
+        logger.debug(f'{ent} health status: {healthStatusText}')
+        ent._.set('health_status', healthStatusText)
         ent._.set('conjecture',conjecture)
 
   def findLeftSubj(self, pred, passive):
