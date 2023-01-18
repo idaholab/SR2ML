@@ -418,6 +418,7 @@ class RuleBasedMatcher(object):
           healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
       else:
         healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:end]
+      healthStatus = self.getAmod(healthStatus, healthStatus.start, healthStatus.end, include=True)
     elif grandparent.pos_ in ['VERB'] and causalStatus:
       healthStatus = self.findRightObj(grandparent)
       subtree = list(healthStatus.subtree)
@@ -425,6 +426,11 @@ class RuleBasedMatcher(object):
         healthStatus = grandparent.doc[healthStatus.i:subtree[-1].i+1]
       elif healthStatus is not None and healthStatus.i >= root.i:
         healthStatus = None
+    elif grandparent.pos_ in ['VERB'] and grandparent.dep_ in ['ROOT']:
+      dobj = [tk for tk in grandparent.rights if tk.dep_ in ['dobj'] and tk.i < start]
+      if len(dobj) > 0:
+        dobjEnt = root.doc[dobj[0].i:dobj[0].i+1]
+        healthStatus = self.getAmod(dobjEnt, dobjEnt.start, dobjEnt.end, include=True)
     elif grandparent.pos_ in ['NOUN']:
       grandEnt = grandparent.doc[grandparent.i:grandparent.i+1]
       healthStatus = self.getAmod(grandEnt, grandparent.i, grandparent.i+1, include=True)
@@ -466,6 +472,7 @@ class RuleBasedMatcher(object):
       deps = [tk.dep_ in ['compound'] for tk in ent.lefts]
       if any(deps):
         healthStatus = self.getPhrase(ent, start, end, include)
+        healthStatus = self.getAmod(healthStatus, healthStatus.start, healthStatus.end, include=True)
     if healthStatus is None and include:
       healthStatus = ent
     return healthStatus
@@ -514,7 +521,7 @@ class RuleBasedMatcher(object):
       valid = [tk.dep_ in ['advcl', 'relcl'] for tk in rights if tk.pos_ not in ['PUNCT', 'SPACE']]
       if root.nbor().dep_ in ['cc'] or root.nbor().pos_ in ['PUNCT']:
         healthStatus = root
-      elif all(valid):
+      elif len(valid)>0 and all(valid):
         healthStatus = root
       elif not causalStatus:
         if [root.lemma_.lower()] in predSynonyms:
@@ -542,7 +549,12 @@ class RuleBasedMatcher(object):
         if healthStatus is None:
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
         if healthStatus is None:
-          healthStatus = root
+          extra = [tk for tk in root.rights if tk.pos_ in ['ADP']]
+          # Only select the first ADP and combine with root
+          if len(extra) > 0:
+            healthStatus = root.doc[root.i:extra[0].i+1]
+          else:
+            healthStatus = root
       else:
         healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
       if healthStatus is None:
@@ -562,13 +574,16 @@ class RuleBasedMatcher(object):
     """
     healthStatus = None
     neg = False
+
     negText = ''
     entRoot = ent.root
     head = entRoot.head
+    prep = False
     if head.pos_ in ['VERB']:
       root = head
     elif head.dep_ in ['prep']:
-      root = head.head.head
+      root = head.head
+      prep = True
     else:
       root = head
     causalStatus = [root.lemma_.lower()] in self._causalKeywords['VERB'] and [root.lemma_.lower()] not in self._statusKeywords['VERB']
@@ -576,8 +591,13 @@ class RuleBasedMatcher(object):
       return healthStatus, neg, negText
     if root.pos_ != 'VERB':
       neg, negText = self.isNegation(root)
-      if root.pos_ in ['NOUN', 'ADJ']:
+      if root.pos_ in ['ADJ']:
         healthStatus = root
+      elif root.pos_ in ['NOUN']:
+        if root.dep_ in ['pobj']:
+          healthStatus = root.doc[root.head.head.i:root.i+1]
+        else:
+          healthStatus = root
       elif root.pos_ in ['AUX']:
         healthStatus = root.doc[root.i-root.n_lefts:root.i]
       else:
@@ -595,6 +615,10 @@ class RuleBasedMatcher(object):
           healthStatus = self.getAmod(healthStatus, healthStatus.i, healthStatus.i+1, include=True)
         else:
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
+        if healthStatus is None:
+          rights =[tk for tk in list(root.rights) if tk.pos_ not in ['SPACE', 'PUNCT'] and tk.i >= ent.end]
+          if len(rights) > 0 and rights[0].pos_ in ['VERB', 'NOUN', 'ADJ', 'ADV']:
+            healthStatus = rights[0]
       else:
         if entRoot.dep_ in ['pobj']:
           healthStatus = self.getHealthStatusForPobj(ent, include=include)
@@ -757,11 +781,11 @@ class RuleBasedMatcher(object):
           if healthStatus is None:
             # search right
             if not ent[-1].is_sent_end:
-              start = ent.end+1
+              start = ent.end
               end = None
-              for i, tk in enumerate(sent.doc[ent.end+1:]):
+              for i, tk in enumerate(sent.doc[ent.end:sent[-1].i]):
                 if tk == sent.doc[tk.i-1].head:
-                  end = tk.i
+                  end = tk.i+1
                 else:
                   break
               if end is not None:
