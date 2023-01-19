@@ -4,7 +4,7 @@
 2,pump,find,inoperative,False,RCP pump 1A pressure gauge was found inoperative.
 3,pump,have,signs of past leakage,False,RCP pump 1A had signs of past leakage.
 4,Pump,experience,not enough flow during test,False,The Pump is not experiencing enough flow during test.
-5,pump shaft,notice,Slight Vibrations,True,Slight Vibrations is noticed - likely from pump shaft deflection.
+5,pump shaft,,deflection,False,Slight Vibrations is noticed - likely from pump shaft deflection.
 6,Pump,,not responding,False,Pump flow meter was not responding.
 7,pump bearings,,Rupture,False,Rupture of pump bearings caused pump shaft degradation.
 8,pump shaft,,degradation,False,Rupture of pump bearings caused pump shaft degradation.
@@ -14,9 +14,9 @@
 12,Pump,,test,False,Pump test failed due to power supply failure.
 13,power supply,,failure,False,Pump test failed due to power supply failure.
 14,Pump,,inspection,False,Pump inspection revealed excessive impeller degradation.
-15,impeller,,degradation,False,Pump inspection revealed excessive impeller degradation.
+15,impeller,,excessive degradation,False,Pump inspection revealed excessive impeller degradation.
 16,Pump,,inspection,True,Pump inspection revealed excessive impeller degradation likely due to cavitation.
-17,impeller,,degradation,True,Pump inspection revealed excessive impeller degradation likely due to cavitation.
+17,impeller,,excessive degradation,True,Pump inspection revealed excessive impeller degradation likely due to cavitation.
 18,pump,find,Oil puddle,False,Oil puddle was found in proximity of RCP pump 1A.
 19,pump,observe,Anomalous vibrations,False,Anomalous vibrations were observed for RCP pump 1A.
 20,pump shaft,,Several cracks,False,Several cracks on pump shaft were observed; they could have caused pump failure within few days.
@@ -30,7 +30,7 @@
 28,pumps,,enough flow,False,The Pump is not experiencing enough flow for the pumps to keep the check valves open during test.
 29,Pump shaft,make,noise,False,Pump shaft made noise.
 30,pump shaft,,Vibration,True,Vibration seems like it is coming from the pump shaft.
-31,pump shaft,,deflection,False,Visible pump shaft deflection in operation.
+31,pump shaft,,Visible deflection,False,Visible pump shaft deflection in operation.
 32,Pump bearings,appear,acceptable condition,False,Pump bearings appear in acceptable condition.
 33,Pump,make,noises,False,Pump made noises - not enough to affect performance.
 34,Pump shaft,have,a slight deflection,False,Pump shaft has a slight deflection.

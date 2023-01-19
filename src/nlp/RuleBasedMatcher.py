@@ -437,6 +437,7 @@ class RuleBasedMatcher(object):
         healthStatus = self.getAmod(dobjEnt, dobjEnt.start, dobjEnt.end, include=True)
       else:
         healthStatus = ent
+        healthStatus = self.getAmod(ent, start, end, include=include)
     elif grandparent.pos_ in ['NOUN']:
       grandEnt = grandparent.doc[grandparent.i:grandparent.i+1]
       healthStatus = self.getAmod(grandEnt, grandparent.i, grandparent.i+1, include=True)
@@ -617,7 +618,7 @@ class RuleBasedMatcher(object):
         passive = self.isPassive(root)
         neg, negText = self.isNegation(root)
         healthStatus = self.findLeftSubj(root, passive)
-        if healthStatus.pos_ in ['PRON']:
+        if healthStatus is not None and healthStatus.pos_ in ['PRON']:
           # coreference resolution
           passive = self.isPassive(root.head)
           neg, negText = self.isNegation(root.head)
@@ -736,16 +737,18 @@ class RuleBasedMatcher(object):
                 healthStatus = (amod, healthStatus)
           elif entRoot.dep_ in ['conj']:
             # TODO: recursive function to retrieve non-conj
-            head = entRoot.head
-            if head.dep_ in ['conj']:
-              head = head.head
-            headEnt = head.doc[head.i:head.i+1]
-            if head.dep_ in ['nsubj', 'nsubjpass']:
-              healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, ent, sent, causalStatus, predSynonyms)
-            elif head.dep_ in ['pobj', 'dobj']:
-              healthStatus = self.getHealthStatusForPobj(headEnt, include=False)
-              if healthStatus is None:
-                healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms)
+            healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+            if healthStatus is None:
+              head = entRoot.head
+              if head.dep_ in ['conj']:
+                head = head.head
+              headEnt = head.doc[head.i:head.i+1]
+              if head.dep_ in ['nsubj', 'nsubjpass']:
+                healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, ent, sent, causalStatus, predSynonyms)
+              elif head.dep_ in ['pobj', 'dobj']:
+                healthStatus = self.getHealthStatusForPobj(headEnt, include=False)
+                if healthStatus is None:
+                  healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms)
           elif entRoot.dep_ in ['ROOT']:
             healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
             if healthStatus is None:
