@@ -274,8 +274,12 @@ class RuleBasedMatcher(object):
       cjList.extend(cj)
       sentList.extend(sl)
 
-    df = pd.DataFrame({'entities':entList, 'root':svList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
-    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'root','status keywords', 'health statuses', 'conjecture', 'sentence'])
+    ## include 'root' in the output
+    # df = pd.DataFrame({'entities':entList, 'root':svList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
+    # df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'root','status keywords', 'health statuses', 'conjecture', 'sentence'])
+    df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
+    df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses', 'conjecture', 'sentence'])
+
     logger.info('End of health status extraction!')
     ## causal relation
     logger.info('Start to extract causal relation using OPM model information')
@@ -431,6 +435,8 @@ class RuleBasedMatcher(object):
       if len(dobj) > 0:
         dobjEnt = root.doc[dobj[0].i:dobj[0].i+1]
         healthStatus = self.getAmod(dobjEnt, dobjEnt.start, dobjEnt.end, include=True)
+      else:
+        healthStatus = ent
     elif grandparent.pos_ in ['NOUN']:
       grandEnt = grandparent.doc[grandparent.i:grandparent.i+1]
       healthStatus = self.getAmod(grandEnt, grandparent.i, grandparent.i+1, include=True)
@@ -549,7 +555,7 @@ class RuleBasedMatcher(object):
         if healthStatus is None:
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=include)
         if healthStatus is None:
-          extra = [tk for tk in root.rights if tk.pos_ in ['ADP']]
+          extra = [tk for tk in root.rights if tk.pos_ in ['ADP', 'ADJ']]
           # Only select the first ADP and combine with root
           if len(extra) > 0:
             healthStatus = root.doc[root.i:extra[0].i+1]
@@ -611,6 +617,11 @@ class RuleBasedMatcher(object):
         passive = self.isPassive(root)
         neg, negText = self.isNegation(root)
         healthStatus = self.findLeftSubj(root, passive)
+        if healthStatus.pos_ in ['PRON']:
+          # coreference resolution
+          passive = self.isPassive(root.head)
+          neg, negText = self.isNegation(root.head)
+          healthStatus = self.findLeftSubj(root.head, passive)
         if healthStatus is not None:
           healthStatus = self.getAmod(healthStatus, healthStatus.i, healthStatus.i+1, include=True)
         else:
@@ -713,6 +724,9 @@ class RuleBasedMatcher(object):
               headEnt = head.doc[head.i:head.i+1]
               if head.dep_ in ['nsubj', 'nsubjpass']:
                 healthStatus, neg, negText = self.getHealthStatusForSubj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
+                if isinstance(healthStatus, Span):
+                  if entRoot.i >= healthStatus.start and entRoot.i < healthStatus.end:
+                    healthStatus = headEnt
               elif head.dep_ in ['dobj', 'pobj']:
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
             if healthStatus is None:
@@ -734,6 +748,10 @@ class RuleBasedMatcher(object):
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms)
           elif entRoot.dep_ in ['ROOT']:
             healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+            if healthStatus is None:
+              rights =[tk for tk in list(entRoot.rights) if tk.pos_ in ['VERB', 'NOUN', 'ADJ', 'ADV'] and tk.i >= ent.end]
+              if len(rights) > 0:
+                healthStatus = rights[0]
           else:
             logger.warning(f'Entity "{ent}" dep_ is "{entRoot.dep_}" is not among valid list "[nsubj, nsubjpass, pobj, dobj, compound]"')
             if entRoot.head == root:
@@ -790,6 +808,9 @@ class RuleBasedMatcher(object):
                   break
               if end is not None:
                 healthStatus = sent.doc[start:end]
+                amod = self.getAmodOnly(healthStatus)
+                if len(amod) != 0:
+                  healthStatus = (amod, healthStatus)
           # handle conjuncts
           if healthStatus is None and len(ent.conjuncts) > 0:
             conjunct = sent.doc[ent.conjuncts[0].i: ent.conjuncts[0].i+1]
