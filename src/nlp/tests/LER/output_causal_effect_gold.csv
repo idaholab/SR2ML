@@ -19,9 +19,9 @@
 ",True
 9,control room,,controlled,steam dump system,automatic operation,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
 ",True
-10,control panels,,controlled,ASDVs,controlled,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
+10,control panels,engineered safeguards,controlled,ASDVs,controlled,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
 ",True
-11,control panels,,controlled,steam dump system,automatic operation,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
+11,control panels,engineered safeguards,controlled,steam dump system,automatic operation,"Although the steam dump system is arranged for automatic operation, the ASDVs may be manually controlled from either control room or engineered safeguards control panels.
 ",True
 12,steam dump control relay coil,failure,due to,failure,,"Troubleshooting the circuit identified that the Bussmann fuse FUZ/IM13-1, model number FNM-5, was found opened due to the steam dump control relay coil failure.
 ",False

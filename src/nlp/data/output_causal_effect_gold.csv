@@ -5,9 +5,9 @@
 ",False
 2,power supply,failure,due to,Pump,test,"Pump test failed due to power supply failure.
 ",False
-3,Pump,inspection,revealed,impeller,degradation,"Pump inspection revealed excessive impeller degradation.
+3,Pump,inspection,revealed,impeller,excessive degradation,"Pump inspection revealed excessive impeller degradation.
 ",False
-4,Pump,inspection,revealed,impeller,degradation,"Pump inspection revealed excessive impeller degradation likely due to cavitation.
+4,Pump,inspection,revealed,impeller,excessive degradation,"Pump inspection revealed excessive impeller degradation likely due to cavitation.
 ",True
 5,pump shaft,Several cracks,caused,pump,failure,"Several cracks on pump shaft were observed; they could have caused pump failure within few days.
 ",True
