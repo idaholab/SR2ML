@@ -87,3 +87,4 @@ if __name__ == "__main__":
   matcher.addEntityPattern(causalName, patternsCausal)
 
   matcher(doc.lower())
+  # matcher(doc)
