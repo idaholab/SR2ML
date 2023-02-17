@@ -329,7 +329,7 @@ class RuleBasedMatcher(object):
       @ In, token, spacy.tokens.Token, the token of the doc, the token should be the root of the Doc
       @ Out, isConjecture, True, if the token/sentence indicates conjecture
     """
-    for left in token.lefts: # Check modal auxilliary verb: can, could, may, might, must, shall, should, will, would
+    for left in token.lefts: # Check modal auxiliary verb: can, could, may, might, must, shall, should, will, would
       if left.dep_.startswith('aux') and left.tag_ in ['MD']:
         return True
     if token.pos_ == 'VERB' and token.tag_ == 'VB': # If it is a verb, and there is no inflectional morphology for the verb
