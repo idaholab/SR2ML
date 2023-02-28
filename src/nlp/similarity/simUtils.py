@@ -4,6 +4,7 @@ import numpy as np
 from nltk import word_tokenize as tokenizer
 from nltk.corpus import brown
 from nltk.corpus import wordnet as wn
+from nltk.corpus import wordnet_ic
 
 """
 	Methods proposed by: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1644735
@@ -133,14 +134,45 @@ def identifyBestSimilarWordFromWordSet(wordA, wordSet):
 	return word, similarity
 
 
+def wordsSimilarity(wordA, wordB, method=None):
+	"""
+	"""
+	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
+	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method)
+	return similarity
+
+def synsetsSimilarity(synsetA, synsetB, method=None):
+	"""
+	"""
+	wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
+	sematicSimMethod = ['semantic_similarity_synsets']
+	if method in wordnetSimMethod:
+		if method in ["path_similarity", "wup_similarity", "lch_similarity"]:
+			similarity = getattr(wn, method)(synsetA, synsetB)
+		else:
+			brownIc = wordnet_ic.ic('ic-brown.dat')
+			similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
+	elif method in sematicSimMethod:
+		similarity = semanticSimilaritySynsets(synsetA, synsetB)
+	else:
+		raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
+
+	return similarity
+
+
 def semanticSimilarityWords(wordA, wordB):
 	"""
 	"""
 	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
-	shortDistance = PathLength(bestPair[0], bestPair[1])
-	maxHierarchy = ScalingDepthEffect(bestPair[0], bestPair[1])
-	return shortDistance*maxHierarchy
+	similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1])
+	return similarity
 
+def semanticSimilaritySynsets(synsetA, synsetB):
+	"""
+	"""
+	shortDistance = PathLength(synsetA, synsetB)
+	maxHierarchy = ScalingDepthEffect(synsetA, synsetB)
+	return shortDistance*maxHierarchy
 
 def identifyBestSimilarSynsetPair(wordA, wordB):
 	"""
@@ -159,6 +191,7 @@ def identifyBestSimilarSynsetPair(wordA, wordB):
 
 		for synsetWordA in synsetsWordA:
 			for synsetWordB in synsetsWordB:
+				# TODO: may change to general similarity method
 				temp = wn.path_similarity(synsetWordA, synsetWordB)
 				if temp > similarity:
 					similarity = temp
@@ -207,10 +240,13 @@ def ScalingDepthEffect(synsetA, synsetB, beta=0.45):
 	maxLength = sys.maxsize
 	smoothingFactor = beta
 	if synsetA is None or synsetB is None:
-		return maxLength
+		return 0.0
 
 	if synsetA == synsetB:
-		maxLength = max(word[1] for word in synsetA.hypernym_distances())
+		# The following is from original code, I think it should be return 1.0 when synset are the same
+		# maxLength = max(word[1] for word in synsetA.hypernym_distances())
+		return 1.0
+
 
 	else:
 		hypernymWordA = {word[0]: word[1] for word in synsetA.hypernym_distances()}
