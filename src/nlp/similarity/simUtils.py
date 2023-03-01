@@ -17,7 +17,7 @@ from nltk.corpus import wordnet_ic
 	Codes are modified from https://github.com/anishvarsha/Sentence-Similaritity-using-corpus-statistics
 """
 
-def sentenceSimialrity(sentenceA, sentenceB, infoContentNorm, delta=0.85):
+def sentenceSimialrity(sentenceA, sentenceB, infoContentNorm=False, delta=0.85):
 	similarity = delta * semanticSimilaritySentences(sentenceA, sentenceB, infoContentNorm) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
 	return similarity
 
@@ -91,7 +91,7 @@ def constructSemanticVector(words, jointWords, infoContentNorm):
 		else:
 			similarWord, similarity =  identifyBestSimilarWordFromWordSet(jointWord, wordSet)
 			if similarity >0.2:
-				vector[i] = 0.2
+				vector[i] = similarity
 			else:
 				vector[i] = 0.0
 			if infoContentNorm:
@@ -145,6 +145,8 @@ def semanticSimilarityWords(wordA, wordB, disambiguation=False):
 	if wordA.lower() == wordB.lower():
 		return 1.0
 	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
+	if bestPair[0] is None or bestPair[1] is None:
+		return 0.0
 	similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1], disambiguation=disambiguation)
 	return similarity
 
@@ -397,3 +399,45 @@ def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMet
 	return wordList, synsetList
 
 
+
+
+# Sentence similarity after disambiguation
+
+def sentenceSimialrity(sentenceA, sentenceB, delta=0.85):
+	similarity = delta * semanticSimilaritySentences(sentenceA, sentenceB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
+	return similarity
+
+def semanticSimilarityUsingDiambiguatedSynsets(synsetsA, synsetsB):
+	"""
+
+	"""
+	jointWordSynsets = set(synsetsA).union(set(synsetsB))
+	wordVectorA = constructSemanticVectorUsingDiambiguatedSynsets(synsetsA, jointWordSynsets)
+	wordVectorB = constructSemanticVectorUsingDiambiguatedSynsets(synsetsB, jointWordSynsets)
+	semSimilarity = np.dot(wordVectorA, wordVectorB)/(np.linalg.norm(wordVectorA)*np.linalg.norm(wordVectorB))
+	return semSimilarity
+
+def constructSemanticVectorUsingDiambiguatedSynsets(wordSynsets, jointWordSynsets):
+	"""
+		Construct semantic vector
+		@ In, wordSynsets, set of words synsets,
+		@ In, jointWords, set of joint words synsets,
+	"""
+	wordSynsets = set(wordSynsets)
+	vector = np.zeros(len(jointWordSynsets))
+	i = 0
+	for jointSynset in jointWordSynsets:
+		simVector = []
+		if jointSynset in wordSynsets:
+			vector[i] = 1
+		else:
+			for synsetB in wordSynsets:
+				similarity = synsetsSimilarity(jointSynset, synsetB, 'semantic_similarity_synsets', disambiguation=True)
+				simVector.append(similarity)
+			maxSim = max(simVector)
+			if maxSim >0.2:
+				vector[i] = maxSim
+			else:
+				vector[i] = 0.0
+		i+=1
+	return vector
