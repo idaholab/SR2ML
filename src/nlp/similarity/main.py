@@ -12,6 +12,8 @@ if fromFile:
     wordPairsData = pd.read_csv(wordPairsFile,  header=0)
     sentencePairsData = pd.read_csv(sentencePairsFile, header=0)
 else:
+    # Results from https://arxiv.org/pdf/1802.05667.pdf
+    # with wordOrder = 0.15, word order threshold: 0.4, semantic threshold: 0.2
     wordPairs = [
         ["asylum", "fruit", 0.21],
         ["autograph", "shore", 0.29],

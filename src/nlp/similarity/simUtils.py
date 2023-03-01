@@ -1,6 +1,12 @@
 import sys
 import math
 import numpy as np
+# https://github.com/alvations/pywsd
+from pywsd.lesk import simple_lesk, original_lesk, cosine_lesk, adapted_lesk
+from pywsd import disambiguate
+from pywsd.similarity import max_similarity as maxsim
+
+import nltk
 from nltk import word_tokenize as tokenizer
 from nltk.corpus import brown
 from nltk.corpus import wordnet as wn
@@ -133,45 +139,20 @@ def identifyBestSimilarWordFromWordSet(wordA, wordSet):
 			word = wordB
 	return word, similarity
 
-
-def wordsSimilarity(wordA, wordB, method=None):
+def semanticSimilarityWords(wordA, wordB, disambiguation=False):
 	"""
 	"""
+	if wordA.lower() == wordB.lower():
+		return 1.0
 	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
-	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method)
+	similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1], disambiguation=disambiguation)
 	return similarity
 
-def synsetsSimilarity(synsetA, synsetB, method=None):
-	"""
-	"""
-	wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
-	sematicSimMethod = ['semantic_similarity_synsets']
-	if method in wordnetSimMethod:
-		if method in ["path_similarity", "wup_similarity", "lch_similarity"]:
-			similarity = getattr(wn, method)(synsetA, synsetB)
-		else:
-			brownIc = wordnet_ic.ic('ic-brown.dat')
-			similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
-	elif method in sematicSimMethod:
-		similarity = semanticSimilaritySynsets(synsetA, synsetB)
-	else:
-		raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
-
-	return similarity
-
-
-def semanticSimilarityWords(wordA, wordB):
-	"""
-	"""
-	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
-	similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1])
-	return similarity
-
-def semanticSimilaritySynsets(synsetA, synsetB):
+def semanticSimilaritySynsets(synsetA, synsetB, disambiguation=False):
 	"""
 	"""
 	shortDistance = PathLength(synsetA, synsetB)
-	maxHierarchy = ScalingDepthEffect(synsetA, synsetB)
+	maxHierarchy = ScalingDepthEffect(synsetA, synsetB, disambiguation=disambiguation)
 	return shortDistance*maxHierarchy
 
 def identifyBestSimilarSynsetPair(wordA, wordB):
@@ -227,7 +208,7 @@ def PathLength(synsetA, synsetB, alpha=0.2):
 	shortDistance = math.exp(-alpha*maxLength)
 	return shortDistance
 
-def ScalingDepthEffect(synsetA, synsetB, beta=0.45):
+def ScalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
 	"""
 		Words at upper layers of hierarchical semantic nets have more general concepts and less semantic similarity
 		between words than words at lower layers. This method is used to scale the similarity behavior with repect
@@ -243,10 +224,11 @@ def ScalingDepthEffect(synsetA, synsetB, beta=0.45):
 		return 0.0
 
 	if synsetA == synsetB:
-		# The following is from original code, I think it should be return 1.0 when synset are the same
-		# maxLength = max(word[1] for word in synsetA.hypernym_distances())
-		return 1.0
-
+		if disambiguation:
+			return 1.0
+		else:
+			# The following is from original code, I think it should be return 1.0 when synset are the same
+			maxLength = max(word[1] for word in synsetA.hypernym_distances())
 
 	else:
 		hypernymWordA = {word[0]: word[1] for word in synsetA.hypernym_distances()}
@@ -271,3 +253,95 @@ def ScalingDepthEffect(synsetA, synsetB, beta=0.45):
 	return treeDist
 
 #################################################
+
+
+"""
+	Methods proposed by: https://arxiv.org/pdf/1802.05667.pdf
+	Codes are modified from https://github.com/nihitsaxena95/sentence-similarity-wordnet-sementic/blob/master/SentenceSimilarity.py
+"""
+
+def identifyNounAndVerbForComparison(sentence):
+	"""
+		Taking out Noun and Verb for comparison word based
+		@ In, sentence, string, sentence string
+		@ Out, pos, list, list of dict {token/word:pos_tag}
+	"""
+	tokens = nltk.word_tokenize(sentence)
+	pos = nltk.pos_tag(tokens)
+	pos = [p for p in pos if p[1].startswith('N') or p[1].startswith('V')]
+	return pos
+
+def sentenceSenseDisambiguation(sentence, method='simple_lesk'):
+	"""
+		removing the disambiguity by getting the context
+		@ In, sentence, string, sentence string
+		@ Out, sense, set, set of wordnet.Synset for the estimated best sense
+	"""
+	pos = identifyNounAndVerbForComparison(sentence)
+	sense = []
+	for p in pos:
+		if method.lower() == 'simple_lesk':
+			sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
+		else:
+			raise NotImplementedError(f"Mehtod {method} not implemented yet!")
+	return set(sense)
+
+###########################################################################
+
+"""
+	Extended methods
+"""
+def wordsSimilarity(wordA, wordB, method=None):
+	"""
+	"""
+	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
+	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method)
+	return similarity
+
+def synsetsSimilarity(synsetA, synsetB, method=None):
+	"""
+	"""
+	wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
+	sematicSimMethod = ['semantic_similarity_synsets']
+	if method in wordnetSimMethod:
+		if method in ["path_similarity", "wup_similarity", "lch_similarity"]:
+			similarity = getattr(wn, method)(synsetA, synsetB)
+		else:
+			brownIc = wordnet_ic.ic('ic-brown.dat')
+			similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
+	elif method in sematicSimMethod:
+		similarity = semanticSimilaritySynsets(synsetA, synsetB)
+	else:
+		raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
+
+	return similarity
+
+
+def wordSenseDisambiguation(word, sentence, method='simple_lesk'):
+	"""
+		removing the disambiguity by getting the context
+		@ In, sentence, string, sentence string
+		@ Out, sense, set, set of wordnet.Synset for the estimated best sense
+	"""
+	if isinstance(word, str):
+		tokens = nltk.word_tokenize(word)
+	elif isinstance(word, list) or isinstance(word, set):
+		tokens = [nltk.word_tokenize(w)[0] for w in word]
+	else:
+		raise ValueError(f'{word} format is not valid, please input string, set/list of string')
+	pos = nltk.pos_tag(tokens)
+	sense = []
+	for p in pos:
+		if method.lower() == 'simple_lesk':
+			sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
+		else:
+			raise NotImplementedError(f"Mehtod {method} not implemented yet!")
+	if isinstance(word, str):
+		return sense[0]
+	elif isinstance(word, list):
+		return sense
+	else:
+		return set(sense)
+
+
+# use disambiguate function to disambiguate sentences
