@@ -17,7 +17,7 @@ from nltk.corpus import wordnet_ic
 	Codes are modified from https://github.com/anishvarsha/Sentence-Similaritity-using-corpus-statistics
 """
 
-def sentenceSimialrity(sentenceA, sentenceB, infoContentNorm, delta=0.58):
+def sentenceSimialrity(sentenceA, sentenceB, infoContentNorm, delta=0.85):
 	similarity = delta * semanticSimilaritySentences(sentenceA, sentenceB, infoContentNorm) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
 	return similarity
 
@@ -151,7 +151,7 @@ def semanticSimilarityWords(wordA, wordB, disambiguation=False):
 def semanticSimilaritySynsets(synsetA, synsetB, disambiguation=False):
 	"""
 	"""
-	shortDistance = PathLength(synsetA, synsetB)
+	shortDistance = PathLength(synsetA, synsetB, disambiguation=disambiguation)
 	maxHierarchy = ScalingDepthEffect(synsetA, synsetB, disambiguation=disambiguation)
 	return shortDistance*maxHierarchy
 
@@ -179,7 +179,7 @@ def identifyBestSimilarSynsetPair(wordA, wordB):
 					bestPair = synsetWordA, synsetWordB
 		return bestPair
 
-def PathLength(synsetA, synsetB, alpha=0.2):
+def PathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
 	"""
 		Path length calculation using nonlinear transfer function between two Wordnet Synsets
 		The two Synsets should be the best Synset Pair (e.g., disambiguation should be performed)
@@ -189,22 +189,29 @@ def PathLength(synsetA, synsetB, alpha=0.2):
 			parameter used to scale the shortest path length. For wordnet, the optimal value is 0.2
 		@ Out,
 	"""
+	synsetA = wn.synset(synsetA.name())
+	synsetB = wn.synset(synsetB.name())
 	maxLength = sys.maxsize
 	if synsetA is None or synsetB is None:
 		return 0.0
 	if synsetA == synsetB:
 		maxLength = 0.0
 	else:
-		lemmaSetA = set([str(word.name()) for word in synsetA.lemmas()])
-		lemmaSetB = set([str(word.name()) for word in synsetB.lemmas()])
-		#this line if the word is none
-		if len(lemmaSetA.intersection(lemmaSetB)) > 0:
-			maxLength = 1.0
+		if not disambiguation:
+			lemmaSetA = set([str(word.name()) for word in synsetA.lemmas()])
+			lemmaSetB = set([str(word.name()) for word in synsetB.lemmas()])
+			#this line if the word is none
+			if len(lemmaSetA.intersection(lemmaSetB)) > 0:
+				maxLength = 1.0
+			else:
+				maxLength = synsetA.shortest_path_distance(synsetB)
+				if maxLength is None:
+					maxLength = 0.0
 		else:
+			# when disamigutation is performed, we should avoid to check lemmas
 			maxLength = synsetA.shortest_path_distance(synsetB)
 			if maxLength is None:
 				maxLength = 0.0
-
 	shortDistance = math.exp(-alpha*maxLength)
 	return shortDistance
 
@@ -295,10 +302,11 @@ def wordsSimilarity(wordA, wordB, method=None):
 	"""
 	"""
 	bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
-	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method)
+	# when campare words only, we assume there is no disambiguation required.
+	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method, disambiguation=False)
 	return similarity
 
-def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets'):
+def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', disambiguation=True):
 	"""
 	"""
 	method = method.lower()
@@ -311,7 +319,7 @@ def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets'):
 			brownIc = wordnet_ic.ic('ic-brown.dat')
 			similarity = getattr(wn, method)(wn.synset(synsetA.name()), wn.synset(synsetB.name()), brownIc)
 	elif method in sematicSimMethod:
-		similarity = semanticSimilaritySynsets(synsetA, synsetB)
+		similarity = semanticSimilaritySynsets(synsetA, synsetB, disambiguation=disambiguation)
 	else:
 		raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
 
