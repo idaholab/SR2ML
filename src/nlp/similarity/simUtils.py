@@ -298,17 +298,18 @@ def wordsSimilarity(wordA, wordB, method=None):
 	similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method)
 	return similarity
 
-def synsetsSimilarity(synsetA, synsetB, method=None):
+def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets'):
 	"""
 	"""
+	method = method.lower()
 	wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
 	sematicSimMethod = ['semantic_similarity_synsets']
 	if method in wordnetSimMethod:
 		if method in ["path_similarity", "wup_similarity", "lch_similarity"]:
-			similarity = getattr(wn, method)(synsetA, synsetB)
+			similarity = getattr(wn, method)(wn.synset(synsetA.name()), wn.synset(synsetB.name()))
 		else:
 			brownIc = wordnet_ic.ic('ic-brown.dat')
-			similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
+			similarity = getattr(wn, method)(wn.synset(synsetA.name()), wn.synset(synsetB.name()), brownIc)
 	elif method in sematicSimMethod:
 		similarity = semanticSimilaritySynsets(synsetA, synsetB)
 	else:
@@ -317,12 +318,20 @@ def synsetsSimilarity(synsetA, synsetB, method=None):
 	return similarity
 
 
-def wordSenseDisambiguation(word, sentence, method='simple_lesk'):
+def wordSenseDisambiguation(word, sentence, senseMethod='simple_lesk', simMethod='path'):
 	"""
 		removing the disambiguity by getting the context
 		@ In, sentence, string, sentence string
 		@ Out, sense, set, set of wordnet.Synset for the estimated best sense
 	"""
+	method = senseMethod.lower()
+	simMethod = simMethod.lower()
+	validMethod = ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
+	validSimMethod = ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
+	if method not in validMethod:
+		raise ValueError(f'{method} is not valid option, please try to use one of {validMethod}')
+	if simMethod not in validSimMethod:
+		raise ValueError(f'{simMethod} is not valid option, please try to use one of {validSimMethod}')
 	if isinstance(word, str):
 		tokens = nltk.word_tokenize(word)
 	elif isinstance(word, list) or isinstance(word, set):
@@ -332,8 +341,16 @@ def wordSenseDisambiguation(word, sentence, method='simple_lesk'):
 	pos = nltk.pos_tag(tokens)
 	sense = []
 	for p in pos:
-		if method.lower() == 'simple_lesk':
+		if method == 'simple_lesk':
 			sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
+		elif method == 'original_lesk':
+			sense.append(original_lesk(sentence, p[0]))
+		elif method == 'adapted_lesk':
+			sense.append(adapted_lesk(sentence, p[0], pos=p[1][0].lower()))
+		elif method == 'cosine_lesk':
+			sense.append(cosine_lesk(sentence, p[0], pos=p[1][0].lower()))
+		elif method == 'max_similarity':
+			sense.append(maxsim(sentence, p[0], pos=p[1][0].lower(), option=simMethod))
 		else:
 			raise NotImplementedError(f"Mehtod {method} not implemented yet!")
 	if isinstance(word, str):
@@ -345,3 +362,30 @@ def wordSenseDisambiguation(word, sentence, method='simple_lesk'):
 
 
 # use disambiguate function to disambiguate sentences
+def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMethod='path'):
+	"""
+	"""
+	method = senseMethod.lower()
+	simMethod = simMethod.lower()
+	validMethod = ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
+	validSimMethod = ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
+	if method not in validMethod:
+		raise ValueError(f'{method} is not valid option, please try to use one of {validMethod}')
+	if simMethod not in validSimMethod:
+		raise ValueError(f'{simMethod} is not valid option, please try to use one of {validSimMethod}')
+	if method == 'simple_lesk':
+		sentSense = disambiguate(sentence, simple_lesk, prefersNone=True, keepLemmas=True)
+	elif method == 'original_lesk':
+		sentSense = disambiguate(sentence, original_lesk, prefersNone=True, keepLemmas=True)
+	elif method == 'adapted_lesk':
+		sentSense = disambiguate(sentence, adapted_lesk, prefersNone=True, keepLemmas=True)
+	elif method == 'cosine_lesk':
+		sentSense = disambiguate(sentence, cosine_lesk, prefersNone=True,  keepLemmas=True)
+	elif method == 'max_similarity':
+		sentSense = disambiguate(sentence, maxsim, similarity_option=simMethod, prefersNone=True,  keepLemmas=True)
+	# sentSense: a list of tuples, [(word, lemma, wn.synset/None)]
+	wordList = list([syn[0] for syn in sentSense if syn[-1] is not None])
+	synsetList = list([syn[-1] for syn in sentSense if syn[-1] is not None])
+	return wordList, synsetList
+
+
