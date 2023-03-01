@@ -30,8 +30,18 @@ print("================ Check two words similarity in two sentences ============
 word = 'plant'
 method = 'simple_lesk'
 simMethod = 'path'
-synsetA = simUtils.wordSenseDisambiguation(word, plantSents[0], senseMethod=method, simMethod=simMethod)
-synsetB = simUtils.wordSenseDisambiguation(word, plantSents[1], senseMethod=method, simMethod=simMethod)
+sent = plantSents
+synsetA = simUtils.wordSenseDisambiguation(word, sent[0], senseMethod=method, simMethod=simMethod)
+synsetB = simUtils.wordSenseDisambiguation(word, sent[1], senseMethod=method, simMethod=simMethod)
+for m in ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"] + ['semantic_similarity_synsets']:
+  similarity = simUtils.synsetsSimilarity(synsetA, synsetB, m)
+  print(word, 'synsetA:', synsetA, 'synsetB:', synsetB, 'method:', m, 'similarity:', similarity)
+
+
+word = 'bank'
+sent = bankSents
+synsetA = simUtils.wordSenseDisambiguation(word, sent[0], senseMethod=method, simMethod=simMethod)
+synsetB = simUtils.wordSenseDisambiguation(word, sent[1], senseMethod=method, simMethod=simMethod)
 for m in ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"] + ['semantic_similarity_synsets']:
   similarity = simUtils.synsetsSimilarity(synsetA, synsetB, m)
   print(word, 'synsetA:', synsetA, 'synsetB:', synsetB, 'method:', m, 'similarity:', similarity)
