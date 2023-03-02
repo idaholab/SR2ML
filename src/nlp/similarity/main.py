@@ -81,15 +81,23 @@ if __name__ == '__main__':
         # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
         print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
-    simObj = SentenceSimilarity()
-    print("Sentence Similarity Best Sense (Class Object):")
+    print("Sentence Similarity with Disambiguation:")
     for index, sentPair in sentencePairsData.iterrows():
-        calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='best_sense')
-        # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+        calculated = simUtils.sentenceSimialrityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='path', delta=0.85)
         print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
-    print("Sentence Similarity PM_Disambiguation:")
-    for index, sentPair in sentencePairsData.iterrows():
-        calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='pm_disambiguation')
-        # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
-        print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
+
+
+
+    # simObj = SentenceSimilarity()
+    # print("Sentence Similarity Best Sense (Class Object):")
+    # for index, sentPair in sentencePairsData.iterrows():
+    #     calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='best_sense')
+    #     # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+    #     print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
+
+    # print("Sentence Similarity PM_Disambiguation:")
+    # for index, sentPair in sentencePairsData.iterrows():
+    #     calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='pm_disambiguation')
+    #     # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+    #     print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
