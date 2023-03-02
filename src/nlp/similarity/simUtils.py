@@ -398,13 +398,14 @@ def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMet
 	synsetList = list([syn[-1] for syn in sentSense if syn[-1] is not None])
 	return wordList, synsetList
 
-
-
-
 # Sentence similarity after disambiguation
 
-def sentenceSimialrity(sentenceA, sentenceB, delta=0.85):
-	similarity = delta * semanticSimilaritySentences(sentenceA, sentenceB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
+def sentenceSimialrityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='path', delta=0.85):
+	"""
+	"""
+	_, synsetsA = sentenceSenseDisambiguationPyWSD(sentenceA, senseMethod=senseMethod, simMethod=simMethod)
+	_, synsetsB = sentenceSenseDisambiguationPyWSD(sentenceB, senseMethod=senseMethod, simMethod=simMethod)
+	similarity = delta * semanticSimilarityUsingDiambiguatedSynsets(synsetsA, synsetsB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
 	return similarity
 
 def semanticSimilarityUsingDiambiguatedSynsets(synsetsA, synsetsB):
@@ -425,8 +426,7 @@ def constructSemanticVectorUsingDiambiguatedSynsets(wordSynsets, jointWordSynset
 	"""
 	wordSynsets = set(wordSynsets)
 	vector = np.zeros(len(jointWordSynsets))
-	i = 0
-	for jointSynset in jointWordSynsets:
+	for i, jointSynset in enumerate(jointWordSynsets):
 		simVector = []
 		if jointSynset in wordSynsets:
 			vector[i] = 1
@@ -439,5 +439,4 @@ def constructSemanticVectorUsingDiambiguatedSynsets(wordSynsets, jointWordSynset
 				vector[i] = maxSim
 			else:
 				vector[i] = 0.0
-		i+=1
 	return vector
