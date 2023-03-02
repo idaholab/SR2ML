@@ -364,8 +364,18 @@ def wordsSimilarity(wordA, wordB, method='semantic_similarity_synsets'):
     @ In, method, str, the method used to compute word similarity
     @ Out, similarity, float, [0, 1], the similarity score
   """
+  method = method.lower()
+  wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
+  sematicSimMethod = ['semantic_similarity_synsets']
+  if method not in sematicSimMethod and not method.endswith('_similarity'):
+    method = method + '_similarity'
+  if method not in sematicSimMethod + wordnetSimMethod:
+    raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
   bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
+  if bestPair[0] is None or bestPair[1] is None:
+    return 0.0
   # when campare words only, we assume there is no disambiguation required.
+
   similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method, disambiguation=False)
   return similarity
 
