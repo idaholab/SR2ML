@@ -23,7 +23,7 @@ class SentenceSimilarity:
   def __init__(self, disambiguationMethod='simple_lesk', similarityMethod='semantic_similarity_synsets', wordOrderContribution=0.0):
     """
     """
-    self.validDisambiguation = ['simple_lesk']
+    self.validDisambiguation = ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
     self.wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
     self.validSimilarity = self.wordnetSimMethod + ["semantic_similarity_synsets"]
     self.wordOrder = wordOrderContribution
@@ -42,31 +42,31 @@ class SentenceSimilarity:
       if key in self.__dict__:
         setattr(self, key, value)
 
-  def identifyNounAndVerbForComparison(self, sentence):
-    """
-      Taking out Noun and Verb for comparison word based
-      @ In, sentence, string, sentence string
-      @ Out, pos, list, list of dict {token/word:pos_tag}
-    """
-    tokens = nltk.word_tokenize(sentence)
-    pos = nltk.pos_tag(tokens)
-    pos = [p for p in pos if p[1].startswith('N') or p[1].startswith('V')]
-    return pos
+  # def identifyNounAndVerbForComparison(self, sentence):
+  #   """
+  #     Taking out Noun and Verb for comparison word based
+  #     @ In, sentence, string, sentence string
+  #     @ Out, pos, list, list of dict {token/word:pos_tag}
+  #   """
+  #   tokens = nltk.word_tokenize(sentence)
+  #   pos = nltk.pos_tag(tokens)
+  #   pos = [p for p in pos if p[1].startswith('N') or p[1].startswith('V')]
+  #   return pos
 
-  def wordSenseDisambiguation(self, sentence):
-    """
-      removing the disambiguity by getting the context
-      @ In, sentence, string, sentence string
-      @ Out, sense, set, set of wordnet.Synset for the estimated best sense
-    """
-    pos = self.identifyNounAndVerbForComparison(sentence)
-    sense = []
-    for p in pos:
-      if self.disambiguationMethod == 'simple_lesk':
-        sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
-      else:
-        raise NotImplementedError(f"Mehtod {self.disambiguationMethod} not implemented yet!")
-    return set(sense)
+  # def wordSenseDisambiguation(self, sentence):
+  #   """
+  #     removing the disambiguity by getting the context
+  #     @ In, sentence, string, sentence string
+  #     @ Out, sense, set, set of wordnet.Synset for the estimated best sense
+  #   """
+  #   pos = self.identifyNounAndVerbForComparison(sentence)
+  #   sense = []
+  #   for p in pos:
+  #     if self.disambiguationMethod == 'simple_lesk':
+  #       sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
+  #     else:
+  #       raise NotImplementedError(f"Mehtod {self.disambiguationMethod} not implemented yet!")
+  #   return set(sense)
 
   def constructSimilarityVectorPawarMagoMethod(self, arr1, arr2):
     """
@@ -117,8 +117,8 @@ class SentenceSimilarity:
       Proposed method from https://arxiv.org/pdf/1802.05667.pdf
 
     """
-    sense1 = self.wordSenseDisambiguation(sentence1)
-    sense2 = self.wordSenseDisambiguation(sentence2)
+    _, sense1 = simUtils.sentenceSenseDisambiguationPyWSD(sentence1, senseMethod=self.disambiguationMethod, simMethod='path')
+    _, sense2 = simUtils.sentenceSenseDisambiguationPyWSD(sentence2, senseMethod=self.disambiguationMethod, simMethod='path')
     v1, c1 = self.constructSimilarityVectorPawarMagoMethod(sense1,sense2)
     v2, c2 = self.constructSimilarityVectorPawarMagoMethod(sense2,sense1)
     # FIXME: check the following algorithms with benchmarks
