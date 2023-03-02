@@ -77,13 +77,13 @@ if __name__ == '__main__':
 
     print("Sentence Similarity Best Sense:")
     for index, sentPair in sentencePairsData.iterrows():
-        calculated = simUtils.sentenceSimialrity(sentPair['sent1'], sentPair['sent2'], False)
+        calculated = simUtils.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], False)
         # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
         print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
     print("Sentence Similarity with Disambiguation:")
     for index, sentPair in sentencePairsData.iterrows():
-        calculated = simUtils.sentenceSimialrityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='path', delta=0.85)
+        calculated = simUtils.sentenceSimilarityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='path', delta=0.85)
         print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
     simObj = SentenceSimilarity()

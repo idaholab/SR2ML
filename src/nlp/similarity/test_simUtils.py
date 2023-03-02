@@ -47,14 +47,14 @@ for m in ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity
   print(word, 'synsetA:', synsetA, 'synsetB:', synsetB, 'method:', m, 'similarity:', similarity)
 
 
-print("================ Testing sentenceSimialrity ================\n")
+print("================ Testing sentenceSimilarity ================\n")
 sents = [bankSents, plantSents]
 for sent in sents:
-  similarity = simUtils.sentenceSimialrity(sent[0], sent[1], infoContentNorm=False, delta=0.85)
+  similarity = simUtils.sentenceSimilarity(sent[0], sent[1], infoContentNorm=False, delta=0.85)
   print(sent[0], 'vs', sent[1], 'similarity', similarity)
 
-print("================ Testing sentenceSimialrityWithDisambiguation ================\n")
+print("================ Testing sentenceSimilarityWithDisambiguation ================\n")
 sents = [bankSents, plantSents]
 for sent in sents:
-  similarity = simUtils.sentenceSimialrityWithDisambiguation(sent[0], sent[1], senseMethod='simple_lesk', simMethod='path', delta=0.85)
+  similarity = simUtils.sentenceSimilarityWithDisambiguation(sent[0], sent[1], senseMethod='simple_lesk', simMethod='path', delta=0.85)
   print(sent[0], 'vs', sent[1], 'similarity', similarity)

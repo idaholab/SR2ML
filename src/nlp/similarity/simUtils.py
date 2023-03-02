@@ -17,13 +17,27 @@ from nltk.corpus import wordnet_ic
   Codes are modified from https://github.com/anishvarsha/Sentence-Similaritity-using-corpus-statistics
 """
 
-def sentenceSimialrity(sentenceA, sentenceB, infoContentNorm=False, delta=0.85):
+def sentenceSimilarity(sentenceA, sentenceB, infoContentNorm=False, delta=0.85):
+  """
+    Compute sentence similarity using both semantic and word order similarity
+    The semantic similarity is based on maximum word similarity between one word and another sentence
+    @ In, sentenceA, str, first sentence used to compute sentence similarity
+    @ In, sentenceB, str, second sentence used to compute sentence similarity
+    @ In, infoContentNorm, bool, True if statistics corpus is used to weight similarity vectors
+    @ In, delta, float, [0,1], similarity contribution from semantic similarity, 1-delta is the similarity
+      contribution from word order similarity
+    @ Out, similarity, float, [0, 1], the computed similarity for given two sentences
+  """
   similarity = delta * semanticSimilaritySentences(sentenceA, sentenceB, infoContentNorm) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
   return similarity
 
 
 def wordOrderSimilaritySentences(sentenceA, sentenceB):
   """
+    Compute sentence similarity using word order similarity
+    @ In, sentenceA, str, first sentence used to compute sentence similarity
+    @ In, sentenceB, str, second sentence used to compute sentence similarity
+    @ Out, similarity, float, [0, 1], the computed word order similarity for given two sentences
   """
   wordsA = tokenizer(sentenceA)
   wordsB = tokenizer(sentenceB)
@@ -40,7 +54,7 @@ def constructWordOrderVector(words, jointWords, index):
     @ In, words, set of words, a set of words for one sentence
     @ In, jointWords, set of joint words, a set of joint words for both sentences
     @ In, index, dict, word index in the joint set of words
-    @ Out,
+    @ Out, vector, numpy.array, the word order vector
   """
   vector = np.zeros(len(jointWords))
   i = 0
@@ -59,7 +73,12 @@ def constructWordOrderVector(words, jointWords, index):
 
 def semanticSimilaritySentences(sentenceA, sentenceB, infoContentNorm):
   """
-
+    Compute sentence similarity using semantic similarity
+    The semantic similarity is based on maximum word similarity between one word and another sentence
+    @ In, sentenceA, str, first sentence used to compute sentence similarity
+    @ In, sentenceB, str, second sentence used to compute sentence similarity
+    @ In, infoContentNorm, bool, True if statistics corpus is used to weight similarity vectors
+    @ Out, semSimilarity, float, [0, 1], the computed similarity for given two sentences
   """
   wordsA = tokenizer(sentenceA)
   wordsB = tokenizer(sentenceB)
@@ -77,6 +96,7 @@ def constructSemanticVector(words, jointWords, infoContentNorm):
     @ In, words, set of words, a set of words for one sentence
     @ In, jointWords, set of joint words, a set of joint words for both sentences
     @ In, infoContentNorm, bool, consider word statistics in Brown  Corpus if True
+    @ Out, vector, numpy.array, the semantic vector
   """
   wordSet = set(words)
   vector = np.zeros(len(jointWords))
@@ -101,6 +121,10 @@ def constructSemanticVector(words, jointWords, infoContentNorm):
 
 def brownInfo():
   """
+    Compute word dict and word numbers in NLTK brown corpus
+    @ In, None
+    @ Out, wordCount, int, the total number of words in brown
+    @ Out, brownDict, dict, the brown word dict, {word:count}
   """
   brownDict = {}
   wordCount = 0
@@ -400,7 +424,7 @@ def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMet
 
 # Sentence similarity after disambiguation
 
-def sentenceSimialrityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='path', delta=0.85):
+def sentenceSimilarityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='path', delta=0.85):
   """
   """
   _, synsetsA = sentenceSenseDisambiguationPyWSD(sentenceA, senseMethod=senseMethod, simMethod=simMethod)
