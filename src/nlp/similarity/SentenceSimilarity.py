@@ -42,32 +42,6 @@ class SentenceSimilarity:
       if key in self.__dict__:
         setattr(self, key, value)
 
-  # def identifyNounAndVerbForComparison(self, sentence):
-  #   """
-  #     Taking out Noun and Verb for comparison word based
-  #     @ In, sentence, string, sentence string
-  #     @ Out, pos, list, list of dict {token/word:pos_tag}
-  #   """
-  #   tokens = nltk.word_tokenize(sentence)
-  #   pos = nltk.pos_tag(tokens)
-  #   pos = [p for p in pos if p[1].startswith('N') or p[1].startswith('V')]
-  #   return pos
-
-  # def wordSenseDisambiguation(self, sentence):
-  #   """
-  #     removing the disambiguity by getting the context
-  #     @ In, sentence, string, sentence string
-  #     @ Out, sense, set, set of wordnet.Synset for the estimated best sense
-  #   """
-  #   pos = self.identifyNounAndVerbForComparison(sentence)
-  #   sense = []
-  #   for p in pos:
-  #     if self.disambiguationMethod == 'simple_lesk':
-  #       sense.append(simple_lesk(sentence, p[0], pos=p[1][0].lower()))
-  #     else:
-  #       raise NotImplementedError(f"Mehtod {self.disambiguationMethod} not implemented yet!")
-  #   return set(sense)
-
   def constructSimilarityVectorPawarMagoMethod(self, arr1, arr2):
     """
       @ In, arr1, set of wordnet.Synset for one sentence
