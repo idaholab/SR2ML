@@ -139,6 +139,16 @@ def brownInfo():
 
 def content(wordData, wordCount=0, brownDict=None):
   """
+    Employ statistics from Brown Corpus to compute the information content of given word in the corpus
+    ref: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1644735
+    information content I(w) = 1 - log(n+1)/log(N+1)
+    The significance of a word is weighted using its information content. The assumption here is
+    that words occur with a higher frequency (in corpus) contain less information than those
+    that occur with lower frequencies.
+    @ In, wordData, string, a given word
+    @ In, wordCount, int, the total number of words in brown corpus
+    @ In, brownDict, dict, the brown word dict, {word:count}
+    @ Out, content, float, [0, 1], the information content of a word in the corpus
   """
   if wordCount == 0:
     wordCount, brownDict = brownInfo()
@@ -150,11 +160,15 @@ def content(wordData, wordCount=0, brownDict=None):
   informationContent = math.log(n+1)/math.log(wordCount+1)
   return 1.0-informationContent
 
-
 def identifyBestSimilarWordFromWordSet(wordA, wordSet):
   """
+    Identify the best similar word in a word set for a given word
+    @ In, wordA, str, a given word that looking for the best similar word in a word set
+    @ In, wordSet, set/list, a pool of words
+    @ Out, word, str, the best similar word in the word set for given word
+    @ Out, similarity, float, [0, 1], similarity score between the best pair of words
   """
-  similarity = -1.0
+  similarity = 0.0
   word = ""
   for wordB in wordSet:
     temp = semanticSimilarityWords(wordA, wordB)
@@ -163,27 +177,43 @@ def identifyBestSimilarWordFromWordSet(wordA, wordSet):
       word = wordB
   return word, similarity
 
-def semanticSimilarityWords(wordA, wordB, disambiguation=False):
+def semanticSimilarityWords(wordA, wordB):
   """
+    Compute the similarity between two words using semantic analysis
+    First identify the best similar synset pair using wordnet similarity, then compute the similarity
+    using both path length and depth information in wordnet
+    @ In, wordA, str, the first word
+    @ In, wordB, str, the second word
+    @ Out, similarity, float, [0, 1], the similarity score
   """
   if wordA.lower() == wordB.lower():
     return 1.0
   bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
   if bestPair[0] is None or bestPair[1] is None:
     return 0.0
-  similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1], disambiguation=disambiguation)
+  # disambiguation is False since only two words is provided and there is no additional information content
+  similarity = semanticSimilaritySynsets(bestPair[0], bestPair[1], disambiguation=False)
   return similarity
 
 def semanticSimilaritySynsets(synsetA, synsetB, disambiguation=False):
   """
+    Compute the similarity between two synset using semantic analysis
+    e.g., using both path length and depth information in wordnet
+    @ In, synsetA, wordnet.synset, the first synset
+    @ In, synsetB, wordnet.synset, the second synset
+    @ Out, similarity, float, [0, 1], the similarity score
   """
-  shortDistance = PathLength(synsetA, synsetB, disambiguation=disambiguation)
-  maxHierarchy = ScalingDepthEffect(synsetA, synsetB, disambiguation=disambiguation)
-  return shortDistance*maxHierarchy
+  shortDistance = pathLength(synsetA, synsetB, disambiguation=disambiguation)
+  maxHierarchy = scalingDepthEffect(synsetA, synsetB, disambiguation=disambiguation)
+  similarity = shortDistance*maxHierarchy
+  return similarity
 
 def identifyBestSimilarSynsetPair(wordA, wordB):
   """
-    Disambiguation and identify the best synset pair for given two words
+    Identify the best synset pair for given two words using wordnet similarity analysis
+    @ In, wordA, str, the first word
+    @ In, wordB, str, the second word
+    @ Out, bestPair, tuple, (first synset, second synset), identified best synset pair using wordnet similarity
   """
   similarity = -1.0
   synsetsWordA = wn.synsets(wordA)
@@ -191,11 +221,9 @@ def identifyBestSimilarSynsetPair(wordA, wordB):
 
   if len(synsetsWordA) == 0 or len(synsetsWordB) == 0:
     return None, None
-
   else:
     similarity = -1.0
     bestPair = None, None
-
     for synsetWordA in synsetsWordA:
       for synsetWordB in synsetsWordB:
         # TODO: may change to general similarity method
@@ -205,15 +233,17 @@ def identifyBestSimilarSynsetPair(wordA, wordB):
           bestPair = synsetWordA, synsetWordB
     return bestPair
 
-def PathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
+def pathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
   """
     Path length calculation using nonlinear transfer function between two Wordnet Synsets
     The two Synsets should be the best Synset Pair (e.g., disambiguation should be performed)
-    @ In, synsetA, wordnet.synset,
-    @ In, synsetB, wordnet.synset,
-    @ In, alpha, float, a constant in monotonically descreasing function, exp(-alpha*wordnetPathLength),
+    @ In, synsetA, wordnet.synset, synset for first word
+    @ In, synsetB, wordnet.synset, synset for second word
+    @ In, alpha, float, a constant in monotonically descreasing function, exp(-alpha*wordnetpathLength),
       parameter used to scale the shortest path length. For wordnet, the optimal value is 0.2
-    @ Out,
+    @ In, disambiguation, bool, True if disambiguation have been performed for the given synsets
+    @ Out, shortDistance, float, [0, 1], the shortest distance between two synsets using exponential descreasing
+      function.
   """
   synsetA = wn.synset(synsetA.name())
   synsetB = wn.synset(synsetB.name())
@@ -241,15 +271,17 @@ def PathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
   shortDistance = math.exp(-alpha*maxLength)
   return shortDistance
 
-def ScalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
+def scalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
   """
     Words at upper layers of hierarchical semantic nets have more general concepts and less semantic similarity
     between words than words at lower layers. This method is used to scale the similarity behavior with repect
     to depth h, e.g., [exp(beta*h)-exp(-beta*g)]/[exp(beta*h)+exp(-beta*g)]
     The two Synsets should be the best Synset Pair (e.g., disambiguation should be performed)
-    @ In, synsetA, wordnet.synset,
-    @ In, synsetB, wordnet.synset,
+    @ In, synsetA, wordnet.synset, synset for first word
+    @ In, synsetB, wordnet.synset, synset for second word
     @ In, beta, float, parameter used to scale the shortest depth, for wordnet, the optimal value is 0.45
+    @ In, disambiguation, bool, True if disambiguation have been performed for the given synsets
+    @ out, treeDist, float, [0, 1], similary score based on depth effect in wordnet
   """
   maxLength = sys.maxsize
   smoothingFactor = beta
@@ -262,7 +294,6 @@ def ScalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
     else:
       # The following is from original code, I think it should be return 1.0 when synset are the same
       maxLength = max(word[1] for word in synsetA.hypernym_distances())
-
   else:
     hypernymWordA = {word[0]: word[1] for word in synsetA.hypernym_distances()}
     hypernymWordB = {word[0]: word[1] for word in synsetB.hypernym_distances()}
@@ -307,7 +338,8 @@ def identifyNounAndVerbForComparison(sentence):
 def sentenceSenseDisambiguation(sentence, method='simple_lesk'):
   """
     removing the disambiguity by getting the context
-    @ In, sentence, string, sentence string
+    @ In, sentence, str, sentence string
+    @ In, method, str, the method for disambiguation, this method only support simple_lesk method
     @ Out, sense, set, set of wordnet.Synset for the estimated best sense
   """
   pos = identifyNounAndVerbForComparison(sentence)
@@ -324,8 +356,13 @@ def sentenceSenseDisambiguation(sentence, method='simple_lesk'):
 """
   Extended methods
 """
-def wordsSimilarity(wordA, wordB, method=None):
+def wordsSimilarity(wordA, wordB, method='semantic_similarity_synsets'):
   """
+    General method for compute words similarity
+    @ In, wordA, str, the first word
+    @ In, wordB, str, the second word
+    @ In, method, str, the method used to compute word similarity
+    @ Out, similarity, float, [0, 1], the similarity score
   """
   bestPair = identifyBestSimilarSynsetPair(wordA, wordB)
   # when campare words only, we assume there is no disambiguation required.
@@ -334,6 +371,12 @@ def wordsSimilarity(wordA, wordB, method=None):
 
 def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', disambiguation=True):
   """
+    Compute synsets similarity
+    @ In, synsetA, wordnet.synset, the first synset
+    @ In, synsetB, wordnet.synset, the second synset
+    @ In, method, str, the method used to compute synset similarity
+    @ In, disambiguation, bool, True if disambiguation has been already performed
+    @ Out, similarity, float, [0, 1], the similarity score
   """
   method = method.lower()
   wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
@@ -355,8 +398,12 @@ def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', di
 def wordSenseDisambiguation(word, sentence, senseMethod='simple_lesk', simMethod='path'):
   """
     removing the disambiguity by getting the context
-    @ In, sentence, string, sentence string
-    @ Out, sense, set, set of wordnet.Synset for the estimated best sense
+    @ In, word, str/list/set, given word or set of words
+    @ In, sentence, str, sentence that will be used to disambiguate the given word
+    @ In, senseMethod, str, method for disambiguation, one of ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
+    @ In, simMethod, str, method for similarity analysis when 'max_similarity' is used,
+      one of ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ Out, sense, str/list/set, the type for given word, identified best sense for given word with disambiguation performed using given sentence
   """
   method = senseMethod.lower()
   simMethod = simMethod.lower()
@@ -398,6 +445,14 @@ def wordSenseDisambiguation(word, sentence, senseMethod='simple_lesk', simMethod
 # use disambiguate function to disambiguate sentences
 def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMethod='path'):
   """
+    Wrap for sentence sense disambiguation method from pywsd
+    https://github.com/alvations/pywsd
+    @ In, sentence, str, given sentence
+    @ In, senseMethod, str, method for disambiguation, one of ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
+    @ In, simMethod, str, method for similarity analysis when 'max_similarity' is used,
+      one of ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ Out, wordList, list, list of words from sentence that has an identified synset from wordnet
+    @ Out, synsetList, list, list of corresponding synset for wordList
   """
   method = senseMethod.lower()
   simMethod = simMethod.lower()
@@ -426,27 +481,40 @@ def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMet
 
 def sentenceSimilarityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='path', delta=0.85):
   """
+    Compute semantic similarity for given two sentences that disambiguation will be performed
+    @ In, sentenceA, str, first sentence
+    @ In, sentenceB, str, second sentence
+    @ In, senseMethod, str, method for disambiguation, one of ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
+    @ In, simMethod, str, method for similarity analysis when 'max_similarity' is used,
+      one of ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ In, delta, float, [0,1], similarity contribution from semantic similarity, 1-delta is the similarity
+      contribution from word order similarity
+    @ Out, similarity, float, [0, 1], the computed similarity for given two sentences
   """
   _, synsetsA = sentenceSenseDisambiguationPyWSD(sentenceA, senseMethod=senseMethod, simMethod=simMethod)
   _, synsetsB = sentenceSenseDisambiguationPyWSD(sentenceB, senseMethod=senseMethod, simMethod=simMethod)
-  similarity = delta * semanticSimilarityUsingDiambiguatedSynsets(synsetsA, synsetsB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
+  similarity = delta * semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
   return similarity
 
-def semanticSimilarityUsingDiambiguatedSynsets(synsetsA, synsetsB):
+def semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB):
   """
-
+    Compute semantic similarity for given synsets while disambiguation has been already performed for given synsets
+    @ In, synsetsA, set/list, list of synsets
+    @ In, synsetsB, set/list, list of synsets
+    @ Out, semSimilarity, float, [0, 1], the similarity score
   """
   jointWordSynsets = set(synsetsA).union(set(synsetsB))
-  wordVectorA = constructSemanticVectorUsingDiambiguatedSynsets(synsetsA, jointWordSynsets)
-  wordVectorB = constructSemanticVectorUsingDiambiguatedSynsets(synsetsB, jointWordSynsets)
+  wordVectorA = constructSemanticVectorUsingDisambiguatedSynsets(synsetsA, jointWordSynsets)
+  wordVectorB = constructSemanticVectorUsingDisambiguatedSynsets(synsetsB, jointWordSynsets)
   semSimilarity = np.dot(wordVectorA, wordVectorB)/(np.linalg.norm(wordVectorA)*np.linalg.norm(wordVectorB))
   return semSimilarity
 
-def constructSemanticVectorUsingDiambiguatedSynsets(wordSynsets, jointWordSynsets):
+def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynsets):
   """
-    Construct semantic vector
-    @ In, wordSynsets, set of words synsets,
-    @ In, jointWords, set of joint words synsets,
+    Construct semantic vector while disambiguation has been already performed
+    @ In, wordSynsets, set/list, set of words synsets
+    @ In, jointWords, set, set of joint words synsets
+    @ Out, vector, numpy.array, semantic vector with disambiguation
   """
   wordSynsets = set(wordSynsets)
   vector = np.zeros(len(jointWordSynsets))

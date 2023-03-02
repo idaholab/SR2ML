@@ -97,12 +97,12 @@ class SentenceSimilarity:
     v2, c2 = self.constructSimilarityVectorPawarMagoMethod(sense2,sense1)
     # FIXME: check the following algorithms with benchmarks
     dot = np.dot(v1,v2)
-    print("dot", dot) # getting the dot product
+    # print("dot", dot) # getting the dot product
     tow = (c1+c2)/1.8
     if tow == 0.:
       tow = len(v1)/2.0
     semanticSimilarity = dot/tow
-    print("similarity",semanticSimilarity)
+    # print("similarity",semanticSimilarity)
     similarity = (1-self.wordOrder) * semanticSimilarity + self.wordOrder * simUtils.wordOrderSimilaritySentences(sentence1, sentence2)
     return similarity
 
