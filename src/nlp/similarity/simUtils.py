@@ -250,6 +250,7 @@ def pathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
   maxLength = sys.maxsize
   if synsetA is None or synsetB is None:
     return 0.0
+  # ? The original word is difference, but their synset are the same, we assume the path length is zero
   if synsetA == synsetB:
     maxLength = 0.0
   else:
@@ -293,6 +294,16 @@ def scalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
       return 1.0
     else:
       # The following is from original code, I think it should be return 1.0 when synset are the same
+      # I think a new similarity calculations should be proposed
+      # values for different lengths and their similarity score:
+      # len simScore
+      # 0   0.0
+      # 1   0.4218990052500079
+      # 2   0.7162978701990244
+      # 3   0.874053287886007
+      # 4   0.9468060128462682
+      # 5   0.9780261147388136
+      # 6   0.9910074536781175
       maxLength = max(word[1] for word in synsetA.hypernym_distances())
   else:
     hypernymWordA = {word[0]: word[1] for word in synsetA.hypernym_distances()}
@@ -378,6 +389,20 @@ def wordsSimilarity(wordA, wordB, method='semantic_similarity_synsets'):
 
   similarity = synsetsSimilarity(bestPair[0], bestPair[1], method=method, disambiguation=False)
   return similarity
+
+# TODO: Utilize Spacy wordvector similarity to improve the similarity score when the POS for given synset are not the same
+# i.e., synsetA.name().split(".")[1] != synsetB.name().split(".")[1], the similarity will be set to 0.0
+# Similarity calculated by word1.similarity(word2)
+# calibration calibrate 0.715878
+# failure fail 0.6802347
+# replacement replace 0.73397416
+# leak leakage 0.652573
+
+# Similarity calculated by wordnet:
+# calibration calibrate 0.09090909090909091
+# failure fail 0.125
+# replacement replace 0.1111111111111111
+# leak leakage 1.0
 
 def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', disambiguation=True):
   """
