@@ -56,5 +56,5 @@ for sent in sents:
 print("================ Testing sentenceSimilarityWithDisambiguation ================\n")
 sents = [bankSents, plantSents]
 for sent in sents:
-  similarity = simUtils.sentenceSimilarityWithDisambiguation(sent[0], sent[1], senseMethod='simple_lesk', simMethod='path', delta=0.85)
+  similarity = simUtils.sentenceSimilarityWithDisambiguation(sent[0], sent[1], senseMethod='simple_lesk', simMethod='semantic_similarity_synsets', delta=0.85)
   print(sent[0], 'vs', sent[1], 'similarity', similarity)

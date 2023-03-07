@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
   print("Sentence Similarity with Disambiguation:")
   for index, sentPair in sentencePairsData.iterrows():
-    calculated = simUtils.sentenceSimilarityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='path', delta=0.85)
+    calculated = simUtils.sentenceSimilarityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='semantic_similarity_synsets', delta=0.85)
     print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
   simObj = SentenceSimilarity()

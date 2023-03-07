@@ -385,18 +385,34 @@ def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', di
     @ In, synsetA, wordnet.synset, the first synset
     @ In, synsetB, wordnet.synset, the second synset
     @ In, method, str, the method used to compute synset similarity
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
     @ In, disambiguation, bool, True if disambiguation has been already performed
     @ Out, similarity, float, [0, 1], the similarity score
   """
   method = method.lower()
+  if method != 'semantic_similarity_synsets' and not method.endswith('_similarity'):
+    method = '_'.join([method, 'similarity'])
   wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
   sematicSimMethod = ['semantic_similarity_synsets']
+  synsetA = wn.synset(synsetA.name())
+  synsetB = wn.synset(synsetB.name())
   if method in wordnetSimMethod:
-    if method in ["path_similarity", "wup_similarity", "lch_similarity"]:
-      similarity = getattr(wn, method)(wn.synset(synsetA.name()), wn.synset(synsetB.name()))
+    if method in ["path_similarity", "wup_similarity"]:
+      similarity = getattr(wn, method)(synsetA, synsetB)
+    elif method == "lch_similarity":
+      if synsetA.name().split(".")[1] == synsetB.name().split(".")[1]:
+        similarity = getattr(wn, method)(synsetA, synsetB)
+      else:
+        similarity = 0.0
     else:
       brownIc = wordnet_ic.ic('ic-brown.dat')
-      similarity = getattr(wn, method)(wn.synset(synsetA.name()), wn.synset(synsetB.name()), brownIc)
+      if synsetA.name().split(".")[1] == synsetB.name().split(".")[1]:
+        try:
+          similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
+        except:
+          similarity = 0.0
+      else:
+        similarity = 0.0
   elif method in sematicSimMethod:
     similarity = semanticSimilaritySynsets(synsetA, synsetB, disambiguation=disambiguation)
   else:
@@ -489,41 +505,51 @@ def sentenceSenseDisambiguationPyWSD(sentence, senseMethod='simple_lesk', simMet
 
 # Sentence similarity after disambiguation
 
-def sentenceSimilarityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='path', delta=0.85):
+def sentenceSimilarityWithDisambiguation(sentenceA, sentenceB, senseMethod='simple_lesk', simMethod='semantic_similarity_synsets', disambiguationSimMethod='path', delta=0.85):
   """
     Compute semantic similarity for given two sentences that disambiguation will be performed
     @ In, sentenceA, str, first sentence
     @ In, sentenceB, str, second sentence
     @ In, senseMethod, str, method for disambiguation, one of ['simple_lesk', 'original_lesk', 'cosine_lesk', 'adapted_lesk', 'max_similarity']
-    @ In, simMethod, str, method for similarity analysis when 'max_similarity' is used,
+    @ In, simMethod, str, method for similarity analysis in the construction of semantic vectors
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ In, disambiguationSimMethod, str, method for similarity analysis when 'max_similarity' is used,
       one of ['path', 'wup', 'lch', 'res', 'jcn', 'lin']
     @ In, delta, float, [0,1], similarity contribution from semantic similarity, 1-delta is the similarity
       contribution from word order similarity
     @ Out, similarity, float, [0, 1], the computed similarity for given two sentences
   """
-  _, synsetsA = sentenceSenseDisambiguationPyWSD(sentenceA, senseMethod=senseMethod, simMethod=simMethod)
-  _, synsetsB = sentenceSenseDisambiguationPyWSD(sentenceB, senseMethod=senseMethod, simMethod=simMethod)
-  similarity = delta * semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
+  simMethod = simMethod.lower()
+  disambiguationSimMethod = disambiguationSimMethod.lower()
+  if disambiguationSimMethod not in ['path', 'wup', 'lch', 'res', 'jcn', 'lin']:
+    raise ValueError(f'Option for "disambiguationSimMethod={disambiguationSimMethod}" is not valid, please try one of "path, wup, lch, res, jcn, lin" ')
+  _, synsetsA = sentenceSenseDisambiguationPyWSD(sentenceA, senseMethod=senseMethod, simMethod=disambiguationSimMethod)
+  _, synsetsB = sentenceSenseDisambiguationPyWSD(sentenceB, senseMethod=senseMethod, simMethod=disambiguationSimMethod)
+  similarity = delta * semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB, simMethod=simMethod) + (1.0-delta)* wordOrderSimilaritySentences(sentenceA, sentenceB)
   return similarity
 
-def semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB):
+def semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB, simMethod='semantic_similarity_synsets'):
   """
     Compute semantic similarity for given synsets while disambiguation has been already performed for given synsets
     @ In, synsetsA, set/list, list of synsets
     @ In, synsetsB, set/list, list of synsets
+    @ In, simMethod, str, method for similarity analysis in the construction of semantic vectors
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
     @ Out, semSimilarity, float, [0, 1], the similarity score
   """
   jointWordSynsets = set(synsetsA).union(set(synsetsB))
-  wordVectorA = constructSemanticVectorUsingDisambiguatedSynsets(synsetsA, jointWordSynsets)
-  wordVectorB = constructSemanticVectorUsingDisambiguatedSynsets(synsetsB, jointWordSynsets)
+  wordVectorA = constructSemanticVectorUsingDisambiguatedSynsets(synsetsA, jointWordSynsets, simMethod=simMethod)
+  wordVectorB = constructSemanticVectorUsingDisambiguatedSynsets(synsetsB, jointWordSynsets, simMethod=simMethod)
   semSimilarity = np.dot(wordVectorA, wordVectorB)/(np.linalg.norm(wordVectorA)*np.linalg.norm(wordVectorB))
   return semSimilarity
 
-def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynsets):
+def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynsets, simMethod='semantic_similarity_synsets'):
   """
     Construct semantic vector while disambiguation has been already performed
     @ In, wordSynsets, set/list, set of words synsets
     @ In, jointWords, set, set of joint words synsets
+    @ In, simMethod, str, method for similarity analysis in the construction of semantic vectors
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
     @ Out, vector, numpy.array, semantic vector with disambiguation
   """
   wordSynsets = set(wordSynsets)
@@ -534,10 +560,11 @@ def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynse
       vector[i] = 1
     else:
       for synsetB in wordSynsets:
-        similarity = synsetsSimilarity(jointSynset, synsetB, 'semantic_similarity_synsets', disambiguation=True)
+        similarity = synsetsSimilarity(jointSynset, synsetB, method=simMethod, disambiguation=True)
         simVector.append(similarity)
       maxSim = max(simVector)
-      if maxSim >0.2:
+      # if similarity < 0.2, treat it as noise and reset it to 0.0
+      if maxSim >= 0.2:
         vector[i] = maxSim
       else:
         vector[i] = 0.0

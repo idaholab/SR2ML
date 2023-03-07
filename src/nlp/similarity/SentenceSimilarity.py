@@ -74,7 +74,8 @@ class SentenceSimilarity:
           allSimilarityIndex.append(0.0)
       allSimilarityIndex = sorted(allSimilarityIndex, reverse = True)
       vector[i]=allSimilarityIndex[0]
-      if vector[i] >= 0.804:
+      # According to Rubinstein 1965, the benchmark synonymy value of two word is 0.8025.
+      if vector[i] >= 0.8025:
         count +=1
     vector = np.asarray(vector)
     return vector, count
@@ -103,7 +104,9 @@ class SentenceSimilarity:
     v1, c1 = self.constructSimilarityVectorPawarMagoMethod(sense1,sense2)
     v2, c2 = self.constructSimilarityVectorPawarMagoMethod(sense2,sense1)
     # FIXME: check the following algorithms with benchmarks
-    dot = np.dot(v1,v2)
+    # dot = np.dot(v1,v2)
+    # from original paper
+    dot = np.linalg.norm(v1)*np.linalg.norm(v2)
     # print("dot", dot) # getting the dot product
     tow = (c1+c2)/1.8
     if tow == 0.:
