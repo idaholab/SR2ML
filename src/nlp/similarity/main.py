@@ -7,7 +7,7 @@ currentPath = os.path.dirname(os.path.abspath(__file__))
 wordPairsFile = os.path.join(currentPath, "benchmark", "noun_pairs.csv")
 sentencePairsFile = os.path.join(currentPath, "benchmark", "Li2006_sim_sents.csv")
 
-fromFile = False
+fromFile = True
 if fromFile:
   wordPairsData = pd.read_csv(wordPairsFile,  header=0)
   sentencePairsData = pd.read_csv(sentencePairsFile, header=0)
@@ -70,9 +70,11 @@ else:
 
 if __name__ == '__main__':
 
+  wordSimSemantic = []
   print("Words Similairty using semanticSimilarityWords:")
   for index, wordPair in wordPairsData.iterrows():
     calculated = simUtils.semanticSimilarityWords(wordPair['word1'], wordPair['word2'])
+    wordSimSemantic.append(calculated)
     print(" ".join([str(e)+'\t' for e in wordPair.to_numpy()]), calculated)
 
   print("Words Similairty using wordsSimilarity semantic_similarity_synsets method:")
@@ -80,31 +82,58 @@ if __name__ == '__main__':
     calculated = simUtils.wordsSimilarity(wordPair['word1'], wordPair['word2'], method='semantic_similarity_synsets')
     print(" ".join([str(e)+'\t' for e in wordPair.to_numpy()]), calculated)
 
+  wordSimPath = []
   print("Words Similairty using wordsSimilarity wordnet path method:")
   for index, wordPair in wordPairsData.iterrows():
     calculated = simUtils.wordsSimilarity(wordPair['word1'], wordPair['word2'], method='path')
+    wordSimPath.append(calculated)
     print(" ".join([str(e)+'\t' for e in wordPair.to_numpy()]), calculated)
 
+  senSimBestSense = []
   print("Sentence Similarity Best Sense:")
   for index, sentPair in sentencePairsData.iterrows():
     calculated = simUtils.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], False)
     # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+    senSimBestSense.append(calculated)
     print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
+  senSimDisabiguate = []
   print("Sentence Similarity with Disambiguation:")
   for index, sentPair in sentencePairsData.iterrows():
-    calculated = simUtils.sentenceSimilarityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='semantic_similarity_synsets', delta=0.85)
+    calculated = simUtils.sentenceSimilarityWithDisambiguation(sentPair['sent1'], sentPair['sent2'], senseMethod='simple_lesk', simMethod='semantic_similarity_synsets', delta=1.0)
+    senSimDisabiguate.append(calculated)
     print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
-  simObj = SentenceSimilarity()
-  print("Sentence Similarity Best Sense (Class Object):")
-  for index, sentPair in sentencePairsData.iterrows():
-    calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='best_sense')
-    # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
-    print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
+  # simObj = SentenceSimilarity()
+  # print("Sentence Similarity Best Sense (Class Object):")
+  # for index, sentPair in sentencePairsData.iterrows():
+  #   calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='best_sense')
+  #   # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+  #   print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
 
-  print("Sentence Similarity PM_Disambiguation:")
-  for index, sentPair in sentencePairsData.iterrows():
-    calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='pm_disambiguation')
-    # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
-    print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
+  # print("Sentence Similarity PM_Disambiguation:")
+  # for index, sentPair in sentencePairsData.iterrows():
+  #   calculated = simObj.sentenceSimilarity(sentPair['sent1'], sentPair['sent2'], method='pm_disambiguation')
+  #   # calculated = sentenceSimialrity(sentPair[0], sentPair[1], True)
+  #   print(" ".join([str(e)+'\t' for e in sentPair.to_numpy()]), calculated)
+
+  def computePearson(name1, name2, data1, data2, type='Word'):
+    pcoef = stats.pearsonr(data1, data2).statistic
+    print(f'{type} Correlation ({name1} vs. {name2}):', pcoef)
+
+  if fromFile:
+    goldMetric = 'RG_similarity'
+    simMetrics = ['Lee2014', 'PV2018']
+    from scipy import stats
+    computePearson(name1=goldMetric, name2='semantic', data1=wordSimSemantic, data2=wordPairsData[goldMetric])
+    computePearson(name1=goldMetric, name2='Path', data1=wordSimPath, data2=wordPairsData[goldMetric])
+    for m in simMetrics:
+      computePearson(name1=goldMetric, name2=m, data1=wordPairsData[m], data2=wordPairsData[goldMetric])
+
+    goldMetric = 'MeanHumanSimilarity'
+    simMetrics = ['PV2018']
+    computePearson(name1=goldMetric, name2='semantic', data1=senSimBestSense, data2=sentencePairsData[goldMetric], type='Sentence Best Sense')
+    computePearson(name1=goldMetric, name2='semantic disambiguate', data1=senSimDisabiguate, data2=sentencePairsData[goldMetric], type='Sentence Disambiguation')
+    for m in simMetrics:
+      computePearson(name1=goldMetric, name2=m, data1=sentencePairsData[m], data2=sentencePairsData[goldMetric], type='Sentence')
+
