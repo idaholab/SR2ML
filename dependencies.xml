@@ -14,6 +14,9 @@
     <numerizer source='pip' optional='True'/>
     <autocorrect source='pip' optional='True'/>
     <contextualSpellCheck source='pip' optional='True'/>
+    <numpy/>
+    <pywsd source='pip'/>
+    <jupyterlab source='pip'/>
     <!-- <recognizers-text-number source='pip'>
     <recognizers-text-number-with-unit source='pip'>
     <recognizers-text-date-time source='pip'> -->
