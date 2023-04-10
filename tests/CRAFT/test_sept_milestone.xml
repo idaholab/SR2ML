@@ -688,7 +688,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>Failure Probability V1</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -755,7 +755,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>cost V1</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -822,7 +822,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>Failure Probability V2</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -889,7 +889,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>cost V2</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -956,7 +956,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>Failure Probability SG</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -1023,7 +1023,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>cost SG</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -1090,7 +1090,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>Failure Probability P1</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -1157,7 +1157,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>cost P1</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -1224,7 +1224,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>Failure Probability P1 and P2</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
@@ -1291,7 +1291,7 @@
         <xlabel>time [days]</xlabel>
         <ylabel>cost P1 and P2</ylabel>
         <legend>
-            <loc>best</loc>
+            <loc>upper right</loc>
         </legend>
       </plotSettings>
       <actions>
