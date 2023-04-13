@@ -303,7 +303,7 @@ class ETStructure(object):
     seqID        = []
 
     for node in root.findall('define-sequence'):
-      for child in node.iter():
+      for child in node.getiterator():
         if 'event-tree' in child.tag:
           dependencies.append(child.get('name'))
           seqID.append(node.get('name'))
@@ -458,7 +458,7 @@ class ETStructure(object):
         ## fill in the details under this branch, later iterations will
         ## correct lower rows if a path does change
         X[rowCounter, col] = val
-        for fork in iter(path):
+        for fork in path.getchildren():
           newCounter = self.constructPointDFS(fork, inputMap, stateMap, outputMap, X, rowCounter)
           for i in range(newCounter-rowCounter):
             X[rowCounter+i, col] = val
