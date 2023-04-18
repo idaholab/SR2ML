@@ -13,6 +13,7 @@ import spacy
 from spacy.vocab import Vocab
 from contextualSpellCheck.contextualSpellCheck import ContextualSpellCheck
 import autocorrect
+import itertools
 
 # list of available preprocessors in textacy.preprocessing.normalize
 textacyNormalize = ['bullet_points',
@@ -253,3 +254,37 @@ class SpellChecker(object):
       corrected = doc._.outcome_spellCheck
 
     return corrected
+
+  def handleAbbreviations(self, abbrDatabase, type):
+    """
+      Performs automatic correction of abbreviations and returns corrected text
+      @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations 
+                                            and their correspoding full expression
+      @ In, type, string, type of abbreviation method ('spellcheck','hard')                    
+      @ Out, options, list, list of corrected text options
+    """
+    if type == 'spellcheck':
+      unknowns = self.getMisspelledWords()
+    else:
+      unknowns = []
+      splitSent = self.text.split()
+      for word in splitSent:
+        if word in abbrDatabase['Abbreviation'].values.tolist():
+          unknowns.append(word)
+
+    corrections={}
+    for word in unknowns:
+      if word.lower() in abbrDatabase['Abbreviation'].values:
+        locs = abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values
+        corrections[word] = abbrDatabase['Full'][locs].values.tolist()
+
+    # clean sentence
+    combinations = list(itertools.product(*list(corrections.values())))
+    options = []
+    for comb in combinations:
+      corrected = self.text
+      for index,key in enumerate(corrections.keys()):
+        corrected = corrected.replace(key,comb[index])
+      options.append(corrected)
+
+    return options
