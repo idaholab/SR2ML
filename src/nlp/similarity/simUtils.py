@@ -484,7 +484,7 @@ def wordSenseDisambiguation(word, sentence, senseMethod='simple_lesk', simMethod
     elif method == 'max_similarity':
       sense.append(maxsim(sentence, p[0], pos=p[1][0].lower(), option=simMethod))
     else:
-      raise NotImplementedError(f"Mehtod {method} not implemented yet!")
+      raise NotImplementedError(f"Method {method} not implemented yet!")
   if isinstance(word, str):
     return sense[0]
   elif isinstance(word, list):

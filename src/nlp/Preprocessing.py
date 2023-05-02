@@ -14,6 +14,9 @@ from spacy.vocab import Vocab
 from contextualSpellCheck.contextualSpellCheck import ContextualSpellCheck
 import autocorrect
 import itertools
+from similarity.simUtils import wordsSimilarity
+from nltk.corpus import wordnet as wn
+import numpy as np
 
 # list of available preprocessors in textacy.preprocessing.normalize
 textacyNormalize = ['bullet_points',
@@ -258,28 +261,44 @@ class SpellChecker(object):
   def handleAbbreviations(self, abbrDatabase, type):
     """
       Performs automatic correction of abbreviations and returns corrected text
-      @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations 
+      This method relies on a database of abbreviations located at:
+      src/nlp/data/abbreviations.xlsx
+      This database contains the most common abbreviations collected from literarture and
+      it provides for each abbreviation its corresponding full word(s); an abbreviation might
+      have multple words associated. In such case the full word that makes more sense given the
+      context is chosen (see findOptimalOption method)
+      @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations
                                             and their correspoding full expression
-      @ In, type, string, type of abbreviation method ('spellcheck','hard')                    
+      @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed')
       @ Out, options, list, list of corrected text options
     """
     if type == 'spellcheck':
       unknowns = self.getMisspelledWords()
-    else:
+    elif type == 'hard' or type=='mixed':
       unknowns = []
       splitSent = self.text.split()
       for word in splitSent:
         if word in abbrDatabase['Abbreviation'].values.tolist():
           unknowns.append(word)
+      if type=='mixed':
+        set1 = set(self.getMisspelledWords())
+        set2 = set(unknowns)
+        unknowns = list(set1.union(set2))
 
     corrections={}
     for word in unknowns:
       if word.lower() in abbrDatabase['Abbreviation'].values:
         locs = abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values
         corrections[word] = abbrDatabase['Full'][locs].values.tolist()
+      else:
+        from difflib import SequenceMatcher
+        corrections[word] = []
+        for index,abbr in enumerate(abbrDatabase['Abbreviation'].values.tolist()):
+          if SequenceMatcher(None, word, abbr).ratio()>0.8:
+            corrections[word].append(abbrDatabase['Full'].values.tolist()[index])
 
-    # clean sentence
     combinations = list(itertools.product(*list(corrections.values())))
+
     options = []
     for comb in combinations:
       corrected = self.text
@@ -287,4 +306,26 @@ class SpellChecker(object):
         corrected = corrected.replace(key,comb[index])
       options.append(corrected)
 
-    return options
+    bestOpt = self.findOptimalOption(options)
+
+    return bestOpt
+
+  def findOptimalOption(self,options):
+    """
+      Method to handle abbreviation with multiple meanings
+      @ In, options, list, list of sentence options
+      @ Out, optimalOpt, string, option from the provided options list that fits more the
+                                 possible
+    """
+    nOpt = len(options)
+    combScore = np.zeros(nOpt)
+    for index,opt in enumerate(options):
+      listOpt = opt.split()
+      for i,word in enumerate(listOpt):
+        for j in range(i+1,len(listOpt)):
+          combScore[index] = combScore[index] + wordsSimilarity(word,listOpt[j])
+    optIndex = np.argmax(combScore)
+    optimalOpt = options[optIndex]
+    return optimalOpt
+
+
