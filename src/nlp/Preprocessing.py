@@ -269,16 +269,24 @@ class SpellChecker(object):
       context is chosen (see findOptimalOption method)
       @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations
                                             and their correspoding full expression
-      @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed')
+      @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed') that are employed
+                          to determine which words are abbreviations that nned to be expanded
+                          * spellcheck: in this case spellchecker is used to identify words that
+                                        are not recognized
+                          * hard: here we directly search for the abbreviations in the provided
+                                  sentence
+                          * mixed: here we perform first a "hard" search followed by a "spellcheck"
+                                   search
       @ Out, options, list, list of corrected text options
     """
+    abbreviationSet = set(abbrDatabase['Abbreviation'].values)
     if type == 'spellcheck':
       unknowns = self.getMisspelledWords()
     elif type == 'hard' or type=='mixed':
       unknowns = []
       splitSent = self.text.split()
       for word in splitSent:
-        if word in abbrDatabase['Abbreviation'].values.tolist():
+        if word.lower() in abbreviationSet:
           unknowns.append(word)
       if type=='mixed':
         set1 = set(self.getMisspelledWords())
@@ -291,9 +299,13 @@ class SpellChecker(object):
         locs = abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values
         corrections[word] = abbrDatabase['Full'][locs].values.tolist()
       else:
+        # Here we are addressing the fact that the abbreviation database will never be complete
+        # Given an abbreviation that is not part of the abbreviation database, we are looking for a
+        # a subset of abbreviations the abbreviation database that are close enough (and consider
+        # them as possible candidates
         from difflib import SequenceMatcher
         corrections[word] = []
-        for index,abbr in enumerate(abbrDatabase['Abbreviation'].values.tolist()):
+        for index,abbr in enumerate(abbrDatabase['Abbreviation'].values):
           if SequenceMatcher(None, word, abbr).ratio()>0.8:
             corrections[word].append(abbrDatabase['Full'].values.tolist()[index])
 
