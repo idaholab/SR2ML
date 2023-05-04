@@ -23,7 +23,9 @@ for sent in sents:
   print(bestSyn1)
   print(bestSyn2)
   st = time.time()
-  similarity = speedup.synsetListSimilarity(bestSyn1, bestSyn2, delta=1.0)
+  similarity = speedup.synsetListSimilarity(bestSyn1, bestSyn2, delta=.8)
   print(sent[0], 'vs', sent[1], 'similarity', similarity)
 
   print('%s second'% (time.time()-st))
+
+# TODO: Use disambiguation to determine synsets for each sentence
