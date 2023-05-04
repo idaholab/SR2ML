@@ -8,9 +8,10 @@ from nltk.corpus import wordnet as wn
 
 
 def convertToSynsets(wordSet):
-  wordList = list(set(wordSet))
+  # keep the order (works for python3.7+)
+  wordList = list(dict.fromkeys(wordSet))
   synsets = [list(wn.synsets(word)) for word in wordList]
-  return wordList, synsets
+  return list(wordList), synsets
 
 def identifyBestSynset(word, wordList, synsets):
   if word in wordList:
@@ -43,7 +44,9 @@ def synsetListSimilarity(synsetList1, synsetList2, delta=0.85):
 def wordOrderSimilaritySynsetList(synsetList1, synsetList2):
   """
   """
-  synSet = list(set(synsetList1).union(set(synsetList2)))
+  # keep the order (works for python3.7+)
+  synSet = list(dict.fromkeys(synsetList1+synsetList2))
+  # synSet = list(set(synsetList1).union(set(synsetList2)))
   index = {syn[1]: syn[0] for syn in enumerate(synSet)}
   r1 = constructSynsetOrderVector(synsetList1, synSet, index)
   r2 = constructSynsetOrderVector(synsetList2, synSet, index)

@@ -16,6 +16,8 @@ for sent in sents:
   wordList2, synsets2 = speedup.convertToSynsets([e.strip() for e in sent[1].split()])
   bestSyn1 = [speedup.identifyBestSynset(word, copy.copy(wordList1), copy.copy(synsets1)) for word in wordList1]
   bestSyn2 = [speedup.identifyBestSynset(word, copy.copy(wordList2), copy.copy(synsets2)) for word in wordList2]
+  bestSyn1 = list(filter(None, bestSyn1))
+  bestSyn2 = list(filter(None, bestSyn2))
   print(wordList1)
   print(wordList2)
   print(bestSyn1)
