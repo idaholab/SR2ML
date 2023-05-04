@@ -305,7 +305,8 @@ class SpellChecker(object):
         # them as possible candidates
         from difflib import SequenceMatcher
         corrections[word] = []
-        for index,abbr in enumerate(abbrDatabase['Abbreviation'].values):
+        abbreviationDS = abbrDatabase['Abbreviation'].values
+        for index,abbr in enumerate(abbreviationDS):
           if SequenceMatcher(None, word, abbr).ratio()>0.8:
             corrections[word].append(abbrDatabase['Full'].values.tolist()[index])
 
