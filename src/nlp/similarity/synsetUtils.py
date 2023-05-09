@@ -1,19 +1,35 @@
 import sys
 import math
 import numpy as np
+import copy
 
 import nltk
 from nltk import word_tokenize as tokenizer
 from nltk.corpus import wordnet as wn
 
 
+def convertSentsToSynsets(sentList):
+  """
+    Use sentence itself to identify the best synset
+  """
+  sentSynsets = []
+  for sent in sentList:
+    wordList, synsetsList = convertToSynsets([e.strip() for e in sent.split()])
+    bestSyn = [identifyBestSynset(word, wordList, synsetsList) for word in wordList]
+    bestSyn = list(filter(None, bestSyn))
+    sentSynsets.append(bestSyn)
+  return sentSynsets
+
+
 def convertToSynsets(wordSet):
   # keep the order (works for python3.7+)
   wordList = list(dict.fromkeys(wordSet))
   synsets = [list(wn.synsets(word)) for word in wordList]
-  return list(wordList), synsets
+  return wordList, synsets
 
-def identifyBestSynset(word, wordList, synsets):
+def identifyBestSynset(word, jointWordList, jointSynsetList):
+  wordList = copy.copy(jointWordList)
+  synsets = copy.copy(jointSynsetList)
   if word in wordList:
     i = wordList.index(word)
     wordList.remove(word)
