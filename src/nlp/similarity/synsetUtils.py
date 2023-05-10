@@ -1,53 +1,9 @@
 import sys
 import math
 import numpy as np
-import copy
 
-import nltk
-from nltk import word_tokenize as tokenizer
 from nltk.corpus import wordnet as wn
-
-
-def convertSentsToSynsets(sentList):
-  """
-    Use sentence itself to identify the best synset
-  """
-  sentSynsets = []
-  for sent in sentList:
-    wordList, synsetsList = convertToSynsets([e.strip() for e in sent.split()])
-    bestSyn = [identifyBestSynset(word, wordList, synsetsList) for word in wordList]
-    bestSyn = list(filter(None, bestSyn))
-    sentSynsets.append(bestSyn)
-  return sentSynsets
-
-
-def convertToSynsets(wordSet):
-  # keep the order (works for python3.7+)
-  wordList = list(dict.fromkeys(wordSet))
-  synsets = [list(wn.synsets(word)) for word in wordList]
-  return wordList, synsets
-
-def identifyBestSynset(word, jointWordList, jointSynsetList):
-  wordList = copy.copy(jointWordList)
-  synsets = copy.copy(jointSynsetList)
-  if word in wordList:
-    i = wordList.index(word)
-    wordList.remove(word)
-    synsets.remove(synsets[i])
-  synsets = [item for sub in synsets for item in sub]
-  wordSyns = wn.synsets(word)
-  if len(wordSyns) == 0:
-    return None
-
-  max = -1
-  bestSyn = wordSyns[0]
-  for syn in wordSyns:
-    similarity = [wn.path_similarity(syn, syn1) for syn1 in synsets]
-    temp = np.max(similarity)
-    if temp > max:
-      bestSyn = syn
-      max = temp
-  return bestSyn
+from nltk.corpus import wordnet_ic
 
 def synsetListSimilarity(synsetList1, synsetList2, delta=0.85):
   """
@@ -55,7 +11,6 @@ def synsetListSimilarity(synsetList1, synsetList2, delta=0.85):
   """
   similarity = delta * semanticSimilaritySynsetList(synsetList1, synsetList2) + (1.0-delta)* wordOrderSimilaritySynsetList(synsetList1, synsetList2)
   return similarity
-
 
 def wordOrderSimilaritySynsetList(synsetList1, synsetList2):
   """
@@ -124,8 +79,8 @@ def pathLength(synsetA, synsetB, alpha=0.2, disambiguation=False):
     @ Out, shortDistance, float, [0, 1], the shortest distance between two synsets using exponential descreasing
       function.
   """
-  # synsetA = wn.synset(synsetA.name())
-  # synsetB = wn.synset(synsetB.name())
+  synsetA = wn.synset(synsetA.name())
+  synsetB = wn.synset(synsetB.name())
   maxLength = sys.maxsize
   if synsetA is None or synsetB is None:
     return 0.0
@@ -235,3 +190,89 @@ def constructSemanticVector(syns, jointSyns):
         vector[i] = 0.0
     i+=1
   return vector
+
+
+def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', disambiguation=True):
+  """
+    Compute synsets similarity
+    @ In, synsetA, wordnet.synset, the first synset
+    @ In, synsetB, wordnet.synset, the second synset
+    @ In, method, str, the method used to compute synset similarity
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ In, disambiguation, bool, True if disambiguation has been already performed
+    @ Out, similarity, float, [0, 1], the similarity score
+  """
+  method = method.lower()
+  if method != 'semantic_similarity_synsets' and not method.endswith('_similarity'):
+    method = '_'.join([method, 'similarity'])
+  wordnetSimMethod = ["path_similarity", "wup_similarity", "lch_similarity", "res_similarity", "jcn_similarity", "lin_similarity"]
+  sematicSimMethod = ['semantic_similarity_synsets']
+  synsetA = wn.synset(synsetA.name())
+  synsetB = wn.synset(synsetB.name())
+  if method in wordnetSimMethod:
+    if method in ["path_similarity", "wup_similarity"]:
+      similarity = getattr(wn, method)(synsetA, synsetB)
+    elif method == "lch_similarity":
+      if synsetA.name().split(".")[1] == synsetB.name().split(".")[1]:
+        similarity = getattr(wn, method)(synsetA, synsetB)
+      else:
+        similarity = 0.0
+    else:
+      brownIc = wordnet_ic.ic('ic-brown.dat')
+      if synsetA.name().split(".")[1] == synsetB.name().split(".")[1]:
+        try:
+          similarity = getattr(wn, method)(synsetA, synsetB, brownIc)
+        except:
+          similarity = 0.0
+      else:
+        similarity = 0.0
+  elif method in sematicSimMethod:
+    similarity = semanticSimilaritySynsets(synsetA, synsetB, disambiguation=disambiguation)
+  else:
+    raise ValueError(f'{method} is not valid, please use one of {wordnetSimMethod+sematicSimMethod}')
+
+  return similarity
+
+
+def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynsets, simMethod='semantic_similarity_synsets'):
+  """
+    Construct semantic vector while disambiguation has been already performed
+    @ In, wordSynsets, set/list, set of words synsets
+    @ In, jointWords, set, set of joint words synsets
+    @ In, simMethod, str, method for similarity analysis in the construction of semantic vectors
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ Out, vector, numpy.array, semantic vector with disambiguation
+  """
+  wordSynsets = set(wordSynsets)
+  vector = np.zeros(len(jointWordSynsets))
+  for i, jointSynset in enumerate(jointWordSynsets):
+    simVector = []
+    if jointSynset in wordSynsets:
+      vector[i] = 1
+    else:
+      for synsetB in wordSynsets:
+        similarity = synsetsSimilarity(jointSynset, synsetB, method=simMethod, disambiguation=True)
+        simVector.append(similarity)
+      maxSim = max(simVector)
+      # if similarity < 0.2, treat it as noise and reset it to 0.0
+      if maxSim >= 0.2:
+        vector[i] = maxSim
+      else:
+        vector[i] = 0.0
+  return vector
+
+
+def semanticSimilarityUsingDisambiguatedSynsets(synsetsA, synsetsB, simMethod='semantic_similarity_synsets'):
+  """
+    Compute semantic similarity for given synsets while disambiguation has been already performed for given synsets
+    @ In, synsetsA, set/list, list of synsets
+    @ In, synsetsB, set/list, list of synsets
+    @ In, simMethod, str, method for similarity analysis in the construction of semantic vectors
+      one of ['semantic_similarity_synsets', 'path', 'wup', 'lch', 'res', 'jcn', 'lin']
+    @ Out, semSimilarity, float, [0, 1], the similarity score
+  """
+  jointWordSynsets = set(synsetsA).union(set(synsetsB))
+  wordVectorA = constructSemanticVectorUsingDisambiguatedSynsets(synsetsA, jointWordSynsets, simMethod=simMethod)
+  wordVectorB = constructSemanticVectorUsingDisambiguatedSynsets(synsetsB, jointWordSynsets, simMethod=simMethod)
+  semSimilarity = np.dot(wordVectorA, wordVectorB)/(np.linalg.norm(wordVectorA)*np.linalg.norm(wordVectorB))
+  return semSimilarity
