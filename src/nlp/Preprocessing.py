@@ -16,6 +16,7 @@ import autocorrect
 import itertools
 from similarity.simUtils import wordsSimilarity
 from nltk.corpus import wordnet as wn
+import os
 import numpy as np
 
 # list of available preprocessors in textacy.preprocessing.normalize
@@ -198,7 +199,8 @@ class SpellChecker(object):
     if self.checker == 'autocorrect':
       self.speller = autocorrect.Speller()
       self.includedWords = []
-      with open('../data/ac_additional_words.txt', 'r') as file:
+      file2open = os.path.dirname(__file__) + '/data/ac_additional_words.txt'
+      with open(file2open, 'r') as file:
         tmp = file.readlines()
       self.addedWords = list({x.replace('\n', '') for x in tmp})
       self.speller.nlp_data.update({x: 1000000 for x in self.addedWords})
@@ -296,8 +298,9 @@ class SpellChecker(object):
     corrections={}
     for word in unknowns:
       if word.lower() in abbrDatabase['Abbreviation'].values:
-        locs = abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values
-        corrections[word] = abbrDatabase['Full'][locs].values.tolist()
+        locs = list(abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values)
+        if locs:
+          corrections[word] = abbrDatabase['Full'][locs].values.tolist()
       else:
         # Here we are addressing the fact that the abbreviation database will never be complete
         # Given an abbreviation that is not part of the abbreviation database, we are looking for a
@@ -309,19 +312,22 @@ class SpellChecker(object):
         for index,abbr in enumerate(abbreviationDS):
           if SequenceMatcher(None, word, abbr).ratio()>0.8:
             corrections[word].append(abbrDatabase['Full'].values.tolist()[index])
+      if not corrections[word]:
+        corrections.pop(word)
 
     combinations = list(itertools.product(*list(corrections.values())))
-
     options = []
     for comb in combinations:
       corrected = self.text
       for index,key in enumerate(corrections.keys()):
-        corrected = corrected.replace(key,comb[index])
+        corrected = re.sub(r"\b%s\b" % str(key) , comb[index], corrected)
       options.append(corrected)
 
-    bestOpt = self.findOptimalOption(options)
-
-    return bestOpt
+    if not options:
+      return self.text
+    else:
+      bestOpt = self.findOptimalOption(options)
+      return bestOpt
 
   def findOptimalOption(self,options):
     """
