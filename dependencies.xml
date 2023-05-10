@@ -2,7 +2,7 @@
   <main>
     <spacy>3.1</spacy>
     <nltk source="pip"/>
-    <textacy source="'pip"/>
+    <textacy source="pip"/>
     <coreferee source='pip'/>
     <beautifulsoup4 source="pip"/>
     <networkx source="pip"/>
