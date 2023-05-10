@@ -7,13 +7,21 @@ from nltk.corpus import wordnet_ic
 
 def synsetListSimilarity(synsetList1, synsetList2, delta=0.85):
   """
-
+    Compute similarity for synsetList pair
+    @ In, synsetList1, list, list of synset
+    @ In, synsetList2, list, list of synset
+    @ In, delta, float, between 0 and 1, factor for semantic similarity contribution
+    @ Out, similarity, float, the similarity score
   """
   similarity = delta * semanticSimilaritySynsetList(synsetList1, synsetList2) + (1.0-delta)* wordOrderSimilaritySynsetList(synsetList1, synsetList2)
   return similarity
 
 def wordOrderSimilaritySynsetList(synsetList1, synsetList2):
   """
+    Compute word order similarity for synsetList pair
+    @ In, synsetList1, list, list of synset
+    @ In, synsetList2, list, list of synset
+    @ Out, float, word order similarity score
   """
   # keep the order (works for python3.7+)
   synSet = list(dict.fromkeys(synsetList1+synsetList2))
@@ -26,6 +34,11 @@ def wordOrderSimilaritySynsetList(synsetList1, synsetList2):
 
 def constructSynsetOrderVector(synsets, jointSynsets, index):
   """
+    Construct synset order vector for word order similarity calculation
+    @ In, synsets, list of synsets
+    @ In, jointSynsets, list of joint synsets
+    @ In, index, int, index for synsets
+    @ Out, vector, np.array, synset order vector
   """
   vector = np.zeros(len(jointSynsets))
   i = 0
@@ -34,7 +47,7 @@ def constructSynsetOrderVector(synsets, jointSynsets, index):
     if syn in synsets:
       vector[i] = index[syn]
     else:
-      synSimilar, similarity = identifyBestSimilarWordFromSynsets(syn, synsets)
+      synSimilar, similarity = identifyBestSimilarSynsetFromSynsets(syn, synsets)
       if similarity > 0.4:
         vector[i] = index[synSimilar]
       else:
@@ -42,8 +55,13 @@ def constructSynsetOrderVector(synsets, jointSynsets, index):
     i +=1
   return vector
 
-def identifyBestSimilarWordFromSynsets(syn, synsets):
+def identifyBestSimilarSynsetFromSynsets(syn, synsets):
   """
+    Identify best similar synset from synsets
+    @ In, syn, wn.synset, synset
+    @ In, synsets, list of synsets
+    @ Out, bestSyn, the best similar synset in synsets
+    @ Out, similarity, the best similarity score
   """
   similarity = 0.0
   bestSyn = None
@@ -163,6 +181,11 @@ def scalingDepthEffect(synsetA, synsetB, beta=0.45, disambiguation=False):
 
 def semanticSimilaritySynsetList(synsetList1, synsetList2):
   """
+    Compute the similarity between two synsetList using semantic analysis
+    i.e., compute the similarity using both path length and depth information in wordnet
+    @ In, synsetList1, list, the list of synset
+    @ In, synsetList2, list, the list of synset
+    @ Out, semSimilarity, float, [0, 1], the similarity score
   """
   synSet = set(synsetList1).union(set(synsetList2))
   wordVectorA = constructSemanticVector(synsetList1, synSet)
@@ -171,9 +194,12 @@ def semanticSimilaritySynsetList(synsetList1, synsetList2):
   semSimilarity = np.dot(wordVectorA, wordVectorB)/(np.linalg.norm(wordVectorA)*np.linalg.norm(wordVectorB))
   return semSimilarity
 
-
 def constructSemanticVector(syns, jointSyns):
   """
+    Construct semantic vector
+    @ In, syns, list of synsets
+    @ In, jointSyns, list of joint synsets
+    @ Out, vector, numpy.array, the semantic vector
   """
   synSet = set(syns)
   vector = np.zeros(len(jointSyns))
@@ -183,14 +209,13 @@ def constructSemanticVector(syns, jointSyns):
     if jointSyn in synSet:
       vector[i] = 1
     else:
-      _, similarity = identifyBestSimilarWordFromSynsets(jointSyn, synSet)
+      _, similarity = identifyBestSimilarSynsetFromSynsets(jointSyn, synSet)
       if similarity >0.2:
         vector[i] = similarity
       else:
         vector[i] = 0.0
     i+=1
   return vector
-
 
 def synsetsSimilarity(synsetA, synsetB, method='semantic_similarity_synsets', disambiguation=True):
   """

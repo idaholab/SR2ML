@@ -411,6 +411,8 @@ def sentenceSimilarityWithDisambiguation(sentenceA, sentenceB, senseMethod='simp
 def convertSentsToSynsetsWithDisambiguation(sentList):
   """
     Use sentence itself to identify the best synset
+    @ In, sentList, list of sentences
+    @ Out, sentSynsets, list of synsets for corresponding sentences
   """
   sentSynsets = []
   for sent in sentList:
@@ -420,12 +422,25 @@ def convertSentsToSynsetsWithDisambiguation(sentList):
   return sentSynsets
 
 def convertToSynsets(wordSet):
+  """
+    Convert a list/set of words into a list of synsets
+    @ In, wordSet, list/set of words
+    @ Out, wordList, list, list of words without duplications
+    @ Out, synsets, list, list of synsets correponding wordList
+  """
   # keep the order (works for python3.7+)
   wordList = list(dict.fromkeys(wordSet))
   synsets = [list(wn.synsets(word)) for word in wordList]
   return wordList, synsets
 
 def identifyBestSynset(word, jointWordList, jointSynsetList):
+  """
+    Identify the best synset for given word with provided additional information, i.e., jointWordList
+    @ In, word, str, a single word
+    @ In, jointWordList, list, a list of words without duplications
+    @ In, jointSynsetList, list, a list of synsets correponding to jointWordList
+    @ Out, bestSyn, wn.synset, identified synset for given word
+  """
   wordList = copy.copy(jointWordList)
   synsets = copy.copy(jointSynsetList)
   if word in wordList:
@@ -446,13 +461,21 @@ def identifyBestSynset(word, jointWordList, jointSynsetList):
       max = temp
   return bestSyn
 
-def convertSentsToSynsets(sentList):
+def convertSentsToSynsets(sentList, info=None):
   """
     Use sentence itself to identify the best synset
+    @ In, sentList, list, list of sentences
+    @ In, info, list, additional list of words that will be used to determine the synset
+    @ Out, sentSynsets, list, lis of synsets correponding to provided sentList
   """
   sentSynsets = []
+  if info is not None:
+    infoWordList, infoSynsetsList = convertToSynsets(info)
   for sent in sentList:
     wordList, synsetsList = convertToSynsets([e.strip() for e in sent.split()])
+    if info is not None:
+      wordList = wordList + infoWordList
+      synsetsList = synsetsList + infoSynsetsList
     bestSyn = [identifyBestSynset(word, wordList, synsetsList) for word in wordList]
     bestSyn = list(filter(None, bestSyn))
     sentSynsets.append(bestSyn)
