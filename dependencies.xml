@@ -1,22 +1,22 @@
 <dependencies>
   <main>
-    <spacy/>
-    <nltk/>
+    <spacy>3.1</spacy>
     <textacy/>
-    <stanza/>
+    <nltk source="pip"/>
     <coreferee source='pip'/>
-    <pandas/>
-    <beautifulsoup4/>
-    <networkx/>
+    <beautifulsoup4 source="pip"/>
+    <networkx source="pip"/>
     <!-- pysbd is used for sentence boundary disambiguation -->
-    <pysbd/>
+    <pysbd source="pip"/>
     <tomli source='pip'/>
     <numerizer source='pip' optional='True'/>
     <autocorrect source='pip' optional='True'/>
     <contextualSpellCheck source='pip' optional='True'/>
-    <numpy/>
     <pywsd source='pip'/>
-    <jupyterlab source='pip'/>
+    <jupyterlab source='pip' optional="True"/>
+    <!-- <stanza/> -->
+    <!-- <pandas/>
+    <numpy/> -->
     <!-- <recognizers-text-number source='pip'>
     <recognizers-text-number-with-unit source='pip'>
     <recognizers-text-date-time source='pip'> -->
