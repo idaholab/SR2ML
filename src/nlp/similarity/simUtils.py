@@ -594,3 +594,15 @@ def constructSemanticVectorUsingDisambiguatedSynsets(wordSynsets, jointWordSynse
       else:
         vector[i] = 0.0
   return vector
+
+
+def convertSentsToSynsetsWithDisambiguation(sentList):
+  """
+    Use sentence itself to identify the best synset
+  """
+  sentSynsets = []
+  for sent in sentList:
+    _, bestSyn = sentenceSenseDisambiguationPyWSD(sent, senseMethod='simple_lesk', simMethod='path')
+    bestSyn = [wn.synset(syn.name()) for syn in bestSyn if syn is not None]
+    sentSynsets.append(bestSyn)
+  return sentSynsets
