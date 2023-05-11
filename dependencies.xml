@@ -2,6 +2,7 @@
   <main>
     <spacy>3.1</spacy>
     <textacy/>
+    <pywsd source="pip"/>
     <nltk source="pip"/>
     <coreferee source='pip'/>
     <beautifulsoup4 source="pip"/>
