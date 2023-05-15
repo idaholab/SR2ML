@@ -13,6 +13,11 @@ import spacy
 from spacy.vocab import Vocab
 from contextualSpellCheck.contextualSpellCheck import ContextualSpellCheck
 import autocorrect
+import itertools
+from similarity.simUtils import wordsSimilarity
+from nltk.corpus import wordnet as wn
+import os
+import numpy as np
 
 # list of available preprocessors in textacy.preprocessing.normalize
 textacyNormalize = ['bullet_points',
@@ -194,7 +199,8 @@ class SpellChecker(object):
     if self.checker == 'autocorrect':
       self.speller = autocorrect.Speller()
       self.includedWords = []
-      with open('../data/ac_additional_words.txt', 'r') as file:
+      file2open = os.path.join(os.path.dirname(__file__) , 'data' , 'ac_additional_words.txt')
+      with open(file2open, 'r') as file:
         tmp = file.readlines()
       self.addedWords = list({x.replace('\n', '') for x in tmp})
       self.speller.nlp_data.update({x: 1000000 for x in self.addedWords})
@@ -203,7 +209,8 @@ class SpellChecker(object):
       self.nlp = spacy.load('en_core_web_sm')
       self.speller = ContextualSpellCheck(self.nlp, name)
       self.includedWords = list(self.speller.BertTokenizer.get_vocab().keys())
-      with open('../data/csc_additional_words.txt', 'r') as file:
+      file2open = os.path.join(os.path.dirname(__file__) , 'data' , 'csc_additional_words.txt')
+      with open(file2open, 'r') as file:
         tmp = file.readlines()
       self.addedWords = [x.replace('\n', '') for x in tmp]
       self.speller.vocab = Vocab(strings=self.includedWords+self.addedWords)
@@ -253,3 +260,92 @@ class SpellChecker(object):
       corrected = doc._.outcome_spellCheck
 
     return corrected
+
+  def handleAbbreviations(self, abbrDatabase, type):
+    """
+      Performs automatic correction of abbreviations and returns corrected text
+      This method relies on a database of abbreviations located at:
+      src/nlp/data/abbreviations.xlsx
+      This database contains the most common abbreviations collected from literarture and
+      it provides for each abbreviation its corresponding full word(s); an abbreviation might
+      have multple words associated. In such case the full word that makes more sense given the
+      context is chosen (see findOptimalOption method)
+      @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations
+                                            and their correspoding full expression
+      @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed') that are employed
+                          to determine which words are abbreviations that nned to be expanded
+                          * spellcheck: in this case spellchecker is used to identify words that
+                                        are not recognized
+                          * hard: here we directly search for the abbreviations in the provided
+                                  sentence
+                          * mixed: here we perform first a "hard" search followed by a "spellcheck"
+                                   search
+      @ Out, options, list, list of corrected text options
+    """
+    abbreviationSet = set(abbrDatabase['Abbreviation'].values)
+    if type == 'spellcheck':
+      unknowns = self.getMisspelledWords()
+    elif type == 'hard' or type=='mixed':
+      unknowns = []
+      splitSent = self.text.split()
+      for word in splitSent:
+        if word.lower() in abbreviationSet:
+          unknowns.append(word)
+      if type=='mixed':
+        set1 = set(self.getMisspelledWords())
+        set2 = set(unknowns)
+        unknowns = list(set1.union(set2))
+
+    corrections={}
+    for word in unknowns:
+      if word.lower() in abbrDatabase['Abbreviation'].values:
+        locs = list(abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values)
+        if locs:
+          corrections[word] = abbrDatabase['Full'][locs].values.tolist()
+      else:
+        # Here we are addressing the fact that the abbreviation database will never be complete
+        # Given an abbreviation that is not part of the abbreviation database, we are looking for a
+        # a subset of abbreviations the abbreviation database that are close enough (and consider
+        # them as possible candidates
+        from difflib import SequenceMatcher
+        corrections[word] = []
+        abbreviationDS = abbrDatabase['Abbreviation'].values
+        for index,abbr in enumerate(abbreviationDS):
+          if SequenceMatcher(None, word, abbr).ratio()>0.8:
+            corrections[word].append(abbrDatabase['Full'].values.tolist()[index])
+      if not corrections[word]:
+        corrections.pop(word)
+
+    combinations = list(itertools.product(*list(corrections.values())))
+    options = []
+    for comb in combinations:
+      corrected = self.text
+      for index,key in enumerate(corrections.keys()):
+        corrected = re.sub(r"\b%s\b" % str(key) , comb[index], corrected)
+      options.append(corrected)
+
+    if not options:
+      return self.text
+    else:
+      bestOpt = self.findOptimalOption(options)
+      return bestOpt
+
+  def findOptimalOption(self,options):
+    """
+      Method to handle abbreviation with multiple meanings
+      @ In, options, list, list of sentence options
+      @ Out, optimalOpt, string, option from the provided options list that fits more the
+                                 possible
+    """
+    nOpt = len(options)
+    combScore = np.zeros(nOpt)
+    for index,opt in enumerate(options):
+      listOpt = opt.split()
+      for i,word in enumerate(listOpt):
+        for j in range(i+1,len(listOpt)):
+          combScore[index] = combScore[index] + wordsSimilarity(word,listOpt[j])
+    optIndex = np.argmax(combScore)
+    optimalOpt = options[optIndex]
+    return optimalOpt
+
+
