@@ -199,7 +199,7 @@ class SpellChecker(object):
     if self.checker == 'autocorrect':
       self.speller = autocorrect.Speller()
       self.includedWords = []
-      file2open = os.path.join(os.path.dirname(__file__) , 'data/ac_additional_words.txt')
+      file2open = os.path.join(os.path.dirname(__file__) , 'data' , 'ac_additional_words.txt')
       with open(file2open, 'r') as file:
         tmp = file.readlines()
       self.addedWords = list({x.replace('\n', '') for x in tmp})
@@ -209,7 +209,7 @@ class SpellChecker(object):
       self.nlp = spacy.load('en_core_web_sm')
       self.speller = ContextualSpellCheck(self.nlp, name)
       self.includedWords = list(self.speller.BertTokenizer.get_vocab().keys())
-      file2open = os.path.join(os.path.dirname(__file__) , 'data/csc_additional_words.txt')
+      file2open = os.path.join(os.path.dirname(__file__) , 'data' , 'csc_additional_words.txt')
       with open(file2open, 'r') as file:
         tmp = file.readlines()
       self.addedWords = [x.replace('\n', '') for x in tmp]
