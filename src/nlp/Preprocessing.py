@@ -18,6 +18,7 @@ from similarity.simUtils import wordsSimilarity
 from nltk.corpus import wordnet as wn
 import os
 import numpy as np
+import pandas as pd
 
 # list of available preprocessors in textacy.preprocessing.normalize
 textacyNormalize = ['bullet_points',
@@ -185,15 +186,12 @@ class SpellChecker(object):
     Object to find misspelled words and automatically correct spelling
   """
 
-  def __init__(self, text, checker='autocorrect'):
+  def __init__(self, checker='autocorrect'):
     """
       SpellChecker object constructor
-      @ In, text, str, string of text that will be analyzed
       @ In, checker, str, optional, spelling corrector to use ('autocorrect' or 'ContextualSpellCheck')
       @ Out, None
     """
-    # store text
-    self.text = text
     self.checker = checker.lower()
     # get included and additional dictionary words and update speller dictionary
     if self.checker == 'autocorrect':
@@ -226,42 +224,42 @@ class SpellChecker(object):
     else:
       self.speller.vocab = Vocab(strings=self.includedWords+self.addedWords+words)
 
-  def getMisspelledWords(self):
+  def getMisspelledWords(self, text):
     """
       Returns a list of words that are misspelled according to the dictionary used
       @ In, None
       @ Out, misspelled, list, list of misspelled words
     """
     if self.checker == 'autocorrect':
-      corrected = self.speller(self.text)
-      original = re.findall(r'[^\s!,.?":;-]+', self.text)
+      corrected = self.speller(text)
+      original = re.findall(r'[^\s!,.?":;-]+', text)
       auto = re.findall(r'[^\s!,.?":;-]+', corrected)
       misspelled = list({w1 if w1 != w2 else None for w1, w2 in zip(original, auto)})
       if None in misspelled:
         misspelled.remove(None)
     else:
-      doc = self.nlp(self.text)
+      doc = self.nlp(text)
       doc = self.speller(doc)
       misspelled = list({str(x) for x in doc._.suggestions_spellCheck.keys()})
 
     return misspelled
 
-  def correct(self):
+  def correct(self, text):
     """
       Performs automatic spelling correction and returns corrected text
       @ In, None
       @ Out, corrected, str, spelling corrected text
     """
     if self.checker == 'autocorrect':
-      corrected = self.speller(self.text)
+      corrected = self.speller(text)
     else:
-      doc = self.nlp(self.text)
+      doc = self.nlp(text)
       doc = self.speller(doc)
       corrected = doc._.outcome_spellCheck
 
     return corrected
 
-  def handleAbbreviations(self, abbrDatabase, type):
+  def handleAbbreviations(self, abbrDatabase, text, type):
     """
       Performs automatic correction of abbreviations and returns corrected text
       This method relies on a database of abbreviations located at:
@@ -272,6 +270,7 @@ class SpellChecker(object):
       context is chosen (see findOptimalOption method)
       @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations
                                             and their correspoding full expression
+      @ In, text, str, string of text that will be analyzed
       @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed') that are employed
                           to determine which words are abbreviations that nned to be expanded
                           * spellcheck: in this case spellchecker is used to identify words that
@@ -284,15 +283,15 @@ class SpellChecker(object):
     """
     abbreviationSet = set(abbrDatabase['Abbreviation'].values)
     if type == 'spellcheck':
-      unknowns = self.getMisspelledWords()
+      unknowns = self.getMisspelledWords(text)
     elif type == 'hard' or type=='mixed':
       unknowns = []
-      splitSent = self.text.split()
+      splitSent = text.split()
       for word in splitSent:
         if word.lower() in abbreviationSet:
           unknowns.append(word)
       if type=='mixed':
-        set1 = set(self.getMisspelledWords())
+        set1 = set(self.getMisspelledWords(text))
         set2 = set(unknowns)
         unknowns = list(set1.union(set2))
 
@@ -319,13 +318,96 @@ class SpellChecker(object):
     combinations = list(itertools.product(*list(corrections.values())))
     options = []
     for comb in combinations:
-      corrected = self.text
+      corrected = text
       for index,key in enumerate(corrections.keys()):
         corrected = re.sub(r"\b%s\b" % str(key) , comb[index], corrected)
       options.append(corrected)
 
     if not options:
-      return self.text
+      return text
+    else:
+      bestOpt = self.findOptimalOption(options)
+      return bestOpt
+
+  def generateAbbrDict(self, abbrDatabase):
+    """
+      Generates a AbbrDict that can be used by handleAbbreviationsDict
+      @ In, abbrDatabase, pandas dataframe, dataframe containing library of abbreviations
+                                            and their correspoding full expression
+      @ Out, abbrDict, dictionary, a abbreviations dictionary
+    """
+    abbrDict = {}
+    #There may be a more efficient way to do the following
+    for row in abbrDatabase.itertuples():
+      abbrs = abbrDict.get(row.Abbreviation,[])
+      abbrs.append(row.Full)
+      abbrDict[row.Abbreviation] = abbrs
+    return abbrDict
+
+  def handleAbbreviationsDict(self, abbrDict, text, type):
+    """
+      Performs automatic correction of abbreviations and returns corrected text
+      This method relies on a database of abbreviations located at:
+      src/nlp/data/abbreviations.xlsx
+      This database contains the most common abbreviations collected from literarture and
+      it provides for each abbreviation its corresponding full word(s); an abbreviation might
+      have multple words associated. In such case the full word that makes more sense given the
+      context is chosen (see findOptimalOption method)
+      @ In, abbrDict, dictionary, dictionary containing library of abbreviations
+                                            and their correspoding full expression
+      @ In, text, str, string of text that will be analyzed
+      @ In, type, string, type of abbreviation method ('spellcheck','hard','mixed') that are employed
+                          to determine which words are abbreviations that nned to be expanded
+                          * spellcheck: in this case spellchecker is used to identify words that
+                                        are not recognized
+                          * hard: here we directly search for the abbreviations in the provided
+                                  sentence
+                          * mixed: here we perform first a "hard" search followed by a "spellcheck"
+                                   search
+      @ Out, options, list, list of corrected text options
+    """
+    if type == 'spellcheck':
+      unknowns = self.getMisspelledWords(text)
+    elif type == 'hard' or type=='mixed':
+      unknowns = []
+      splitSent = text.split()
+      for word in splitSent:
+        if word.lower() in abbrDict:
+          unknowns.append(word)
+      if type=='mixed':
+        set1 = set(self.getMisspelledWords(text))
+        set2 = set(unknowns)
+        unknowns = list(set1.union(set2))
+
+    corrections={}
+    for word in unknowns:
+      if word.lower() in abbrDict:
+        if len(abbrDict[word.lower()]) > 0:
+          corrections[word] = abbrDict[word.lower()]
+      else:
+        # Here we are addressing the fact that the abbreviation database will never be complete
+        # Given an abbreviation that is not part of the abbreviation database, we are looking for a
+        # a subset of abbreviations the abbreviation database that are close enough (and consider
+        # them as possible candidates
+        from difflib import SequenceMatcher
+        corrections[word] = []
+        abbreviationDS = list(abbrDict)
+        for index,abbr in enumerate(abbreviationDS):
+          if SequenceMatcher(None, word, abbr).ratio()>0.8:
+            corrections[word] = abbrDict[abbr]
+      if not corrections[word]:
+        corrections.pop(word)
+
+    combinations = list(itertools.product(*list(corrections.values())))
+    options = []
+    for comb in combinations:
+      corrected = text
+      for index,key in enumerate(corrections.keys()):
+        corrected = re.sub(r"\b%s\b" % str(key) , comb[index], corrected)
+      options.append(corrected)
+
+    if not options:
+      return text
     else:
       bestOpt = self.findOptimalOption(options)
       return bestOpt
@@ -349,3 +431,32 @@ class SpellChecker(object):
     return optimalOpt
 
 
+class AbbrExpander(object):
+  """
+    Class to expand abbreviations
+  """
+
+  def __init__(self, abbreviationsFilename):
+    """
+      Abbrviation expander constructor
+      @ In, abbreviationsFilename, string, filename of abbreviations data
+      @ Out, None
+    """
+    self.abbrList = pd.read_excel(abbreviationsFilename)
+    self.preprocessorList = ['hyphenated_words',
+                             'whitespace',
+                             'numerize']
+    self.preprocess = Preprocessing(self.preprocessorList, {})
+    self.checker = SpellChecker(checker='mixed')
+    self.abbrDict = self.checker.generateAbbrDict(self.abbrList)
+
+
+  def abbrProcess(self, text):
+    """
+      Expands the abbreviations in text
+      @ In, text, string, the text to expand
+      @ Out, expandedText, string, the text with abbreviations expanded
+    """
+    text = self.preprocess(text)
+    expandedText = self.checker.handleAbbreviationsDict(self.abbrDict, text.lower(), type='mixed')
+    return expandedText
