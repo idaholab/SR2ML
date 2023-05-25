@@ -11,8 +11,8 @@ from nltk import word_tokenize as tokenizer
 from nltk.corpus import brown
 from nltk.corpus import wordnet as wn
 
-from synsetUtils import semanticSimilaritySynsets, synsetsSimilarity
-from synsetUtils import semanticSimilarityUsingDisambiguatedSynsets
+from .synsetUtils import semanticSimilaritySynsets, synsetsSimilarity
+from .synsetUtils import semanticSimilarityUsingDisambiguatedSynsets
 
 """
   Methods proposed by: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=1644735

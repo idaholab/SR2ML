@@ -10,11 +10,12 @@
     <!-- pysbd is used for sentence boundary disambiguation -->
     <pysbd source="pip"/>
     <tomli source='pip'/>
-    <numerizer source='pip' optional='True'/>
-    <autocorrect source='pip' optional='True'/>
-    <contextualSpellCheck source='pip' optional='True'/>
+    <numerizer source='pip'/>
+    <autocorrect source='pip'/>
+    <contextualSpellCheck source='pip'/>
     <pywsd source='pip'/>
-    <jupyterlab source='pip' optional="True"/>
+    <jupyterlab source='pip'/>
+    <openpyxl source="pip"/>
     <!-- <stanza/> -->
     <!-- <pandas/>
     <numpy/> -->
