@@ -1,4 +1,5 @@
 import synsetUtils
+import simUtils as SU
 import time
 
 bankSents = ['I went to the bank to deposit my money',
@@ -10,10 +11,10 @@ plantSents = ['The workers at the industrial plant were overworked',
 print("================ Testing sentenceSimilarity ================\n")
 sents = [bankSents, plantSents]
 for sent in sents:
-  wordList1, synsets1 = synsetUtils.convertToSynsets([e.strip() for e in sent[0].split()])
-  wordList2, synsets2 = synsetUtils.convertToSynsets([e.strip() for e in sent[1].split()])
-  bestSyn1 = [synsetUtils.identifyBestSynset(word, wordList1, synsets1) for word in wordList1]
-  bestSyn2 = [synsetUtils.identifyBestSynset(word, wordList2, synsets2) for word in wordList2]
+  wordList1, synsets1 = SU.convertToSynsets([e.strip() for e in sent[0].split()])
+  wordList2, synsets2 = SU.convertToSynsets([e.strip() for e in sent[1].split()])
+  bestSyn1 = [SU.identifyBestSynset(word, wordList1, synsets1) for word in wordList1]
+  bestSyn2 = [SU.identifyBestSynset(word, wordList2, synsets2) for word in wordList2]
   bestSyn1 = list(filter(None, bestSyn1))
   bestSyn2 = list(filter(None, bestSyn2))
   print(wordList1)
