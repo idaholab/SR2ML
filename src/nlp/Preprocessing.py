@@ -451,12 +451,21 @@ class AbbrExpander(object):
     self.abbrDict = self.checker.generateAbbrDict(self.abbrList)
 
 
-  def abbrProcess(self, text):
+  def abbrProcess(self, text, splitToList='False'):
     """
       Expands the abbreviations in text
       @ In, text, string, the text to expand
       @ Out, expandedText, string, the text with abbreviations expanded
     """
     text = self.preprocess(text)
-    expandedText = self.checker.handleAbbreviationsDict(self.abbrDict, text.lower(), type='mixed')
+    if not splitToList:
+      expandedText = self.checker.handleAbbreviationsDict(self.abbrDict, text.lower(), type='mixed')
+    else:
+      text = text.replace("\n", "")
+      textList = [t.strip() for t in text.split('.')]
+      expandedText = []
+      for t in textList:
+        cleanedText = self.checker.handleAbbreviationsDict(self.abbrDict, t.lower(), type='mixed')
+        expandedText.append(cleanedText)
+      expandedText = '. '.join(expandedText)
     return expandedText
