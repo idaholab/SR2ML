@@ -32,7 +32,7 @@ class OPMobject(object):
     self.OPLtextParser()
     self.OPLparser()
 
-    
+
   def OPLentityParser(self):
     '''
     This method extracts all the form and function entities out of the OPL html file and it puts them in two separate lists:
@@ -47,15 +47,15 @@ class OPMobject(object):
         if element.has_attr('color'):
           elem = element.string.replace("\n", " ")
           elem = checkAcronym(elem)
-          if elem[1] is not None:            
+          if elem[1] is not None:
             self.acronyms[elem[1]] = elem[0]
           elem = elem[0]
-          if element['color'] == '#006d00': 
+          if element['color'] == '#006d00':
             if elem.lower() not in self.objectList:
               self.objectList.append(elem.lower())
           elif element['color'] == '#000078':
             if elem.lower() not in self.processList:
-              self.processList.append(elem.lower())   
+              self.processList.append(elem.lower())
 
 
   def OPLtextParser(self):
@@ -123,7 +123,7 @@ class OPMobject(object):
           for conj in conjs:
             self.opmGraph.add_edge(subj.strip(), conj.strip(), color=colorMatches[elem], key=elem)
             self.edge_colors.append(colorMatches[elem])
-      
+
       # remove elements from "exhibits"
       if OPLkeywordsAttributes[0] in sentence:
         partitions = sentence.partition(OPLkeywordsAttributes[0])
@@ -135,14 +135,14 @@ class OPMobject(object):
           self.opmGraph.add_edge(subj.strip(), conj.strip(), color='b', key='exhibits')
 
       # address "changes"
-      if OPLkeywordsAction[0] in sentence: 
+      if OPLkeywordsAction[0] in sentence:
         partitions = sentence.partition(OPLkeywordsAction[0])
         subj = partitions[0]
         conj = partitions[2].partition(' from ')
         self.opmGraph.add_edge(subj.strip(), conj[0].strip(), color='g', key='changes')
 
       # address 'is instance of a'
-      if 'is instance of a' in sentence: 
+      if 'is instance of a' in sentence:
         partitions = sentence.partition('is instance of a')
         subj = partitions[0]
         conj = partitions[2]
@@ -156,34 +156,34 @@ class OPMobject(object):
 
   def returnsExternalLinks(self):
     '''
-    This method returns the links to other external OPM models 
-    ''' 
+    This method returns the links to other external OPM models
+    '''
     return self.links2OPMs
 
   def returnGraph(self):
     '''
-    This method returns the networkx graph 
-    '''    
+    This method returns the networkx graph
+    '''
     return self.opmGraph
 
   def returnObjectList(self):
     '''
-    This method returns the the list of objects 
-    '''   
+    This method returns the the list of objects
+    '''
     objectNodes = [x for x,y in self.opmGraph.nodes(data=True) if y['key']=='object']
     return objectNodes
 
   def returnProcessList(self):
     '''
-    This method returns the the list of processes 
-    '''  
+    This method returns the the list of processes
+    '''
     processNodes = [x for x,y in self.opmGraph.nodes(data=True) if y['key']=='process']
     return processNodes
 
   def returnAttributeList(self):
     '''
-    This method returns the the list of attributes 
-    '''  
+    This method returns the the list of attributes
+    '''
     attributeNodes = [x for x,y in self.opmGraph.nodes(data=True) if y['key']=='attribute']
     return attributeNodes
 

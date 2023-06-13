@@ -447,7 +447,7 @@ class AbbrExpander(object):
     """
     self.abbrType = abbrType
     self.checkerType = checkerType
-    
+
     self.abbrList = pd.read_excel(abbreviationsFilename)
     self.preprocessorList = ['hyphenated_words',
                              'whitespace',
