@@ -35,10 +35,10 @@ class OPMobject(object):
     
   def OPLentityParser(self):
     '''
-    This method extracts all the form and function entities out of the OPL html file and it puts them in two separate lists
-    @in: filename, file name containing the OPL text
-    @out: objectList, list, list of form elements contained in the OPL file
-    @out: processList, list, list of function elements contained in the OPL file
+    This method extracts all the form and function entities out of the OPL html file and it puts them in two separate lists:
+    - self.objectList
+    - self.processList
+    This process is performed by parsing the html file and identify color-coded entities.
     '''
     with open(self.filename) as fp:
       soup = BeautifulSoup(fp, "html.parser")
@@ -60,9 +60,7 @@ class OPMobject(object):
 
   def OPLtextParser(self):
     '''
-    This method extracts all the sentences out of the OPL html file and it puts them in a list
-    @in: filename, file name containing the OPL text
-    @out: objectList, sentences, list of sentenced contained in the OPL file
+    This method extracts all the sentences out of the OPL html file and it puts them in a list (self.sentences)
     '''
     objects = {}
     functions = {}
@@ -92,9 +90,7 @@ class OPMobject(object):
 
   def OPLparser(self):
     '''
-    This method translates all the sentences create a graph structure
-    @in: filename: file name containing the OPL text
-    @out: objectList: sentences, list of sentenced contained in the OPL file
+    This method translates all the sentences (see self.sentences) and it create a graph structure (self.opmGraph)
     '''
     self.opmGraph = nx.MultiDiGraph()
 
@@ -196,7 +192,7 @@ class OPMobject(object):
 
 def checkAcronym(s):
   '''
-  This method separate an OPM object if an acronym is defined
+  This method separates an OPM object if an acronym is defined
   E.g.: 'travelling screen (TWS)'  --> ('travelling screen', 'TWS')
         'travelling screen'        --> ('travelling screen', None)
   '''
@@ -209,7 +205,7 @@ def checkAcronym(s):
 
 def removeAcronym(s):
   '''
-  This method separate an OPM object if an acronym is defined
+  This method returns only the OPM object if an acronym is defined
   E.g.: 'travelling screen (TWS) failed'  --> 'travelling screen failed'
   '''
   if '(' in s:
