@@ -372,7 +372,7 @@ class SpellChecker(object):
       unknowns = []
       splitSent = text.split()
       for word in splitSent:
-        if word.lower() in abbrDict:
+        if word.lower() in abbrDict.keys():
           unknowns.append(word)
       if type=='mixed':
         set1 = set(self.getMisspelledWords(text))
@@ -381,7 +381,7 @@ class SpellChecker(object):
 
     corrections={}
     for word in unknowns:
-      if word.lower() in abbrDict:
+      if word.lower() in abbrDict.keys():
         if len(abbrDict[word.lower()]) > 0:
           corrections[word] = abbrDict[word.lower()]
       else:
@@ -393,8 +393,11 @@ class SpellChecker(object):
         corrections[word] = []
         abbreviationDS = list(abbrDict)
         for index,abbr in enumerate(abbreviationDS):
-          if SequenceMatcher(None, word, abbr).ratio()>0.8:
+          val=0
+          newVal = SequenceMatcher(None, word, abbr).ratio()
+          if newVal>=0.75 and newVal>val:
             corrections[word] = abbrDict[abbr]
+            val = newVal
       if not corrections[word]:
         corrections.pop(word)
 
@@ -436,18 +439,21 @@ class AbbrExpander(object):
     Class to expand abbreviations
   """
 
-  def __init__(self, abbreviationsFilename):
+  def __init__(self, abbreviationsFilename, checkerType='autocorrect', abbrType='mixed'):
     """
       Abbrviation expander constructor
       @ In, abbreviationsFilename, string, filename of abbreviations data
       @ Out, None
     """
+    self.abbrType = abbrType
+    self.checkerType = checkerType
+
     self.abbrList = pd.read_excel(abbreviationsFilename)
     self.preprocessorList = ['hyphenated_words',
                              'whitespace',
                              'numerize']
     self.preprocess = Preprocessing(self.preprocessorList, {})
-    self.checker = SpellChecker(checker='mixed')
+    self.checker = SpellChecker(checker=self.checkerType)
     self.abbrDict = self.checker.generateAbbrDict(self.abbrList)
 
 
@@ -459,13 +465,13 @@ class AbbrExpander(object):
     """
     text = self.preprocess(text)
     if not splitToList:
-      expandedText = self.checker.handleAbbreviationsDict(self.abbrDict, text.lower(), type='mixed')
+      expandedText = self.checker.handleAbbreviationsDict(self.abbrDict, text.lower(), type=self.abbrType)
     else:
       text = text.replace("\n", "")
       textList = [t.strip() for t in text.split('.')]
       expandedText = []
       for t in textList:
-        cleanedText = self.checker.handleAbbreviationsDict(self.abbrDict, t.lower(), type='mixed')
+        cleanedText = self.checker.handleAbbreviationsDict(self.abbrDict, t.lower(), type=self.abbrType)
         expandedText.append(cleanedText)
       expandedText = '. '.join(expandedText)
     return expandedText
