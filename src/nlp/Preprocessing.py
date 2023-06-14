@@ -231,10 +231,10 @@ class SpellChecker(object):
       @ Out, misspelled, list, list of misspelled words
     """
     if self.checker == 'autocorrect':
-      corrected = self.speller(text)
+      corrected = self.speller(text.lower())
       original = re.findall(r'[^\s!,.?":;-]+', text)
       auto = re.findall(r'[^\s!,.?":;-]+', corrected)
-      misspelled = list({w1 if w1 != w2 else None for w1, w2 in zip(original, auto)})
+      misspelled = list({w1 if w1.lower() != w2.lower() else None for w1, w2 in zip(original, auto)})
       if None in misspelled:
         misspelled.remove(None)
     else:
@@ -298,9 +298,11 @@ class SpellChecker(object):
     corrections={}
     for word in unknowns:
       if word.lower() in abbrDatabase['Abbreviation'].values:
-        locs = list(abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word].index.values)
+        locs = list(abbrDatabase['Abbreviation'][abbrDatabase['Abbreviation']==word.lower()].index.values)
         if locs:
           corrections[word] = abbrDatabase['Full'][locs].values.tolist()
+        else:
+          print(word)
       else:
         # Here we are addressing the fact that the abbreviation database will never be complete
         # Given an abbreviation that is not part of the abbreviation database, we are looking for a
