@@ -457,7 +457,7 @@ class AbbrExpander(object):
     self.abbrDict = self.checker.generateAbbrDict(self.abbrList)
 
 
-  def abbrProcess(self, text, splitToList='False'):
+  def abbrProcess(self, text, splitToList=False):
     """
       Expands the abbreviations in text
       @ In, text, string, the text to expand
