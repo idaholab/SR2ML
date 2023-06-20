@@ -142,6 +142,7 @@ class RuleBasedMatcher(object):
     self._causalSentsNoEnts = []
     self._rawCausalList = []
     self._causalSentsOneEnt = []
+    self._entHS = None
 
   def getKeywords(self, filename):
     """
@@ -243,8 +244,10 @@ class RuleBasedMatcher(object):
 
     # First identify coreference through coreferee, then filter it through doc.ents
     if self._coref:
-      logger.debug('Print Coreference Info:')
-      print(doc._.coref_chains.pretty_representation)
+      corefRep = doc._.coref_chains.pretty_representation
+      if len(corefRep) != 0:
+        logger.debug('Print Coreference Info:')
+        print(corefRep)
 
     matchedSents, matchedSentsForVis = self.collectSents(self._doc)
     self._matchedSents += matchedSents
@@ -277,6 +280,7 @@ class RuleBasedMatcher(object):
     ## include 'root' in the output
     df = pd.DataFrame({'entities':entList, 'root':svList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
     df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'root','status keywords', 'health statuses', 'conjecture', 'sentence'])
+    self._entHS = df
     # df = pd.DataFrame({'entities':entList, 'status keywords':kwList, 'health statuses':hsList, 'conjecture':cjList, 'sentence':sentList})
     # df.to_csv(nlpConfig['files']['output_health_status_file'], columns=['entities', 'status keywords', 'health statuses', 'conjecture', 'sentence'])
 
@@ -288,9 +292,9 @@ class RuleBasedMatcher(object):
     dfCausals.to_csv(nlpConfig['files']['output_causal_effect_file'], columns=self._causalNames)
     logger.info('End of causal relation extraction!')
     ## print extracted relation
-    logger.info('Start to use general extraction method to extract causal relation')
-    print(*self.extract(self._matchedSents, predSynonyms=self._causalKeywords['VERB'], exclPrepos=[]), sep='\n')
-    logger.info('End of causal relation extraction using general extraction method!')
+    # logger.info('Start to use general extraction method to extract causal relation')
+    # print(*self.extract(self._matchedSents, predSynonyms=self._causalKeywords['VERB'], exclPrepos=[]), sep='\n')
+    # logger.info('End of causal relation extraction using general extraction method!')
 
   def visualize(self):
     """
@@ -545,8 +549,11 @@ class RuleBasedMatcher(object):
           healthStatus = self.getHealthStatusForPobj(healthStatus, include=True)
         elif healthStatus and healthStatus.dep_ == 'dobj':
           subtree = list(healthStatus.subtree)
-          if healthStatus.nbor().dep_ in ['prep']:
-            healthStatus = healthStatus.doc[healthStatus.i:subtree[-1].i+1]
+          try:
+            if healthStatus.nbor().dep_ in ['prep']:
+              healthStatus = healthStatus.doc[healthStatus.i:subtree[-1].i+1]
+          except IndexError:
+            pass
         # no object is found
         if not healthStatus:
           healthStatus = self.findRightKeyword(root)
@@ -696,7 +703,10 @@ class RuleBasedMatcher(object):
         continue
       causalStatus = [sent.root.lemma_.lower()] in self._causalKeywords['VERB'] and [sent.root.lemma_.lower()] not in self._statusKeywords['VERB']
       for ent in ents:
-        healthStatus = None
+        healthStatus = None        # store health status for identified entities
+        healthStatusAmod = None    # store amod for health status
+        healthStatusAppend = None  # store some append info for health status (used for short phrase)
+        healthStatusAppendAmod = None # store amod info for health status append info
         conjecture = False
         passive = False
         entRoot = ent.root
@@ -732,9 +742,11 @@ class RuleBasedMatcher(object):
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
             if healthStatus is None:
               healthStatus = entRoot.head
-              amod = self.getAmodOnly(healthStatus)
-              if len(amod) != 0:
-                healthStatus = (amod, healthStatus)
+              healthStatusAmod = self.getAmodOnly(healthStatus)
+            else:
+              # identify the dobj/pobj, and use it as append info
+              healthStatusAppend = headEnt
+              healthStatusAppendAmod = self.getAmodOnly(headEnt)
           elif entRoot.dep_ in ['conj']:
             # TODO: recursive function to retrieve non-conj
             healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
@@ -799,21 +811,26 @@ class RuleBasedMatcher(object):
         else:
           # handle short phrase
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
+          # search right
+          if not ent[-1].is_sent_end:
+            start = ent.end
+            end = None
+            for i, tk in enumerate(sent.doc[ent.end:sent[-1].i]):
+              if tk == sent.doc[tk.i-1].head:
+                end = tk.i+1
+              else:
+                break
+            if end is not None:
+              healthStatusAppend = sent.doc[start:end]
+              healthStatusAppendAmod = self.getAmodOnly(healthStatusAppend)
+
           if healthStatus is None:
-            # search right
-            if not ent[-1].is_sent_end:
-              start = ent.end
-              end = None
-              for i, tk in enumerate(sent.doc[ent.end:sent[-1].i]):
-                if tk == sent.doc[tk.i-1].head:
-                  end = tk.i+1
-                else:
-                  break
-              if end is not None:
-                healthStatus = sent.doc[start:end]
-                amod = self.getAmodOnly(healthStatus)
-                if len(amod) != 0:
-                  healthStatus = (amod, healthStatus)
+            healthStatus = healthStatusAppend
+            healthStatusAmod = healthStatusAppendAmod
+            # reset
+            healthStatusAppend = None
+            healthStatusAppendAmod = None
+
           # handle conjuncts
           if healthStatus is None and len(ent.conjuncts) > 0:
             conjunct = sent.doc[ent.conjuncts[0].i: ent.conjuncts[0].i+1]
@@ -825,9 +842,7 @@ class RuleBasedMatcher(object):
               ent._.set('conjecture',conjunct._.conjecture)
         if healthStatus is None:
           continue
-        amod = None
-        if isinstance(healthStatus, tuple):
-          amod, healthStatus = healthStatus[0], healthStatus[1]
+
         if isinstance(healthStatus, Span):
           conjecture = self.isConjecture(healthStatus.root.head)
         elif isinstance(healthStatus, Token):
@@ -839,11 +854,11 @@ class RuleBasedMatcher(object):
             neg, negText = self.isNegation(healthStatus)
         # conjecture = self.isConjecture(healthStatus.head)
         # neg, negText = self.isNegation(healthStatus)
-        if amod is not None:
-          amodText = ' '.join(amod)
-          healthStatusText = ' '.join([amodText, healthStatus.text])
-        else:
-          healthStatusText = healthStatus.text
+
+        amodText = ' '.join(healthStatusAmod) if healthStatusAmod is not None else ''
+        appendAmodText = ' '.join(healthStatusAppendAmod) if healthStatusAppendAmod is not None else ''
+        appText = healthStatusAppend.text if healthStatusAppend is not None else ''
+        healthStatusText = ' '.join([amodText, healthStatus.text, appendAmodText,appText]).strip()
         if neg:
           healthStatusText = ' '.join([negText,healthStatusText])
         logger.debug(f'{ent} health status: {healthStatusText}')
@@ -918,7 +933,10 @@ class RuleBasedMatcher(object):
       # print("child", child, child.dep_)
       if child.dep_ in deps:
         # to handle preposition
-        nbor = child.nbor()
+        try:
+          nbor = child.nbor()
+        except IndexError:
+          pass # ignore for now
         # TODO, what else need to be added
         # can not use the first check only, since is nbor is 'during', it will also satisfy the check condition
         # if (nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of', 'in']) or nbor.pos_ in ['VERB']:
