@@ -497,6 +497,20 @@ class RuleBasedMatcher(object):
     amod = [tk.text for tk in ent.lefts if tk.dep_ in ['amod']]
     return amod
 
+  def getCompoundOnly(self, headEnt, ent):
+    """
+      Get the compounds for headEnt except ent
+      @ In, headEnt, Span, the head entity to ent
+      @ Out, compDes, list, the list of compounds for head ent
+    """
+    compDes = []
+    comp = [tk for tk in headEnt.lefts if tk.dep_ in ['compound'] and tk not in ent]
+    if len(comp) > 0:
+      for elem in comp:
+        des = [tk.text for tk in elem.lefts if tk.dep_ in ['amod', 'compound']]
+        compDes.extend(des)
+        compDes.append(elem.text)
+    return compDes
 
   def getHealthStatusForSubj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
@@ -707,6 +721,8 @@ class RuleBasedMatcher(object):
         healthStatusAmod = None    # store amod for health status
         healthStatusAppend = None  # store some append info for health status (used for short phrase)
         healthStatusAppendAmod = None # store amod info for health status append info
+        healthStatusPrepend = None  # store some prepend info
+        healthStatusPrependAmod = None # store amod info for prepend info
         conjecture = False
         passive = False
         entRoot = ent.root
@@ -738,8 +754,15 @@ class RuleBasedMatcher(object):
                 if isinstance(healthStatus, Span):
                   if entRoot.i >= healthStatus.start and entRoot.i < healthStatus.end:
                     healthStatus = headEnt
+                if healthStatus is not None:
+                  healthStatusPrepend = headEnt
+                  healthStatusPrependAmod = self.getAmodOnly(headEnt)
               elif head.dep_ in ['dobj', 'pobj']:
                 healthStatus, neg, negText = self.getHealthStatusForObj(headEnt, ent, sent, causalStatus, predSynonyms, include=True)
+                if healthStatus is not None:
+                  # identify the dobj/pobj, and use it as append info
+                  healthStatusAppend = headEnt
+                  healthStatusAppendAmod = self.getAmodOnly(headEnt)
             if healthStatus is None:
               healthStatus = entRoot.head
               healthStatusAmod = self.getAmodOnly(healthStatus)
@@ -751,10 +774,7 @@ class RuleBasedMatcher(object):
                     lefts.remove(elem)
                 if len(lefts) != 0:
                   healthStatusAmod = [e.text for e in lefts]
-            else:
-              # identify the dobj/pobj, and use it as append info
-              healthStatusAppend = headEnt
-              healthStatusAppendAmod = self.getAmodOnly(headEnt)
+
           elif entRoot.dep_ in ['conj']:
             # TODO: recursive function to retrieve non-conj
             healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
@@ -820,6 +840,8 @@ class RuleBasedMatcher(object):
           # handle short phrase
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
           # search right
+          start = None
+          end = None
           if not ent[-1].is_sent_end and ent[-1].dep_ in ['compound']:
             start = ent.end
             end = None
@@ -828,12 +850,16 @@ class RuleBasedMatcher(object):
                 end = tk.i+1
               else:
                 break
-            if end is not None:
-              healthStatusAppend = sent.doc[start:end]
-            else:
+          if end is not None:
+            healthStatusAppend = sent.doc[start:end]
+          else:
+            if ent[-1].head != ent[-1]:
               ind = ent[-1].head.i
               healthStatusAppend = sent.doc[ind:ind+1]
+          if healthStatusAppend is not None:
             healthStatusAppendAmod = self.getAmodOnly(healthStatusAppend)
+            if not healthStatusAppendAmod:
+              healthStatusAppendAmod = self.getCompoundOnly(healthStatusAppend, ent)
             for elem in healthStatusAppendAmod:
               if elem in ent.text:
                 healthStatusAppendAmod.remove(elem)
@@ -869,14 +895,15 @@ class RuleBasedMatcher(object):
         # conjecture = self.isConjecture(healthStatus.head)
         # neg, negText = self.isNegation(healthStatus)
 
+        prependAmodText = ' '.join(healthStatusPrependAmod) if healthStatusPrependAmod is not None else ''
+        prependText = healthStatusPrepend.text if healthStatusPrepend is not None else ''
         amodText = ' '.join(healthStatusAmod) if healthStatusAmod is not None else ''
         appendAmodText = ' '.join(healthStatusAppendAmod) if healthStatusAppendAmod is not None else ''
         if healthStatusAppend is not None:
-
           appText = healthStatusAppend.root.head.text + ' ' + healthStatusAppend.text if healthStatusAppend.root.dep_ in ['pobj'] else healthStatusAppend.text
         else:
           appText = ''
-        healthStatusText = ' '.join(list(filter(None, [amodText, healthStatus.text, appendAmodText,appText]))).strip()
+        healthStatusText = ' '.join(list(filter(None, [prependAmodText, prependText, amodText, healthStatus.text, appendAmodText,appText]))).strip()
         if neg:
           healthStatusText = ' '.join([negText,healthStatusText])
         logger.debug(f'{ent} health status: {healthStatusText}')
