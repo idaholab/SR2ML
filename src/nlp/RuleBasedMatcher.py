@@ -743,6 +743,14 @@ class RuleBasedMatcher(object):
             if healthStatus is None:
               healthStatus = entRoot.head
               healthStatusAmod = self.getAmodOnly(healthStatus)
+              if len(healthStatusAmod) == 0:
+                lefts = list(healthStatus.lefts)
+                # remove entity itself
+                for elem in lefts:
+                  if elem in ent:
+                    lefts.remove(elem)
+                if len(lefts) != 0:
+                  healthStatusAmod = [e.text for e in lefts]
             else:
               # identify the dobj/pobj, and use it as append info
               healthStatusAppend = headEnt
@@ -812,7 +820,7 @@ class RuleBasedMatcher(object):
           # handle short phrase
           healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
           # search right
-          if not ent[-1].is_sent_end:
+          if not ent[-1].is_sent_end and ent[-1].dep_ in ['compound']:
             start = ent.end
             end = None
             for i, tk in enumerate(sent.doc[ent.end:sent[-1].i]):
@@ -822,7 +830,13 @@ class RuleBasedMatcher(object):
                 break
             if end is not None:
               healthStatusAppend = sent.doc[start:end]
-              healthStatusAppendAmod = self.getAmodOnly(healthStatusAppend)
+            else:
+              ind = ent[-1].head.i
+              healthStatusAppend = sent.doc[ind:ind+1]
+            healthStatusAppendAmod = self.getAmodOnly(healthStatusAppend)
+            for elem in healthStatusAppendAmod:
+              if elem in ent.text:
+                healthStatusAppendAmod.remove(elem)
 
           if healthStatus is None:
             healthStatus = healthStatusAppend
@@ -857,8 +871,12 @@ class RuleBasedMatcher(object):
 
         amodText = ' '.join(healthStatusAmod) if healthStatusAmod is not None else ''
         appendAmodText = ' '.join(healthStatusAppendAmod) if healthStatusAppendAmod is not None else ''
-        appText = healthStatusAppend.text if healthStatusAppend is not None else ''
-        healthStatusText = ' '.join([amodText, healthStatus.text, appendAmodText,appText]).strip()
+        if healthStatusAppend is not None:
+
+          appText = healthStatusAppend.root.head.text + ' ' + healthStatusAppend.text if healthStatusAppend.root.dep_ in ['pobj'] else healthStatusAppend.text
+        else:
+          appText = ''
+        healthStatusText = ' '.join(list(filter(None, [amodText, healthStatus.text, appendAmodText,appText]))).strip()
         if neg:
           healthStatusText = ' '.join([negText,healthStatusText])
         logger.debug(f'{ent} health status: {healthStatusText}')
@@ -913,8 +931,9 @@ class RuleBasedMatcher(object):
     for right in pred.rights:
       pos = right.pos_
       if pos in ['VERB', 'NOUN', 'ADJ']:
-        if [right.lemma_.lower()] in self._statusKeywords[pos]:
-          return right
+        # skip check to remove the limitation of status only in status keywords list
+        # if [right.lemma_.lower()] in self._statusKeywords[pos]:
+        return right
     return None
 
   def findHealthStatus(self, root, deps):
