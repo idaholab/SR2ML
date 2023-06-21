@@ -144,6 +144,19 @@ class RuleBasedMatcher(object):
     self._causalSentsOneEnt = []
     self._entHS = None
 
+  def reset(self):
+    """
+      Reset rule-based matcher
+    """
+    self._matchedSents = []
+    self._matchedSentsForVis = []
+    self._extractedCausals = []
+    self._causalSentsNoEnts = []
+    self._rawCausalList = []
+    self._causalSentsOneEnt = []
+    self._entHS = None
+    self._doc = None
+
   def getKeywords(self, filename):
     """
       Get the keywords from given file
@@ -418,14 +431,15 @@ class RuleBasedMatcher(object):
     parent = root.head
     causalStatus = [grandparent.lemma_.lower()] in self._causalKeywords['VERB'] and [grandparent.lemma_.lower()] not in self._statusKeywords['VERB']
     if grandparent.dep_ in ['dobj', 'nsubj', 'nsubjpass', 'pobj']:
+      leftInd = list(grandparent.lefts)[0].i
       if not include:
         rights = list(grandparent.rights)
         if grandparent.n_rights > 1 and rights[-1] == parent:
-          healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:rights[-1].i]
+          healthStatus = grandparent.doc[leftInd:rights[-1].i]
         else:
-          healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:grandparent.i+1]
+          healthStatus = grandparent.doc[leftInd:grandparent.i+1]
       else:
-        healthStatus = grandparent.doc[grandparent.i-grandparent.n_lefts:end]
+        healthStatus = grandparent.doc[leftInd:end]
       healthStatus = self.getAmod(healthStatus, healthStatus.start, healthStatus.end, include=True)
     elif grandparent.pos_ in ['VERB'] and causalStatus:
       healthStatus = self.findRightObj(grandparent)
@@ -460,10 +474,11 @@ class RuleBasedMatcher(object):
       @ In, include, bool, include ent in the returned expression if True
       @ Out, healthStatus, Span or Token, the identified status
     """
+    leftInd = list(ent.lefts)[0].i
     if not include:
-      healthStatus = ent.doc[start-ent.n_lefts:start]
+      healthStatus = ent.doc[leftInd:start]
     else:
-      healthStatus = ent.doc[start-ent.n_lefts:end]
+      healthStatus = ent.doc[leftInd:end]
     return healthStatus
 
   def getAmod(self, ent, start, end, include = False):
@@ -507,7 +522,7 @@ class RuleBasedMatcher(object):
     comp = [tk for tk in headEnt.lefts if tk.dep_ in ['compound'] and tk not in ent]
     if len(comp) > 0:
       for elem in comp:
-        des = [tk.text for tk in elem.lefts if tk.dep_ in ['amod', 'compound']]
+        des = [tk.text for tk in elem.lefts if tk.dep_ in ['amod', 'compound'] and tk not in ent]
         compDes.extend(des)
         compDes.append(elem.text)
     return compDes
@@ -627,7 +642,8 @@ class RuleBasedMatcher(object):
         else:
           healthStatus = root
       elif root.pos_ in ['AUX']:
-        healthStatus = root.doc[root.i-root.n_lefts:root.i]
+        leftInd = list(root.lefts)[0].i
+        healthStatus = root.doc[leftInd:root.i]
       else:
         logger.warning(f'No status identified for "{ent}" in "{sent}"')
     else:
@@ -852,7 +868,10 @@ class RuleBasedMatcher(object):
           if not ent[-1].is_sent_end and ent[-1].dep_ in ['compound']:
             start = ent.end
             end = None
-            for i, tk in enumerate(sent.doc[ent.end:sent[-1].i]):
+            for i, tk in enumerate(sent.doc[ent.end:sent[-1].i+1]):
+              # assume SPACE got removed already
+              if tk.pos_ in ['PUNCT']:
+                break
               if tk == sent.doc[tk.i-1].head:
                 end = tk.i+1
               else:
