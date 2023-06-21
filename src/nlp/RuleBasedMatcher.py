@@ -734,6 +734,13 @@ class RuleBasedMatcher(object):
           elif entRoot.dep_ in ['pobj', 'dobj']:
             if len(ents) == 1 or entRoot.dep_ in ['dobj']:
               healthStatus, neg, negText = self.getHealthStatusForObj(ent, ent, sent, causalStatus, predSynonyms)
+              if entRoot.dep_ in ['pobj']:
+                # extract append info for health status
+                prep = entRoot.head
+                healthStatusAppendAmod = self.getCompoundOnly(ent, ent)
+                if len(healthStatusAppendAmod) > 0:
+                  healthStatusAppendAmod = [prep.text] + healthStatusAppendAmod
+                  healthStatusAppend = ent
             else:
               healthStatus = self.getHealthStatusForPobj(ent, include=False)
             if healthStatus is None:
@@ -899,7 +906,7 @@ class RuleBasedMatcher(object):
         prependText = healthStatusPrepend.text if healthStatusPrepend is not None else ''
         amodText = ' '.join(healthStatusAmod) if healthStatusAmod is not None else ''
         appendAmodText = ' '.join(healthStatusAppendAmod) if healthStatusAppendAmod is not None else ''
-        if healthStatusAppend is not None:
+        if healthStatusAppend is not None and healthStatusAppend != ent:
           appText = healthStatusAppend.root.head.text + ' ' + healthStatusAppend.text if healthStatusAppend.root.dep_ in ['pobj'] else healthStatusAppend.text
         else:
           appText = ''
