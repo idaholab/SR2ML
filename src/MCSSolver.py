@@ -79,6 +79,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
     self.solver['setType'] = None # type of set provided by the user: path sets for cut sets
+    self.fullListBE = None        # list of BEs 
 
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
     setTypes = ['path','cut']
@@ -155,9 +156,10 @@ class MCSSolver(ExternalModelPluginBase):
         elif input.__getstate__()['type'] == 'BElist':
           self.fullListBE = beReader(input.getFilename())
     # Check list of BEs
-    missingBEs = set(self.beList) - set(self.fullListBE)
-    if len(missingBEs)>0:
-      raise IOError("MCSSolver: there are BEs in the MCSs not defined in the BE file: " +str(missingBEs))
+    if self.fullListBE is not None:
+      missingBEs = set(self.beList) - set(self.fullListBE)
+      if len(missingBEs)>0:
+        raise IOError("MCSSolver: there are BEs in the MCSs not defined in the BE file: " +str(missingBEs))
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
     #       then mcsList = [MCS1,MCS2,MCS3] =
