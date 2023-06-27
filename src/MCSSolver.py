@@ -79,7 +79,7 @@ class MCSSolver(ExternalModelPluginBase):
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
     self.solver['setType'] = None # type of set provided by the user: path sets for cut sets
-    self.fullListBE = None        # list of BEs 
+    self.fullListBE = None        # list of BEs
 
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
     setTypes = ['path','cut']
