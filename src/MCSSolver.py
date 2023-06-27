@@ -78,6 +78,8 @@ class MCSSolver(ExternalModelPluginBase):
     container.beId       = None  # ID of the variable containing the IDs of the BEs
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
+    self.solver['setType'] = None # type of set provided by the user: path sets for cut sets
+
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
     setTypes = ['path','cut']
 
@@ -119,13 +121,16 @@ class MCSSolver(ExternalModelPluginBase):
         container.invMapping[child.text.strip()] = child.get('var')
       else:
         raise IOError("MCSSolver: xml node " + str(child.tag) + " is not allowed")
-    
+
+    if self.solver['setType'] == None:
+      ("MCSSolver: set type in xml node setType has not been specified (cut,or path)")
+
     if not bool(container.mapping):
       variables.remove(container.topEventID)
       for variable in (variables):
         container.mapping[variable] = variable
         container.invMapping[variable] = variable
-  
+
   def createNewInput(self, container, inputs, samplerType, **kwargs):
     """
       This function has been added for this model in order to generate the terms in each order
@@ -257,17 +262,20 @@ class MCSSolver(ExternalModelPluginBase):
         container.__dict__[keyID] = sensitivities[key]
 
 
-  def marginSensitivities(self, MsysBase, inputDict):
+  def marginSensitivities(self, MsysBase, inputDict, epsilon = 0.01):
     """
       This method calculates the sensitivity (derivative based) of the top event margin vs. basic event margin
-      @ In, inputs, inputDict, dictionary containing the probability  value of all basic events
+      @ In, inputDict, dictionary containing the probability  value of all basic events
       @ In, MsysBase, float, base top event margin
       @ Out, sensDict, dict, dictionary containing the sensitivity values of all basic events
     """
     sensDict={}
-    epsilon = 0.01
     for key in inputDict:
       tempDict = copy.deepcopy(inputDict)
+      # The sensitivitiy of each basic event is calculated in a derivative form as d M_sys/d M_be
+      # Thus it is needed to calculate:
+      #   * M_sys with nominal value of M_be
+      #   * M_sys with modified value of M_be as M_be*(1.-epsilon)
       tempDict[key] = tempDict[key] * (1.-epsilon)
       deltaMsys = self.mcsSolverMargin(tempDict)
       sensDict[key] = (MsysBase - deltaMsys) / (inputDict[key] - tempDict[key])
@@ -278,7 +286,7 @@ class MCSSolver(ExternalModelPluginBase):
   def mcsSolverProbability(self, inputDict):
     """
       This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
-      @ In, inputs, inputDict, dictionary containing the probability value of all basic events
+      @ In, inputDict, dictionary containing the probability value of all basic events
       @ Out, teProbability, float, probability value of the top event
     """
     teProbability = 0.0
@@ -350,7 +358,7 @@ class MCSSolver(ExternalModelPluginBase):
 
     return basicEventHistorySet
 
-  
+
 def beReader(fileID):
   data = pd.read_csv(fileID)
   fromList = ['FALSE','TRUE']

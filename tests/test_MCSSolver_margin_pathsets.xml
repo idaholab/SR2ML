@@ -25,8 +25,8 @@
 
   <Models>
     <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
-      <variables>statusA,statusB,statusC,statusD,statusE,
-                 TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</variables>
+      <inputs>statusA,statusB,statusC,statusD,statusE</inputs>
+      <outputs>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</outputs>
       <solver type='margin'>
         <metric>2</metric>
         <setType>path</setType>
