@@ -46,6 +46,7 @@
       <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
       <solver type='margin'>
         <metric>2</metric>
+        <setType>cut</setType>
       </solver>
       <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>

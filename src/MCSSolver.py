@@ -83,6 +83,7 @@ class MCSSolver(ExternalModelPluginBase):
 
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
     setTypes = ['path','cut']
+    externalModelNodes = ['inputs','outputs']
 
     for child in xmlNode:
       if child.tag == 'topEventID':
@@ -120,7 +121,7 @@ class MCSSolver(ExternalModelPluginBase):
       elif child.tag == 'map':
         container.mapping[child.get('var')]      = child.text.strip()
         container.invMapping[child.text.strip()] = child.get('var')
-      else:
+      elif child.tag not in externalModelNodes:
         raise IOError("MCSSolver: xml node " + str(child.tag) + " is not allowed")
 
     if self.solver['setType'] == None:
@@ -323,7 +324,6 @@ class MCSSolver(ExternalModelPluginBase):
         mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
       else:
         mcsMargins[index] = np.amin(termValues)
-
     if self.solver['setType']=='cut':
       teMargin = np.amin(mcsMargins)
     else:
