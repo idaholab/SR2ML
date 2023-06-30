@@ -431,7 +431,11 @@ class RuleBasedMatcher(object):
     parent = root.head
     causalStatus = [grandparent.lemma_.lower()] in self._causalKeywords['VERB'] and [grandparent.lemma_.lower()] not in self._statusKeywords['VERB']
     if grandparent.dep_ in ['dobj', 'nsubj', 'nsubjpass', 'pobj']:
-      leftInd = list(grandparent.lefts)[0].i
+      lefts = list(grandparent.lefts)
+      if len(lefts) == 0:
+        leftInd = grandparent.i
+      else:
+        leftInd = lefts[0].i
       if not include:
         rights = list(grandparent.rights)
         if grandparent.n_rights > 1 and rights[-1] == parent:
