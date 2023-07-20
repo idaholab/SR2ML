@@ -156,6 +156,7 @@ def generatePatternList(entList, label, id, nlp, attr="LOWER"):
       ent = extractLemma(ent, nlp)
       # print('ent lemma: --->', ent)
       ptnLemma = generatePattern(ent, label, id, attr)
+      # print(ptnLemma)
       ptnList.append(ptnLemma)
   return ptnList
 

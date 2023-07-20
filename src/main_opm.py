@@ -21,10 +21,12 @@ import argparse
 # sys.path.append(sr2mlPath)
 
 # OPL parser to generate object and process lists
-from utils.nlpUtils.OPLparser import OPLentityParser
+from utils.nlpUtils.OPLparser import OPMobject
 
 
+# logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.ERROR)
 logging.basicConfig(format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+
 # To enable the logging to both file and console, the logger for the main should be the root,
 # otherwise, a function to add the file handler and stream handler need to be created and called by each module.
 # logger = logging.getLogger(__name__)
@@ -48,7 +50,10 @@ if __name__ == "__main__":
   # some modifications, bearings --> pump bearings
   if 'opm_file' in config.nlpConfig['files']:
     opmFile = config.nlpConfig['files']['opm_file']
-    formList, functionList = OPLentityParser(opmFile)
+    opmObj = OPMobject(opmFile)
+    formList = opmObj.returnObjectList()
+    functionList = opmObj.returnProcessList()
+    attributeList = opmObj.returnAttributeList()
     ents.extend(formList)
   if 'entity_file' in config.nlpConfig['files']:
     entityFile = config.nlpConfig['files']['entity_file']
