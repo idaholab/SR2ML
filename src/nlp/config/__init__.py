@@ -5,8 +5,8 @@ import tomli
 import os
 
 # configFileName = 'nlp_config.toml'
-# configFileName = 'nlp_config_ler.toml'
-configFileName = 'nlp_config_cws.toml'
+configFileName = 'nlp_config_ler.toml'
+#configFileName = 'nlp_config_cws.toml'
 
 path = pathlib.Path(os.path.join(pathlib.Path(__file__).parent, configFileName))
 with path.open(mode="rb") as fp:
