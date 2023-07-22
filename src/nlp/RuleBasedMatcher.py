@@ -744,6 +744,7 @@ class RuleBasedMatcher(object):
         healthStatusAppendAmod = None # store amod info for health status append info
         healthStatusPrepend = None  # store some prepend info
         healthStatusPrependAmod = None # store amod info for prepend info
+        healthStatusText = None
         conjecture = False
         passive = False
         entRoot = ent.root
@@ -799,6 +800,8 @@ class RuleBasedMatcher(object):
                         # identify the dobj/pobj, and use it as append info
                         healthStatusAppend = headEnt
                         healthStatusAppendAmod = self.getAmodOnly(headEnt)
+                if healthStatus is None:
+                  healthStatus = headEnt
               else:
                 healthStatus = entRoot.head
                 healthStatusAmod = self.getAmodOnly(healthStatus)
@@ -810,6 +813,8 @@ class RuleBasedMatcher(object):
                       lefts.remove(elem)
                   if len(lefts) != 0:
                     healthStatusAmod = [e.text for e in lefts]
+                if head.dep_ in ['dobj','pobj','nsubj', 'nsubjpass'] and [root.lemma_.lower()] in predSynonyms:
+                  ent._.set('hs_keyword', root.lemma_)
             else:
               healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
 
@@ -948,8 +953,11 @@ class RuleBasedMatcher(object):
         healthStatusText = ' '.join(list(filter(None, [prependAmodText, prependText, amodText, healthStatus.text, appendAmodText,appText]))).strip()
         if neg:
           healthStatusText = ' '.join([negText,healthStatusText])
-        # remove entity info in healthStatusTest
-        healthStatusText = healthStatusText.replace(ent.text, '')
+
+        if isinstance(healthStatus, Span):
+          if ent.start > healthStatus.start and ent.end < healthStatus.end:
+            # remove entity info in healthStatusTest
+            healthStatusText = healthStatusText.replace(ent.text, '')
 
         logger.debug(f'{ent} health status: {healthStatusText}')
         ent._.set('health_status', healthStatusText)
