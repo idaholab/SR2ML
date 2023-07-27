@@ -6,6 +6,7 @@ Created on March, 2022
 @author: wangc, mandd
 """
 import pandas as pd
+import re
 import copy
 import spacy
 from spacy.matcher import Matcher
@@ -953,11 +954,12 @@ class RuleBasedMatcher(object):
         healthStatusText = ' '.join(list(filter(None, [prependAmodText, prependText, amodText, healthStatus.text, appendAmodText,appText]))).strip()
         if neg:
           healthStatusText = ' '.join([negText,healthStatusText])
-
         if isinstance(healthStatus, Span):
           if ent.start > healthStatus.start and ent.end < healthStatus.end:
-            # remove entity info in healthStatusTest
-            healthStatusText = healthStatusText.replace(ent.text, '')
+            # remove entity info in healthStatusText
+            pn = re.compile(rf'{ent.text}\w*')
+            healthStatusText = re.sub(pn, '', healthStatusText).strip()
+            # healthStatusText = healthStatusText.replace(ent.text, '')
 
         logger.debug(f'{ent} health status: {healthStatusText}')
         ent._.set('health_status', healthStatusText)
