@@ -11,6 +11,7 @@ import spacy
 from nlp.CreatePatterns import CreatePatterns
 from nlp.ConjectureEntity import ConjectureEntity
 from nlp.GeneralEntity import GeneralEntity
+from nlp.TemporalAttributeEntity import TemporalAttributeEntity
 # sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # sys.path.append(sr2mlPath)
 
@@ -43,15 +44,22 @@ if __name__ == "__main__":
 Rupture of pump bearings likely caused shaft degradation.
 Pump power supply seems burnout.
 Pump test failed unlikely due to power supply failure.
+The valve is about a twenty-nine years old.
+It is almost five years since it was replaced.
         """
 
+  #########################
+  #  Testing conjecture_entity pipeline
+  #########################
   # nlp.add_pipe('conjecture_entity', config={"patterns":patterns})
   nlp.add_pipe('conjecture_entity')
   newDoc = nlp(doc)
   ents = [ent for ent in newDoc.ents if ent.label_=='conjecture']
   print('conjecture:', ents)
 
-
+  #########################
+  #  Testing general_entity pipeline
+  #########################
   filename = '~/projects/raven/plugins/SR2ML/src/nlp/data/conjecture_keywords.csv'
   ###################################################################
   conjecturePatterns = CreatePatterns(filename, entLabel='general', nlp=nlp)
@@ -62,3 +70,11 @@ Pump test failed unlikely due to power supply failure.
   entsConjecture = [ent for ent in newDoc.ents if ent.label_=='conjecture']
   print('general:', ents)
   print('conjecture:', entsConjecture)
+
+  #########################
+  #  Testing temporal_attribute_entity pipeline
+  #########################
+  nlp.add_pipe('temporal_attribute_entity')
+  newDoc = nlp(doc)
+  ents = [ent for ent in newDoc.ents if ent.label_=='temporal_attribute']
+  print('temporal_attribute:', ents)

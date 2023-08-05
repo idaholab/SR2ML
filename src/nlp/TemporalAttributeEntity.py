@@ -5,24 +5,24 @@ from .CreatePatterns import CreatePatterns
 import logging
 logger = logging.getLogger(__name__)
 
-@Language.factory("conjecture_entity", default_config={"patterns": None,  "asSpan":True})
-def create_conjecture_component(nlp, name, patterns, asSpan):
-  return ConjectureEntity(nlp, patterns=patterns, asSpan=asSpan)
+@Language.factory("temporal_attribute_entity", default_config={"patterns": None,  "asSpan":True})
+def create_temporal_attribute_component(nlp, name, patterns, asSpan):
+  return TemporalAttributeEntity(nlp, patterns=patterns, asSpan=asSpan)
 
 
-class ConjectureEntity(object):
+class TemporalAttributeEntity(object):
   """
     How to use it:
-    from ConjectureEntity import ConjectureEntity
+    from TemporalAttributeEntity import TemporalAttributeEntity
     nlp = spacy.load("en_core_web_sm")
-    patterns = {'label': 'conjecture', 'pattern': [{'LOWER': 'possible'}], 'id': 'conjecture'}
+    patterns = {'label': 'temporal_attribute', 'pattern': [{'LOWER': 'possible'}], 'id': 'temporal_attribute'}
     cmatcher = ConjectureEntity(nlp, patterns)
-    doc = nlp("Vibration seems like it is coming from the shaft.")
+    doc = nlp("It is close to 5pm.")
     updatedDoc = cmatcher(doc)
 
     or:
 
-    nlp.add_pipe('conjecture_entity', config={"patterns": {'label': 'conjecture', 'pattern': [{'LOWER': 'possible'}], 'id': 'conjecture'}, "asSpan":True})
+    nlp.add_pipe('temporal_attribute_entity', config={"patterns": {'label': 'temporal_attribute_entity', 'pattern': [{'LOWER': 'possible'}], 'id': 'temporal_attribute_entity'}, "asSpan":True})
     newDoc = nlp(doc.text)
   """
 
@@ -32,13 +32,13 @@ class ConjectureEntity(object):
       @ label, str, the name/label for the patterns in terms
       @ patterns, list/dict,
     """
-    self.name = 'conjecture_entity'
+    self.name = 'temporal_attribute_entity'
     if patterns is None:
       # update to use config file instead
-      # filename = nlpConfig['files']['conjecture_keywords_file']
-      filename = '~/projects/raven/plugins/SR2ML/src/nlp/data/conjecture_keywords.csv'
-      conjecturePatterns = CreatePatterns(filename, entLabel='conjecture', nlp=nlp)
-      patterns = conjecturePatterns.getPatterns()
+      # filename = nlpConfig['files']['time_keywords_file']
+      filename = '~/projects/raven/plugins/SR2ML/src/nlp/data/time_keywords.csv'
+      temporalPatterns = CreatePatterns(filename, entLabel='temporal_attribute', nlp=nlp)
+      patterns = temporalPatterns.getPatterns()
     if not isinstance(patterns, list) and isinstance(patterns, dict):
       patterns = [patterns]
     # do we need to pop out other pipes?

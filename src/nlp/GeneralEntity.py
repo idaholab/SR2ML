@@ -29,8 +29,7 @@ class GeneralEntity(object):
     """
       @ In, nlp
       @ label, str, the name/label for the patterns in terms
-      @ terms, list, the phrase list, for example:
-        phraseList = ["hello", "world"]
+      @ patterns, list/dict,
     """
     self.name = 'general_entity'
     if not isinstance(patterns, list) and isinstance(patterns, dict):
