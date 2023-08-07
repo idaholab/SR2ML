@@ -5,9 +5,9 @@ from .CreatePatterns import CreatePatterns
 import logging
 logger = logging.getLogger(__name__)
 
-@Language.factory("conjecture_entity", default_config={"patterns": None,  "asSpan":True})
-def create_conjecture_component(nlp, name, patterns, asSpan):
-  return ConjectureEntity(nlp, patterns=patterns, asSpan=asSpan)
+@Language.factory("conjecture_entity", default_config={"patterns": None})
+def create_conjecture_component(nlp, name, patterns):
+  return ConjectureEntity(nlp, patterns=patterns)
 
 
 class ConjectureEntity(object):
@@ -26,7 +26,7 @@ class ConjectureEntity(object):
     newDoc = nlp(doc.text)
   """
 
-  def __init__(self, nlp, patterns=None, asSpan=True, callback=None):
+  def __init__(self, nlp, patterns=None, callback=None):
     """
       @ In, nlp
       @ label, str, the name/label for the patterns in terms
@@ -46,7 +46,6 @@ class ConjectureEntity(object):
       nlp.add_pipe('entity_ruler')
     self.entityRuler = nlp.get_pipe('entity_ruler')
     self.entityRuler.add_patterns(patterns)
-    self.asSpan = asSpan
 
   def __call__(self, doc):
     """

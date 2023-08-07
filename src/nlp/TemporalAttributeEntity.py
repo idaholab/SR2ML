@@ -5,9 +5,9 @@ from .CreatePatterns import CreatePatterns
 import logging
 logger = logging.getLogger(__name__)
 
-@Language.factory("temporal_attribute_entity", default_config={"patterns": None,  "asSpan":True})
-def create_temporal_attribute_component(nlp, name, patterns, asSpan):
-  return TemporalAttributeEntity(nlp, patterns=patterns, asSpan=asSpan)
+@Language.factory("temporal_attribute_entity", default_config={"patterns": None})
+def create_temporal_attribute_component(nlp, name, patterns):
+  return TemporalAttributeEntity(nlp, patterns=patterns)
 
 
 class TemporalAttributeEntity(object):
@@ -26,7 +26,7 @@ class TemporalAttributeEntity(object):
     newDoc = nlp(doc.text)
   """
 
-  def __init__(self, nlp, patterns=None, asSpan=True, callback=None):
+  def __init__(self, nlp, patterns=None, callback=None):
     """
       @ In, nlp
       @ label, str, the name/label for the patterns in terms
@@ -46,7 +46,6 @@ class TemporalAttributeEntity(object):
       nlp.add_pipe('entity_ruler')
     self.entityRuler = nlp.get_pipe('entity_ruler')
     self.entityRuler.add_patterns(patterns)
-    self.asSpan = asSpan
 
   def __call__(self, doc):
     """
