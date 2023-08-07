@@ -13,6 +13,7 @@ from nlp.ConjectureEntity import ConjectureEntity
 from nlp.GeneralEntity import GeneralEntity
 from nlp.TemporalAttributeEntity import TemporalAttributeEntity
 from nlp.TemporalRelationEntity import TemporalRelationEntity
+from nlp.LocationEntity import LocationEntity
 # sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # sys.path.append(sr2mlPath)
 
@@ -50,6 +51,9 @@ It is almost five years since it was replaced.
 The pump failed first, then the system failed.
 The system failed following the pump failure.
 The motor failed while the pump stopped working.
+The water leakage is happened above the pump.
+The oil puddle is found next to the motor.
+The debris is located below the generator.
         """
 
   #########################
@@ -95,3 +99,15 @@ The motor failed while the pump stopped working.
   print('temporal_relation_reverse_order:', ents)
   ents = [ent for ent in newDoc.ents if ent.label_=='temporal_relation_concurrency']
   print('temporal_relation_concurrency:', ents)
+
+  #########################
+  #  Testing location_entity pipeline
+  #########################
+  nlp.add_pipe('location_entity')
+  newDoc = nlp(doc)
+  ents = [ent for ent in newDoc.ents if ent.label_=='location_proximity']
+  print('location_proximity:', ents)
+  ents = [ent for ent in newDoc.ents if ent.label_=='location_up']
+  print('location_up:', ents)
+  ents = [ent for ent in newDoc.ents if ent.label_=='location_down']
+  print('location_down:', ents)

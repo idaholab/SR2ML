@@ -1,5 +1,4 @@
 from spacy.language import Language
-from .CreatePatterns import CreatePatterns
 import pandas as pd
 from nlp.nlp_utils import generatePatternList
 # from .config import nlpConfig
@@ -19,7 +18,7 @@ class TemporalRelationEntity(object):
     nlp = spacy.load("en_core_web_sm")
     patterns = {'label': 'temporal_relation', 'pattern': [{'LOWER': 'follow'}], 'id': 'temporal_relation'}
     cmatcher = ConjectureEntity(nlp, patterns)
-    doc = nlp("It is close to 5pm.")
+    doc = nlp("The system failed following the pump failure.")
     updatedDoc = cmatcher(doc)
 
     or:
