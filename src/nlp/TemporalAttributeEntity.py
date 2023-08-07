@@ -15,14 +15,14 @@ class TemporalAttributeEntity(object):
     How to use it:
     from TemporalAttributeEntity import TemporalAttributeEntity
     nlp = spacy.load("en_core_web_sm")
-    patterns = {'label': 'temporal_attribute', 'pattern': [{'LOWER': 'possible'}], 'id': 'temporal_attribute'}
+    patterns = {'label': 'temporal_attribute', 'pattern': [{'LOWER': 'about'}], 'id': 'temporal_attribute'}
     cmatcher = ConjectureEntity(nlp, patterns)
     doc = nlp("It is close to 5pm.")
     updatedDoc = cmatcher(doc)
 
     or:
 
-    nlp.add_pipe('temporal_attribute_entity', config={"patterns": {'label': 'temporal_attribute_entity', 'pattern': [{'LOWER': 'possible'}], 'id': 'temporal_attribute_entity'}, "asSpan":True})
+    nlp.add_pipe('temporal_attribute_entity', config={"patterns": {'label': 'temporal_attribute_entity', 'pattern': [{'LOWER': 'about'}], 'id': 'temporal_attribute_entity'}})
     newDoc = nlp(doc.text)
   """
 

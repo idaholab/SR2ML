@@ -22,7 +22,7 @@ class ConjectureEntity(object):
 
     or:
 
-    nlp.add_pipe('conjecture_entity', config={"patterns": {'label': 'conjecture', 'pattern': [{'LOWER': 'possible'}], 'id': 'conjecture'}, "asSpan":True})
+    nlp.add_pipe('conjecture_entity', config={"patterns": {'label': 'conjecture', 'pattern': [{'LOWER': 'possible'}], 'id': 'conjecture'}})
     newDoc = nlp(doc.text)
   """
 

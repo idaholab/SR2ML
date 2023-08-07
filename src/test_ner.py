@@ -12,6 +12,7 @@ from nlp.CreatePatterns import CreatePatterns
 from nlp.ConjectureEntity import ConjectureEntity
 from nlp.GeneralEntity import GeneralEntity
 from nlp.TemporalAttributeEntity import TemporalAttributeEntity
+from nlp.TemporalRelationEntity import TemporalRelationEntity
 # sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # sys.path.append(sr2mlPath)
 
@@ -46,6 +47,9 @@ Pump power supply seems burnout.
 Pump test failed unlikely due to power supply failure.
 The valve is about a twenty-nine years old.
 It is almost five years since it was replaced.
+The pump failed first, then the system failed.
+The system failed following the pump failure.
+The motor failed while the pump stopped working.
         """
 
   #########################
@@ -78,3 +82,16 @@ It is almost five years since it was replaced.
   newDoc = nlp(doc)
   ents = [ent for ent in newDoc.ents if ent.label_=='temporal_attribute']
   print('temporal_attribute:', ents)
+
+
+  #########################
+  #  Testing temporal_relation_entity pipeline
+  #########################
+  nlp.add_pipe('temporal_relation_entity')
+  newDoc = nlp(doc)
+  ents = [ent for ent in newDoc.ents if ent.label_=='temporal_relation_order']
+  print('temporal_relation_order:', ents)
+  ents = [ent for ent in newDoc.ents if ent.label_=='temporal_relation_reverse_order']
+  print('temporal_relation_reverse_order:', ents)
+  ents = [ent for ent in newDoc.ents if ent.label_=='temporal_relation_concurrency']
+  print('temporal_relation_concurrency:', ents)
