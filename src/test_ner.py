@@ -55,9 +55,7 @@ The motor failed while the pump stopped working.
 The water leakage is happened above the pump.
 The oil puddle is found next to the motor.
 The debris is located below the generator.
-There are 30 gallons of water.
         """
-
   #########################
   #  Testing conjecture_entity pipeline
   #########################
@@ -114,6 +112,35 @@ There are 30 gallons of water.
   ents = [ent for ent in newDoc.ents if ent.label_=='location_down']
   print('location_down:', ents)
 
+
+
+
+  doc = r"""There are 30 gallons of water.
+  Twenty milligrams is the desired amount, but 15 mg is enough.
+  The seventh patient enrolled was still relapse-free when the oncologist performed his analysis.
+  The 11th and 12th tests showed degradation.
+  Twenty milligrams is the desired amount, but 15 mg is enough.
+  The desired amount is 20 mg, but 15 mg is enough.
+  The sample was divided into four 20 g container.
+  I use two 32-inch monitors side by side.
+  Samples 6 through 10 were reacted in a similar manner but at approximately 100°C.
+  The success rate was 95%.
+  The equivalence margin ranged from -15% to +15%.
+  The equivalence margin ranged from -15 to +15%.
+  Twenty-five percent of the samples were positive.
+  I performed three experiments yesterday.
+  Mike performed 12 experiments.
+  The chemicals only weighed 46 g.
+  The chemicals only weighed 46 g. Compound A was 30 g lighter than Compound B.
+  The chemicals only weighed 46 g. Compound A was approximately 20 percent as heavy as Compound B before burning at 21 ˚C.
+  The chemicals only weigh 46 g.
+  The study was perfomed on all 42 MOVs.
+  Recorded speed was in the 330-350 rpm range."""
+
+  # Units Entity has issues with the following sentences
+  # The sample was divided into 4 container of 20 g each.
+  # One hundred thirty to one hundred eighty grams per liter is the reference range.
+  # Absolute zero (0 K) is equal to -273.15 ˚C.
 
   #########################
   #  Testing unit_entity pipeline
