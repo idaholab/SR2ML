@@ -14,6 +14,7 @@ from nlp.GeneralEntity import GeneralEntity
 from nlp.TemporalAttributeEntity import TemporalAttributeEntity
 from nlp.TemporalRelationEntity import TemporalRelationEntity
 from nlp.LocationEntity import LocationEntity
+from nlp.UnitEntity import UnitEntity
 # sr2mlPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # sys.path.append(sr2mlPath)
 
@@ -54,6 +55,7 @@ The motor failed while the pump stopped working.
 The water leakage is happened above the pump.
 The oil puddle is found next to the motor.
 The debris is located below the generator.
+There are 30 gallons of water.
         """
 
   #########################
@@ -111,3 +113,12 @@ The debris is located below the generator.
   print('location_up:', ents)
   ents = [ent for ent in newDoc.ents if ent.label_=='location_down']
   print('location_down:', ents)
+
+
+  #########################
+  #  Testing unit_entity pipeline
+  #########################
+  nlp.add_pipe('unit_entity')
+  newDoc = nlp(doc)
+  ents = [ent for ent in newDoc.ents if ent.label_=='unit']
+  print('unit:', ents)
