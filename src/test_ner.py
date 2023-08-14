@@ -113,8 +113,6 @@ The debris is located below the generator.
   print('location_down:', ents)
 
 
-
-
   doc = r"""There are 30 gallons of water.
   Twenty milligrams is the desired amount, but 15 mg is enough.
   The seventh patient enrolled was still relapse-free when the oncologist performed his analysis.
@@ -135,12 +133,16 @@ The debris is located below the generator.
   The chemicals only weighed 46 g. Compound A was approximately 20 percent as heavy as Compound B before burning at 21 ˚C.
   The chemicals only weigh 46 g.
   The study was perfomed on all 42 MOVs.
-  Recorded speed was in the 330-350 rpm range."""
+  Recorded speed was in the 330-350 rpm range.
+  on 7/1/2023 at 5 pm, the pump failed.
+  The pump failed at 5 pm.
+  """
 
   # Units Entity has issues with the following sentences
   # The sample was divided into 4 container of 20 g each.
   # One hundred thirty to one hundred eighty grams per liter is the reference range.
   # Absolute zero (0 K) is equal to -273.15 ˚C.
+  # The pump failed on July 23 at 5 PM.
 
   #########################
   #  Testing unit_entity pipeline

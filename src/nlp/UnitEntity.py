@@ -52,6 +52,7 @@ class UnitEntity(object):
     patterns = [self.nlp.make_doc(quant) for quant in quants]
     self.matcher.add(self.label, patterns)
     matches = self.matcher(doc, as_spans=self.asSpan)
+
     spans = []
     if not self.asSpan:
       for label, start, end in matches:
@@ -59,5 +60,11 @@ class UnitEntity(object):
         spans.append(span)
     else:
       spans.extend(matches)
-    doc.ents = filter_spans(list(doc.ents)+spans)
+
+    newEnts = []
+    for ent in spans:
+      check = [True if tk.dep_ in ['prep'] or tk.pos_ in ['ADP'] else False for tk in ent]
+      if True not in check:
+        newEnts.append(ent)
+    doc.ents = filter_spans(list(doc.ents)+newEnts)
     return doc

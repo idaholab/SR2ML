@@ -5,3 +5,6 @@
 
 # download language model from spacy (can not use INL network)
 - python -m spacy download en_core_web_lg
+
+# You may need to install stemming for some of unit parsing
+- pip install stemming
