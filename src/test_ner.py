@@ -128,7 +128,7 @@ The debris is located below the generator.
   Twenty-five percent of the samples were positive.
   I performed three experiments yesterday.
   Mike performed 12 experiments.
-  The chemicals only weighed 46 g.
+  The chemicals only weighed 36 g .
   The chemicals only weighed 46 g. Compound A was 30 g lighter than Compound B.
   The chemicals only weighed 46 g. Compound A was approximately 20 percent as heavy as Compound B before burning at 21 ˚C.
   The chemicals only weigh 46 g.
@@ -136,13 +136,11 @@ The debris is located below the generator.
   Recorded speed was in the 330-350 rpm range.
   on 7/1/2023 at 5 pm, the pump failed.
   The pump failed at 5 pm.
+  The sample was divided into 4 container of 20 g each.
+  One hundred thirty to one hundred eighty grams per liter is the reference range.
+  Absolute zero (0 K) is equal to -273.15 ˚C.
+  The pump failed on July 23 at 5 PM.
   """
-
-  # Units Entity has issues with the following sentences
-  # The sample was divided into 4 container of 20 g each.
-  # One hundred thirty to one hundred eighty grams per liter is the reference range.
-  # Absolute zero (0 K) is equal to -273.15 ˚C.
-  # The pump failed on July 23 at 5 PM.
 
   #########################
   #  Testing unit_entity pipeline

@@ -1,7 +1,9 @@
 # How to install NLP libraries for SR2ML
 - conda create -n nlp_libs python=3.9
 - conda activate nlp_libs
-- pip install spacy==3.1 textacy matplotlib nltk coreferee beautifulsoup4 networkx pysbd tomli numerizer autocorrect pywsd openpyxl quantulum3 numpy
+- pip install spacy==3.1 textacy matplotlib nltk coreferee beautifulsoup4 networkx pysbd tomli numerizer autocorrect pywsd openpyxl quantulum3[classifier] numpy scikit-learn=1.2.2
+
+# scikit-learn 1.2.2 is required for quantulum3
 
 # download language model from spacy (can not use INL network)
 - python -m spacy download en_core_web_lg
