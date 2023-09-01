@@ -18,7 +18,8 @@
     <jupyterlab source='pip'/>
     <openpyxl source="pip"/>
     <quantulum3 source='pip'/>
-    <python>3.9</python>
+    <!-- python 3.9 is required-->
+    <!--python>3.9</python-->
     <!-- <stanza/> -->
     <!-- <pandas/>
     <numpy/> -->
