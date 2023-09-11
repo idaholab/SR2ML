@@ -48,6 +48,7 @@ class UnitEntity(object):
     text = doc.text
     # print(text)
     quants = parser.parse(text)
+    # print(quants)
     # Methods using pattern and matcher to identify the entities
     quants = set([quant.surface.lower().strip() for quant in quants if quant.unit.entity.name not in ['dimensionless', 'time']])
     patterns = [self.nlp.make_doc(quant) for quant in quants]
