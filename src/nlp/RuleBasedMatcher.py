@@ -449,7 +449,8 @@ class RuleBasedMatcher(object):
     elif grandparent.pos_ in ['VERB'] and causalStatus:
       healthStatus = self.findRightObj(grandparent)
       subtree = list(healthStatus.subtree)
-      if healthStatus is not None and healthStatus.nbor().dep_ in ['prep'] and subtree[-1].i < root.i:
+      nbor = self.getNbor(healthStatus)
+      if healthStatus is not None and not nbor and nbor.dep_ in ['prep'] and subtree[-1].i < root.i:
         healthStatus = grandparent.doc[healthStatus.i:subtree[-1].i+1]
       elif healthStatus is not None and healthStatus.i >= root.i:
         healthStatus = None
@@ -532,6 +533,21 @@ class RuleBasedMatcher(object):
         compDes.append(elem.text)
     return compDes
 
+  def getNbor(self, token):
+    """
+      Method to get the nbor from token, return None if nbor is not exist
+      @ In, token, Token, the provided Token to request nbor
+      @ Out, nbor, Token, the requested nbor
+    """
+    nbor = None
+    if token is None:
+      return nbor
+    try:
+      nbor = token.nbor()
+    except IndexError:
+      pass
+    return nbor
+
   def getHealthStatusForSubj(self, ent, entHS, sent, causalStatus, predSynonyms, include=False):
     """
       Get the status for nsubj/nsubjpass ent
@@ -564,7 +580,8 @@ class RuleBasedMatcher(object):
     else:
       rights = root.rights
       valid = [tk.dep_ in ['advcl', 'relcl'] for tk in rights if tk.pos_ not in ['PUNCT', 'SPACE']]
-      if root.nbor().dep_ in ['cc'] or root.nbor().pos_ in ['PUNCT']:
+      nbor = self.getNbor(root)
+      if nbor is not None and (nbor.dep_ in ['cc'] or nbor.pos_ in ['PUNCT']):
         healthStatus = root
       elif len(valid)>0 and all(valid):
         healthStatus = root
@@ -858,13 +875,15 @@ class RuleBasedMatcher(object):
                   healthStatus = self.getHealthStatusForPobj(healthStatus, include=True)
                 elif healthStatus and healthStatus.dep_ == 'dobj':
                   subtree = list(healthStatus.subtree)
-                  if healthStatus.nbor().dep_ in ['prep']:
+                  nbor = self.getNbor(healthStatus)
+                  if nbor is not None and nbor.dep_ in ['prep']:
                     healthStatus = healthStatus.doc[healthStatus.i:subtree[-1].i+1]
                 # no object is found
                 if not healthStatus:
                   healthStatus = self.findRightKeyword(root)
                 # last is punct, the one before last is the root
-                if not healthStatus and root.nbor().pos_ in ['PUNCT']:
+                nbor = self.getNbor(root)
+                if not healthStatus and not nbor and nbor.pos_ in ['PUNCT']:
                   healthStatus = root
                 if healthStatus is None:
                   healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
@@ -1600,8 +1619,8 @@ class RuleBasedMatcher(object):
       child = toVisit.popleft()
       if child.dep_ in deps:
         # to handle preposition
-        nbor = child.nbor()
-        if nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of']:
+        nbor = self.getNbor(child)
+        if not nbor and nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of']:
           obj = self.findObj(nbor, deps=['pobj'])
           return obj
         else:
