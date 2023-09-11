@@ -450,7 +450,7 @@ class RuleBasedMatcher(object):
       healthStatus = self.findRightObj(grandparent)
       subtree = list(healthStatus.subtree)
       nbor = self.getNbor(healthStatus)
-      if healthStatus is not None and not nbor and nbor.dep_ in ['prep'] and subtree[-1].i < root.i:
+      if healthStatus is not None and nbor is not None and nbor.dep_ in ['prep'] and subtree[-1].i < root.i:
         healthStatus = grandparent.doc[healthStatus.i:subtree[-1].i+1]
       elif healthStatus is not None and healthStatus.i >= root.i:
         healthStatus = None
@@ -883,7 +883,7 @@ class RuleBasedMatcher(object):
                   healthStatus = self.findRightKeyword(root)
                 # last is punct, the one before last is the root
                 nbor = self.getNbor(root)
-                if not healthStatus and not nbor and nbor.pos_ in ['PUNCT']:
+                if not healthStatus and nbor is not None and nbor.pos_ in ['PUNCT']:
                   healthStatus = root
                 if healthStatus is None:
                   healthStatus = self.getAmod(ent, ent.start, ent.end, include=False)
@@ -1620,7 +1620,7 @@ class RuleBasedMatcher(object):
       if child.dep_ in deps:
         # to handle preposition
         nbor = self.getNbor(child)
-        if not nbor and nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of']:
+        if nbor is not None and nbor.dep_ in ['prep'] and nbor.lemma_.lower() in ['of']:
           obj = self.findObj(nbor, deps=['pobj'])
           return obj
         else:
