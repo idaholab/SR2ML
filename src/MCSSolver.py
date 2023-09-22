@@ -364,7 +364,7 @@ class MCSSolver(ExternalModelPluginBase):
 def beReader(fileID):
   """
     This method is designed to read the file containing the set of basic events and their associated probability value
-    @ In, fileID, file, file which is structured in two columns; the first containing the ID of the basic events, 
+    @ In, fileID, file, file which is structured in two columns; the first containing the ID of the basic events,
                         the second one containing the corresponding probability values
     @ Out, BEdict, dict, dictionary containing the ID of the basic events and the corresponding probability values
   """
