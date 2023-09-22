@@ -22,6 +22,7 @@ import numpy as np
 import itertools
 import math
 import xarray as xr
+import pandas as pd
 import copy
 #External Modules End-----------------------------------------------------------
 
@@ -45,6 +46,8 @@ class MCSSolver(ExternalModelPluginBase):
     self.timeDepData   = None  # This variable contains the basic event temporal profiles as xr.Dataset
     self.topEventTerms = {}    # Dictionary containing, for each order, a list of terms containing the union of MCSs
     self.mcsList = None        # List containing all the MCSs; each MCS is a list of basic events
+    self.solver['setType'] = None # Type of sets provided path sets (path) or cut sets (cut)
+    self.fullListBE = None
 
   def initialize(self, container, runInfoDict, inputFiles):
     """
@@ -75,7 +78,12 @@ class MCSSolver(ExternalModelPluginBase):
     container.beId       = None  # ID of the variable containing the IDs of the BEs
     container.tdFromPS   = False # boolean variable which flags when TD calculation is generated from PS
 
+    self.solver['setType'] = None # type of set provided by the user: path sets for cut sets
+    self.fullListBE = None        # list of BEs
+
     metricOrder = {'0':0, '1':1, '2':2, 'inf':np.inf}
+    setTypes = ['path','cut']
+    externalModelNodes = ['inputs','outputs']
 
     for child in xmlNode:
       if child.tag == 'topEventID':
@@ -103,14 +111,27 @@ class MCSSolver(ExternalModelPluginBase):
             if metricValue not in metricOrder.keys():
               raise IOError("MCSSolver: value in xml node metric is not allowed (0,1,2,inf)")
             self.solver['metric'] = metricOrder[metricValue]
+          elif childChild.tag == 'setType':
+            setType = childChild.text.strip()
+            if setType not in setTypes:
+              raise IOError("MCSSolver: set type in xml node setType is not allowed (cut,or path)")
+            self.solver['setType'] = setType
       elif child.tag == 'variables':
         variables = [str(var.strip()) for var in child.text.split(",")]
       elif child.tag == 'map':
         container.mapping[child.get('var')]      = child.text.strip()
         container.invMapping[child.text.strip()] = child.get('var')
-      else:
+      elif child.tag not in externalModelNodes:
         raise IOError("MCSSolver: xml node " + str(child.tag) + " is not allowed")
 
+    if self.solver['setType'] == None:
+      ("MCSSolver: set type in xml node setType has not been specified (cut,or path)")
+
+    if not bool(container.mapping):
+      variables.remove(container.topEventID)
+      for variable in (variables):
+        container.mapping[variable] = variable
+        container.invMapping[variable] = variable
 
   def createNewInput(self, container, inputs, samplerType, **kwargs):
     """
@@ -124,7 +145,6 @@ class MCSSolver(ExternalModelPluginBase):
     """
     if len(inputs) > 2:
       raise IOError("MCSSolver: More than one file has been passed to the MCS solver")
-
     for input in inputs:
       if input.type == 'HistorySet':
         self.timeDepData = input.asDataset()
@@ -132,8 +152,15 @@ class MCSSolver(ExternalModelPluginBase):
         self.timeDepData = self.generateHistorySetFromSchedule(container,input.asDataset())
         container.tdFromPS = True
       else:
-        mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
-
+        if input.__getstate__()['type'] == 'MCSlist':
+          mcsIDs, probability, self.mcsList, self.beList = mcsReader(input.getFilename(), type=container.fileFrom)
+        elif input.__getstate__()['type'] == 'BElist':
+          self.fullListBE = beReader(input.getFilename())
+    # Check list of BEs
+    if self.fullListBE is not None:
+      missingBEs = set(self.beList) - set(self.fullListBE)
+      if len(missingBEs)>0:
+        raise IOError("MCSSolver: there are BEs in the MCSs not defined in the BE file: " +str(missingBEs))
     # mcsList is supposed to be a list of lists
     # E.g., if the MCS are ABC CD and AE --> MCS1=['A','B','C'], MCS2=['D','C'], MCS3=['A','E']
     #       then mcsList = [MCS1,MCS2,MCS3] =
@@ -152,7 +179,7 @@ class MCSSolver(ExternalModelPluginBase):
         #                      (['D', 'C'], ['A', 'E']) ]
 
         basicEventCombined = list(set(itertools.chain.from_iterable(term)) for term in terms)
-        self.topEventTerms[order]=basicEventCombined
+        self.topEventTerms[order] = basicEventCombined
 
     return kwargs
 
@@ -164,6 +191,7 @@ class MCSSolver(ExternalModelPluginBase):
       @ In, inputs, dict, dictionary of inputs from RAVEN
       @ Out, None
     """
+
     if self.timeDepData is None:
       self.runStatic(container, inputs)
     else:
@@ -185,6 +213,10 @@ class MCSSolver(ExternalModelPluginBase):
       topEventValue = self.mcsSolverProbability(inputForSolver)
     else:
       topEventValue = self.mcsSolverMargin(inputForSolver)
+      sensitivities = self.marginSensitivities(topEventValue, inputForSolver)
+      for key in sensitivities:
+        keyID = "sens_" + str(container.invMapping[key])
+        container.__dict__[keyID] = sensitivities[key]
 
     container.__dict__[container.topEventID] = np.asarray(float(topEventValue))
 
@@ -198,6 +230,10 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, None
     """
     topEventValue = np.zeros([self.timeDepData[container.timeID].shape[0]])
+    if self.solver['type'] == 'margin':
+      sensitivities = {}
+      for key in inputs:
+        sensitivities[key] = np.zeros([self.timeDepData[container.timeID].shape[0]])
 
     for index,t in enumerate(self.timeDepData[container.timeID]):
       inputForSolver = {}
@@ -212,6 +248,10 @@ class MCSSolver(ExternalModelPluginBase):
       else:
         topEventValue[index] = self.mcsSolverMargin(inputForSolver)
 
+        sensValues = self.marginSensitivities(topEventValue, inputForSolver)
+        for key in sensitivities:
+          sensitivities[key][index] = sensValues[key]
+
     if container.tdFromPS:
       for key in container.invMapping.keys():
         container.__dict__[key] = self.timeDepData[key][0].values
@@ -219,22 +259,51 @@ class MCSSolver(ExternalModelPluginBase):
     container.__dict__[container.timeID]     = self.timeDepData[container.timeID].values
     container.__dict__[container.topEventID] = topEventValue
 
+    if self.solver['type'] == 'margin':
+      for key in sensitivities:
+        keyID = "sens_" + str(container.invMapping[key])
+        container.__dict__[keyID] = sensitivities[key]
+
+
+  def marginSensitivities(self, MsysBase, inputDict, epsilon = 0.01):
+    """
+      This method calculates the sensitivity (derivative based) of the top event margin vs. basic event margin
+      @ In, inputDict, dictionary containing the probability  value of all basic events
+      @ In, MsysBase, float, base top event margin
+      @ Out, sensDict, dict, dictionary containing the sensitivity values of all basic events
+    """
+    sensDict={}
+    for key in inputDict:
+      tempDict = copy.deepcopy(inputDict)
+      # The sensitivitiy of each basic event is calculated in a derivative form as d M_sys/d M_be
+      # Thus it is needed to calculate:
+      #   * M_sys with nominal value of M_be
+      #   * M_sys with modified value of M_be as M_be*(1.-epsilon)
+      tempDict[key] = tempDict[key] * (1.-epsilon)
+      deltaMsys = self.mcsSolverMargin(tempDict)
+      sensDict[key] = (MsysBase - deltaMsys) / (inputDict[key] - tempDict[key])
+
+    return sensDict
+
 
   def mcsSolverProbability(self, inputDict):
     """
       This method determines the probability of the TopEvent of the FT provided the probability of its Basic Events
-      @ In, inputs, inputDict, dictionary containing the probability  value of all basic events
+      @ In, inputDict, dictionary containing the probability value of all basic events
       @ Out, teProbability, float, probability value of the top event
     """
     teProbability = 0.0
     multiplier = 1.0
 
+    if self.fullListBE is not None:
+      inputDict = {**self.fullListBE, **inputDict}
     # perform probability calculation for each order level
     for order in range(1,self.solver['solverOrder']+1):
       orderProbability=0
       for term in self.topEventTerms[order]:
         # map the sampled values of the basic event probabilities to the MCS basic events ID
         termValues = list(map(inputDict.get,term))
+        #print(term, termValues)
         orderProbability = orderProbability + np.prod(termValues)
       teProbability = teProbability + multiplier * orderProbability
       multiplier = -1.0 * multiplier
@@ -249,12 +318,16 @@ class MCSSolver(ExternalModelPluginBase):
       @ Out, teMargin, float, margin value of the top event
     """
     mcsMargins = np.zeros(len(self.mcsList))
-
     for index,mcs in enumerate(self.mcsList):
       termValues = list(map(inputDict.get,mcs))
-      mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
-
-    teMargin = np.amin(mcsMargins)
+      if self.solver['setType']=='cut':
+        mcsMargins[index] = np.linalg.norm(termValues, ord=self.solver['metric'])
+      else:
+        mcsMargins[index] = np.amin(termValues)
+    if self.solver['setType']=='cut':
+      teMargin = np.amin(mcsMargins)
+    else:
+      teMargin = np.linalg.norm(mcsMargins, ord=self.solver['metric'])
 
     return teMargin
 
@@ -286,3 +359,24 @@ class MCSSolver(ExternalModelPluginBase):
       basicEventHistorySet[key][0][indexes] = 1.0
 
     return basicEventHistorySet
+
+
+def beReader(fileID):
+  """
+    This method is designed to read the file containing the set of basic events and their associated probability value
+    @ In, fileID, file, file which is structured in two columns; the first containing the ID of the basic events,
+                        the second one containing the corresponding probability values
+    @ Out, BEdict, dict, dictionary containing the ID of the basic events and the corresponding probability values
+  """
+  data = pd.read_csv(fileID)
+  fromList = ['FALSE','TRUE']
+  toList   = [0.0,1.0]
+  data = data.replace(to_replace=fromList, value=toList)
+  pd.set_option('display.max_rows', None)
+  finalColumns = ['Name','Value']
+  data = data[data.columns.intersection(finalColumns)]
+  data = data[finalColumns]
+  data['Value'] = data['Value'].astype(float)
+  data['Name'] = data['Name'].str.replace(' ','')
+  BEdict = dict(data.values)
+  return BEdict

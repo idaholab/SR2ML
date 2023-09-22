@@ -1,33 +1,15 @@
 <Simulation verbosity="debug">
-  <!--
-  This is a test for the system: TopEvent = A or B D or B E or C D or CE
-  Basic event margin values: A=0.35
-                             B=0.2
-                             C=0.1
-                             D=0.3
-                             E=0.4
-  Margin of top event is calculated as: M(TopEvent) = min[M(A), M(B D), M(B E), M(C D), M(C E)]
-  where:
-                MCS   Margin
-               *****************
-                A    0.35
-                BD   0.360555128
-                BE   0.447213595
-                CD   0.316227766
-                CE   0.412310563
-
-  Given these values, M(TopEvent) = 0.316227766
-  -->
   <TestInfo>
-    <name>SR2ML/tests.MCSSolver</name>
+    <name>SR2ML/tests.MCSSolver_margin_pathsets</name>
     <author>mandd</author>
     <created>2021-04-27</created>
     <classesTested>SR2ML.MCSSolver</classesTested>
     <description>
-      This model is designed to read from file a list of Minimal Cut Sets (MCSs) and
+      This model is designed to read from file a list of Minimal Path Sets (MPSs) and
       to import such Boolean logic structure as a RAVEN model. Provided the sampled
-      values of Basic Events (BEs) margin values, the MCSSolver determines the
-      margin of Top Event (TE) using the Euclidean metrics
+      margin values of all Basic Events (BEs), the MCSSolver determines the
+      margin of Top Event (TE) using the Euclidean metrics and it calculates the 
+      derivative based importance measures for each basic event
     </description>
   </TestInfo>
 
@@ -43,10 +25,11 @@
 
   <Models>
     <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
-      <variables>statusA,statusB,statusC,statusD,statusE,TOP</variables>
+      <inputs>statusA,statusB,statusC,statusD,statusE</inputs>
+      <outputs>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</outputs>
       <solver type='margin'>
         <metric>2</metric>
-        <setType>cut</setType>
+        <setType>path</setType>
       </solver>
       <topEventID>TOP</topEventID>
       <map var='statusA'>A</map>
@@ -76,12 +59,12 @@
       <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
       <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
       <Output  class="DataObjects"  type="PointSet"        >sim_PS</Output>
-      <Output  class="OutStreams"   type="Print"           >Print_sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS_path</Output>
     </MultiRun>
   </Steps>
 
   <OutStreams>
-    <Print name="Print_sim_PS">
+    <Print name="Print_sim_PS_path">
       <type>csv</type>
       <source>sim_PS</source>
       <what>input,output</what>
@@ -95,7 +78,7 @@
     </PointSet>
     <PointSet name="sim_PS">
       <Input>statusA,statusB,statusC,statusD,statusE</Input>
-      <Output>TOP</Output>
+      <Output>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</Output>
     </PointSet>
   </DataObjects>
 
