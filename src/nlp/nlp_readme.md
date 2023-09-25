@@ -26,4 +26,4 @@
 # Windows machine have issue with pydantic
 See https://github.com/explosion/spaCy/issues/12659
 Installing typing_extensions<4.6
-pip install typing_extensions=4.5.*
+pip install typing_extensions==4.5.*
