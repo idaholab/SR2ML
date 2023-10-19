@@ -112,8 +112,8 @@ def extractLemma(var, nlp):
     @ In, nlp, object, preloaded nlp model
     @ Out, lemVar, list, list of lammatized variables
   """
-  var = ' '.join(var.split())
-  lemVar = [token.lemma_ for token in nlp(var)]
+  mvar = ' '.join(var.split())
+  lemVar = [token.lemma_ for token in nlp(mvar)]
   return lemVar
 
 def generatePattern(form, label, id, attr="LOWER"):
@@ -153,9 +153,9 @@ def generatePatternList(entList, label, id, nlp, attr="LOWER"):
     ptn = generatePattern(ent, label, id, attr="LOWER")
     ptnList.append(ptn)
     if attr.lower() == "lemma":
-      ent = extractLemma(ent, nlp)
+      entLemma = extractLemma(ent, nlp)
       # print('ent lemma: --->', ent)
-      ptnLemma = generatePattern(ent, label, id, attr)
+      ptnLemma = generatePattern(entLemma, label, id, attr)
       # print(ptnLemma)
       ptnList.append(ptnLemma)
   return ptnList

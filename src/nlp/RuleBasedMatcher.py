@@ -111,7 +111,7 @@ class RuleBasedMatcher(object):
     self._updateStatusKeywords = False
     self._updateCausalKeywords = False
     self._conjectureFile = nlpConfig['files']['conjecture_keywords_file']
-    self._conjectureKeywords = self.getKeywords(self._conjectureFile)
+    self._conjectureKeywords = self.getKeywords(self._conjectureFile, columnNames=['conjecture-keywords'])
     ## pipelines "merge_entities" and "merge_noun_chunks" can be used to merge noun phrases and entities
     ## for easier analysis
     if _corefAvail:
@@ -158,14 +158,17 @@ class RuleBasedMatcher(object):
     self._entHS = None
     self._doc = None
 
-  def getKeywords(self, filename):
+  def getKeywords(self, filename, columnNames=None):
     """
       Get the keywords from given file
       @ In, filename, str, the file name to read the keywords
       @ Out, kw, dict, dictionary contains the keywords
     """
     kw = {}
-    ds = pd.read_csv(filename, skipinitialspace=True)
+    if columnNames is not None:
+      ds = pd.read_csv(filename, skipinitialspace=True, names=columnNames)
+    else:
+      ds = pd.read_csv(filename, skipinitialspace=True)
     for col in ds.columns:
       vars = set(ds[col].dropna())
       kw[col] = self.extractLemma(vars)

@@ -2,7 +2,7 @@
   <main>
     <spacy>3.1</spacy>
     <textacy/>
-    <pywsd source="pip"/>
+    <matplotlib/>
     <nltk source="pip"/>
     <coreferee source='pip'/>
     <beautifulsoup4 source="pip"/>
@@ -12,10 +12,14 @@
     <tomli source='pip'/>
     <numerizer source='pip'/>
     <autocorrect source='pip'/>
-    <contextualSpellCheck source='pip'/>
+    <!--There is some conflict with the contextualSpellCheck lib -->
+    <!--contextualSpellCheck source='pip'/-->
     <pywsd source='pip'/>
     <jupyterlab source='pip'/>
     <openpyxl source="pip"/>
+    <quantulum3 source='pip'/>
+    <!-- python 3.9 is required-->
+    <!--python>3.9</python-->
     <!-- <stanza/> -->
     <!-- <pandas/>
     <numpy/> -->
