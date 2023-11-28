@@ -160,7 +160,7 @@ class MarkovModel(ExternalModelPluginBase):
       elif len(detTrans[key]) == 2:
         lowVal  = min(detTrans[key])
         highVal = max(detTrans[key])
-        time = self.randomEngine.uniform(low=lowVal, high=highVal)
+        time = self.randomEngine._engine.uniform(low=lowVal, high=highVal)
         if time<detTransitionTime:
           detTransitionTime = time
           detTransitionState = key
@@ -175,8 +175,8 @@ class MarkovModel(ExternalModelPluginBase):
       @ Out, state, float, arrival state for the next transition
     """
     totLambda = sum(stochTrans.values())
-    transitionTime = self.randomEngine.exponential(1./totLambda)
+    transitionTime = self.randomEngine._engine.exponential(1./totLambda)
     for transition in stochTrans.keys():
       stochTrans[transition] = stochTrans[transition]/totLambda
-    state = self.randomEngine.choice(list(stochTrans.keys()), size = 1, p=list(stochTrans.values()))[0]
+    state = self.randomEngine._engine.choice(list(stochTrans.keys()), size = 1, p=list(stochTrans.values()))[0]
     return transitionTime, state
