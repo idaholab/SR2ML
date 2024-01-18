@@ -1,0 +1,17 @@
+On April 5th, 2023, Duke Catawba Nuclear Station informed Paragon of a failure of the relay card
+upon installation into the CH-531 control panel during planned maintenance on the chiller system.
+Following replacement, the relay module bound to the Adaptiview system correctly, but the chiller
+attempted to start without signal to start from the control room. The issue was discovered when
+the chiller initiated diagnostics for missing evaporator water flow. Flow was not maintained on
+the chiller due to continued maintenance; however, an internal failure of the 1A13 Module (X13650728-06)
+caused the module to read a closed contact at terminals J3-1/2 which would ordinarily come from
+closure of the control room start contact. The failure was readily determined during system restoration.
+
+The affected card was originally supplied to Catawba in December 2024 with three other
+units which have been tested satisfactorily at the plant. The specific failure noted above
+would not prevent the chiller from performing its safety function. To date this is the only
+failure of the affected part number which has been reported to Paragon. Our analysis of the failed
+relay card has identified minor delamination and water intrusion of the microcontroller chip
+(date code 1308) installed. This is the only anomaly identified to date, and therefore it is
+difficult to determine 1) if this condition could exist in more units and 2) if this condition
+prevent the chiller from performing its safety function.

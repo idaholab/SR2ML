@@ -1,0 +1,15 @@
+
+[files]
+text_file = "../tests/excavator/excavator.txt"
+#text_file = "../tests/excavator/excavator_shortlist.txt"
+entity_file = "../tests/excavator/excavator_entities.csv"
+cause_effect_keywords_file = "../data/cause_effect_keywords.csv"
+conjecture_keywords_file = "../data/conjecture_keywords.csv"
+
+status_keywords_file.all = "../data/health_status_keywords.csv"
+status_keywords_file.negative = "../data/health_status_keywords_negative.csv"
+status_keywords_file.positive = "../data/health_status_keywords_positive.csv"
+status_keywords_file.neutral = "../data/health_status_keywords_neutral.csv"
+
+output_health_status_file = "../tests/excavator/excavator_output_health_status.csv"
+output_causal_effect_file = "../tests/excavator/excavator_output_causal_effect.csv"

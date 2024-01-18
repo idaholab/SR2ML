@@ -1,0 +1,32 @@
+VERB,NOUN,TRANSITION,effect-relator,causal-relator,causal-noun,effect-noun
+affect,actor,accordingly,on account of,hence,actor,consequence
+constitute ,consequence,consequently,due to,consequently,agent,impact
+create,end,hence,because,so,creation,product
+force,impact,on account of,because of,as ? result,event,influence 
+initiate,product,so,since,result in,author,result
+restrain,agent,as a result,as,therefore,creator ,benefit
+benefit,creation,due to,,for ? reason,factor,outcome
+construct ,event,if then,,lead to,issue,effect
+damage,influence,results in,,thus,source,
+harm,result,therefore,,accordingly,reason,
+institute,author,because of,,,,
+stop,creator,for that reason,,,,
+cause,factor,leads to,,,,
+contribute,issue,since,,,,
+determine,source,thus,,,,
+induce,benefit,,,,,
+preclude,damage,,,,,
+compose,ground,,,,,
+control,outcome,,,,,
+facilitate,condition,,,,,
+influence,effect,,,,,
+prevent,harm,,,,,
+stimulate,outgrowth,,,,,
+make,reason,,,,,
+derive,,,,,,
+trigger,,,,,,
+result,,,,,,
+lead,,,,,,
+increase,,,,,,
+decrease,,,,,,
+reveal,,,,,,

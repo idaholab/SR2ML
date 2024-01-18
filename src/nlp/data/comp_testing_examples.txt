@@ -1,0 +1,13 @@
+#### These are examples of component testing reports ####
+Since the pump had been sitting idle for over 20 years there was some corrosion on the casing. 
+Prior to the start of the pump test, the casing  was brushed and swabbed. 
+The test started at 8:30am on October 13th at maximum power.
+A 2-hour constant rate pump test was conducted. 
+A constant rate of 400gpm was measured.
+Inspection of pump controller did not show any deterioration.
+Power cables and connectors are not showing any sign of oxidation.
+Pump impeller has been inspected and minor blade corrosion has been found.
+The pump was able to reach a stable flow rate at approximately 350gpm after 20 seconds.
+A constant pump discharge pressure of 20 psig was observed 15 seconds after start-up.
+A total of two pressure transducers were used.
+Nominal pumping rate was difficult to obtain due to transducer failure.

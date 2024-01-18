@@ -1,0 +1,76 @@
+,entities,root,status keywords,health statuses,conjecture,sentence
+0,lip,,,missing tips,True,replace missing lip tips.
+1,tips,replace,,missing lip,False,replace missing lip tips.
+2,bucket teeth,replace,,,False,replace bucket teeth..
+3,tip,replace,,missing,False,replace missing tip & adaptor..
+4,adaptor,replace,,missing,False,replace missing tip & adaptor..
+5,adapter,,,refit,False,refit adapter and tooth.
+6,tooth,,,refit,False,refit adapter and tooth.
+7,adaptor,,,change,False,change adaptor and tooth.
+8,tooth,,,change,False,change adaptor and tooth.
+9,adaptor,,,replace,False,replace adaptor & tooth.
+10,tooth,,,replace,False,replace adaptor & tooth.
+11,lip shroud,,,pin,True,replace lip shroud pin.
+12,pin,replace,,lip shroud,False,replace lip shroud pin.
+13,bucket cylinder grease line,replace,,h,False,replace l/h bucket cylinder grease line.
+14,grease line,,,"
+",False,"loose grease line on bucket ,."
+15,bucket,,,loose grease line,False,"loose grease line on bucket ,."
+16,bucket teeth,,,,False,two bucket teeth and adaptors missing..
+17,adaptors,,,two bucket,False,two bucket teeth and adaptors missing..
+18,bucket tip,replace,,,False,replace bucket tip & pins.
+19,pins,replace,,bucket,False,replace bucket tip & pins.
+20,grease line,,,broken,False,broken grease line on bucket..
+21,bucket,,,broken grease line,False,broken grease line on bucket..
+22,lip,rebuild,,spare lip get,True,rebuild spare lip get.
+23,bucket,,,,False,rh120c-bucket front lip changeout.
+24,lip,,,,False,rh120c-bucket front lip changeout.
+25,wear package,replace,,package lower wall,True,replace wear package lower wall.
+26,air con.,,get,not getting cold,False,air con. not getting cold..
+27,adapter,,,missing,False,"missing adapter,tooth and pins."
+28,tooth,,,missing,False,"missing adapter,tooth and pins."
+29,pins,,,missing,False,"missing adapter,tooth and pins."
+30,bucket cyl gland seal,,,leaking,False,l/h bucket cyl gland seal leaking.
+31,wear package,,,,False,repair wear package rhs inside bkt wall.
+32,lip pivot grease lines,replace,,busted,False,replace busted lip pivot grease lines.
+33,boom valve clam pipe adapter,,,oil leak rh,False,oil leak rh boom valve clam pipe adapter.
+34,adaptor,,,replace,False,replace adaptor  completed.
+35,tip,replace,,completed,True,replace tip & pin  completed.
+36,pin,replace,,completed,True,replace tip & pin  completed.
+37,bucket rod cyl gland seal,,,leaking,False,r/h bucket rod cyl gland seal leaking.
+38,grease line,,,repair,False,repair broken grease line on bucket.
+39,bucket,,,broken grease line,False,repair broken grease line on bucket.
+40,lip shroud lock,replace,,,False,replace lip shroud lock.
+41,bucket clam,,fall,gard,False,bucket clam gard is falling off.
+42,bucket,,,rear,False,oil leak dist. block rear of bucket.
+43,grease fitting,repair,,broken,False,repair broken grease fitting on bucket..
+44,bucket,,,broken grease fitting,True,repair broken grease fitting on bucket..
+45,lube fitting,,,,False,replace broken lube fitting / bucket.
+46,bucket,replace,,lube fitting /,False,replace broken lube fitting / bucket.
+47,bucket,,,,False,weld npb07 on spare bucket.
+48,lube line,replace,,damaged,False,replace damaged lube line on rhs bucket.
+49,bucket,,,damaged lube line,True,replace damaged lube line on rhs bucket.
+50,grease fitting,repair,,broken,False,repair broken grease fitting on bucket.
+51,bucket,,,broken grease fitting,True,repair broken grease fitting on bucket.
+52,bucket clam hose,replace,,,False,replace o ring on bucket clam hose.
+53,bucket clam,,,slow action,False,slow bucket clam action.
+54,tooth,,,x broken,False,change out 1 x broken tooth.
+55,tips,replace,,,False,replace / tips broken off teeth.
+56,teeth,,break,,False,replace / tips broken off teeth.
+57,hose,replace,,leaking,False,replace leaking hose at bucket.
+58,bucket,,,leaking hose,True,replace leaking hose at bucket.
+59,bucket clam,,,oil leak,False,oil leak bucket clam.
+60,bucket,,,repair,False,repair bucket cracks.
+61,bucket pin,come,,coming out,False,bucket pin coming out.
+62,grease line,,,,False,grease line on bucket broken.
+63,bucket,,,grease line,False,grease line on bucket broken.
+64,hydraulic oil hose,,,blown,False,blown hydraulic oil hose on bucket.
+65,bucket,,,hydraulic oil hose,False,blown hydraulic oil hose on bucket.
+66,steel tube,,,,False,steel tube on bucket clam broken.
+67,bucket clam,,,steel tube,False,steel tube on bucket clam broken.
+68,bucket crowd cylinder,,,leaking,False,lh bucket crowd cylinder leaking.
+69,bucket,,,ram,False,repairs to r/h bucket ram  hyd hose.
+70,hose,,,repairs,False,repairs to r/h bucket ram  hyd hose.
+71,bucket wear plates,,,,False,repair  bucket wear plates - broken away.
+72,bucket,,,cracks under heel,False,cracks under heel of bucket.
+73,bucket,,,cracks,False,bucket cracks.

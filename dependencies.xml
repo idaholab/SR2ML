@@ -1,0 +1,30 @@
+<dependencies>
+  <main>
+    <spacy>3.1</spacy>
+    <textacy/>
+    <matplotlib/>
+    <nltk source="pip"/>
+    <coreferee source='pip'/>
+    <beautifulsoup4 source="pip"/>
+    <networkx source="pip"/>
+    <!-- pysbd is used for sentence boundary disambiguation -->
+    <pysbd source="pip"/>
+    <tomli source='pip'/>
+    <numerizer source='pip'/>
+    <autocorrect source='pip'/>
+    <!--There is some conflict with the contextualSpellCheck lib -->
+    <!--contextualSpellCheck source='pip'/-->
+    <pywsd source='pip'/>
+    <jupyterlab source='pip'/>
+    <openpyxl source="pip"/>
+    <quantulum3 source='pip'/>
+    <!-- python 3.9 is required-->
+    <!--python>3.9</python-->
+    <!-- <stanza/> -->
+    <!-- <pandas/>
+    <numpy/> -->
+    <!-- <recognizers-text-number source='pip'>
+    <recognizers-text-number-with-unit source='pip'>
+    <recognizers-text-date-time source='pip'> -->
+  </main>
+</dependencies>

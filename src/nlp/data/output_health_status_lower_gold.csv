@@ -1,0 +1,36 @@
+,entities,root,status keywords,health statuses,conjecture,sentence
+0,pump,,notice,a leak,False,a leak was noticed from the rcp pump 1a.
+1,pump,,find,not operating,False,rcp pump 1a pressure gauge was found not operating.
+2,pump,,find,inoperative,False,rcp pump 1a pressure gauge was found inoperative.
+3,pump,,have,signs of past leakage,False,rcp pump 1a had signs of past leakage.
+4,pump,,experience,not enough flow during test,False,the pump is not experiencing enough flow during test.
+5,pump shaft,,,deflection,False,slight vibrations is noticed - likely from pump shaft deflection.
+6,pump,,,not responding,False,pump flow meter was not responding.
+7,pump bearings,,,rupture,False,rupture of pump bearings caused pump shaft degradation.
+8,pump shaft,,,degradation,False,rupture of pump bearings caused pump shaft degradation.
+9,pump bearings,,,rupture,False,rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
+10,pump shaft,,,degradation,False,rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
+11,power supply,,find,burnout,False,power supply has been found burnout.
+12,pump,,,test,False,pump test failed due to power supply failure.
+13,power supply,,,failure,False,pump test failed due to power supply failure.
+14,pump,,,inspection,False,pump inspection revealed excessive impeller degradation.
+15,impeller,,,excessive degradation,False,pump inspection revealed excessive impeller degradation.
+16,pump,,,inspection,True,pump inspection revealed excessive impeller degradation likely due to cavitation.
+17,impeller,,,excessive degradation,True,pump inspection revealed excessive impeller degradation likely due to cavitation.
+18,pump,,,found in proximity,False,oil puddle was found in proximity of rcp pump 1a.
+19,pump,,observe,anomalous vibrations,False,anomalous vibrations were observed for rcp pump 1a.
+20,pump shaft,,,several cracks,False,several cracks on pump shaft were observed; they could have caused pump failure within few days.
+21,pump,,,failure,True,several cracks on pump shaft were observed; they could have caused pump failure within few days.
+22,pump,,,cavitating,False,rcp pump 1a was cavitating and vibrating to some degree during test.
+23,pump shaft,,,vibration,False,the pump shaft vibration appears to be causing the motor to vibrate as well.
+24,motor,,vibrate,vibrate,False,the pump shaft vibration appears to be causing the motor to vibrate as well.
+25,pump,,have,noise of cavitation which became faint after ops bled off the air,False,pump had noise of cavitation which became faint after ops bled off the air.
+26,pump shaft,,,deflection,False,the pump shaft deflection is causing the safety cage to rattle.
+27,pump,,experience,not enough flow for the pumps,False,the pump is not experiencing enough flow for the pumps to keep the check valves open during test.
+28,pumps,,,enough flow,False,the pump is not experiencing enough flow for the pumps to keep the check valves open during test.
+29,pump shaft,,make,noise,False,pump shaft made noise.
+30,pump shaft,come,,vibration,True,vibration seems like it is coming from the pump shaft.
+31,pump shaft,,,visible deflection,False,visible pump shaft deflection in operation.
+32,pump bearings,,appear,acceptable condition,False,pump bearings appear in acceptable condition.
+33,pump,,make,noises,False,pump made noises - not enough to affect performance.
+34,pump shaft,,have,a slight deflection,False,pump shaft has a slight deflection.

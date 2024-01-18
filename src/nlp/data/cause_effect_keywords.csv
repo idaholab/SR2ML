@@ -1,0 +1,131 @@
+VERB,NOUN,TRANSITION,effect-relator,causal-relator,causal-noun,effect-noun
+affect,actor,accordingly,on account of,hence,actor,consequence
+constitute ,consequence,consequently,due to,consequently,agent,impact
+create,end,hence,because,so,creation,product
+force,impact,on account of,because of,as ? result,event,influence
+initiate,product,so,since,result in,author,result
+restrain,agent,as a result,as,therefore,creator ,benefit
+benefit,creation,due to,,for ? reason,factor,outcome
+construct ,event,if then,,lead to,issue,effect
+damage,influence,results in,,thus,source,aftereffect
+harm,result,therefore,,accordingly,reason,aftermath
+institute,author,because of,,eventually,cause,backfire
+stop,creator,for that reason,,finally,compensation,byproduct
+cause,factor,leads to,,subsequently,determination,conclusion
+contribute,issue,since,,ultimately,development,counteraction
+determine,source,thus,,,evolution,counterbalance
+induce,benefit,,,,fallout,countermove
+preclude,damage,,,,improvement,explanation
+compose,ground,,,,ramification,feedback
+control,outcome,,,,,finding
+facilitate,condition,,,,,kickback
+influence,effect,,,,,implication
+prevent,harm,,,,,outgrowth
+stimulate,outgrowth,,,,,reaction
+make,reason,,,,,rebound
+derive,,,,,,recoil
+trigger,,,,,,repercussion
+result,,,,,,side effect
+lead,,,,,,
+increase,,,,,,
+decrease,,,,,,
+reveal,,,,,,
+Admit,,,,,,
+Agree,,,,,,
+Assent,,,,,,
+Authorize,,,,,,
+Concede,,,,,,
+Confirm,,,,,,
+Consent,,,,,,
+Decline,,,,,,
+Deny,,,,,,
+Disallow,,,,,,
+Disapprove,,,,,,
+Hold,,,,,,
+Keep,,,,,,
+License,,,,,,
+Permit,,,,,,
+Ratify,,,,,,
+Receive,,,,,,
+Refuse,,,,,,
+Reject,,,,,,
+Retain,,,,,,
+Sanction,,,,,,
+Tolerate,,,,,,
+Accelerate,,,,,,
+Achieve,,,,,,
+Activate,,,,,,
+Actuate,,,,,,
+Advance,,,,,,
+Affect,,,,,,
+Alter,,,,,,
+Augment,,,,,,
+Backfire,,,,,,
+Begin,,,,,,
+Bring about,,,,,,
+Build-up,,,,,,
+Cause,,,,,,
+Change,,,,,,
+Combat,,,,,,
+Compensate,,,,,,
+Counter,,,,,,
+Create,,,,,,
+Deactivate,,,,,,
+Decelerate,,,,,,
+Decrease,,,,,,
+Derive,,,,,,
+Develop,,,,,,
+Discourage,,,,,,
+Disturb,,,,,,
+Drag,,,,,,
+Drive,,,,,,
+Effect,,,,,,
+Encourage,,,,,,
+Enhance,,,,,,
+Expand,,,,,,
+Expedite,,,,,,
+Facilitate,,,,,,
+Foment,,,,,,
+Force,,,,,,
+Generate,,,,,,
+Give rise to,,,,,,
+Impede,,,,,,
+Impinge,,,,,,
+Improve,,,,,,
+Increase ,,,,,,
+Induce,,,,,,
+Induce,,,,,,
+Influence,,,,,,
+Initiate,,,,,,
+Launch,,,,,,
+Lead to,,,,,,
+Make,,,,,,
+Modify,,,,,,
+Originate,,,,,,
+Perturb,,,,,,
+Precipitate,,,,,,
+Prevent,,,,,,
+Produce,,,,,,
+Prohibit,,,,,,
+Promote,,,,,,
+Prompt,,,,,,
+Propagate,,,,,,
+Provoke,,,,,,
+Raise,,,,,,
+React,,,,,,
+Repress,,,,,,
+Result,,,,,,
+Set up,,,,,,
+simulate,,,,,,
+Spark,,,,,,
+Start,,,,,,
+Stimulate,,,,,,
+Stop,,,,,,
+Subdue,,,,,,
+Suppress,,,,,,
+Switch on,,,,,,
+Transform,,,,,,
+Trigger,,,,,,
+Turn on,,,,,,
+Upset,,,,,,
+render,,,,,,

@@ -1,0 +1,15 @@
+,cause,cause health status,causal keyword,effect,effect health status,sentence,conjecture
+0,pump bearings,Rupture,caused,pump shaft,degradation,"Rupture of pump bearings caused pump shaft degradation.
+",False
+1,pump bearings,Rupture,caused,pump shaft,degradation,"Rupture of pump bearings caused pump shaft degradation and consequent flow reduction.
+",False
+2,power supply,failure,due to,Pump,test,"Pump test failed due to power supply failure.
+",False
+3,Pump,inspection,revealed,impeller,excessive degradation,"Pump inspection revealed excessive impeller degradation.
+",False
+4,Pump,inspection,revealed,impeller,excessive degradation,"Pump inspection revealed excessive impeller degradation likely due to cavitation.
+",True
+5,pump shaft,Several cracks,caused,pump,failure,"Several cracks on pump shaft were observed; they could have caused pump failure within few days.
+",True
+6,pump shaft,vibration,causing,motor,vibrate,"The pump shaft vibration appears to be causing the motor to vibrate as well.
+",False

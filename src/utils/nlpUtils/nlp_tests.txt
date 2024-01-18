@@ -1,0 +1,29 @@
+A leak was noticed from the RCP pump 1A.
+RCP pump 1A pressure gauge was found not operating.
+RCP pump 1A pressure gauge was found inoperative.
+Rupture of pump bearings caused shaft degradation.
+Rupture of pump bearings caused shaft degradation and consequent flow reduction.
+Pump power supply has been found burnout.
+Pump test failed due to power supply failure.
+Pump inspection revealed excessive impeller degradation.
+Pump inspection revealed excessive impeller degradation likely due to cavitation.
+Oil puddle was found in proximity of RCP pump 1A.
+Anomalous vibrations were observed for RCP pump 1A.
+Several cracks on pump shaft were observed; they could have caused pump failure within few days.
+RCP pump 1A  had signs of past leakage.
+RCP pump 1A was cavitating and vibrating to some degree during test. This is most likely due to low flow conditions rather than mechanical issues. 
+Pump flow meter was not responding. 
+Cavitation was noticed but did not seem severe. The shaft vibration appears to be causing the motor to vibrate as well. 
+Pump had noise of cavitation which became faint after OPS bled off the air. Low flow conditions most likely causing cavitation. 
+The shaft deflection is causing the safety cage to rattle. Pumps not experiencing enough flow for the pumps to keep the check valves open during test.
+Pump not experiencing enough flow during test.
+Shaft made noise. Vibration seems like it is coming from the shaft.
+Slight Vibrations noticed - likely from shaft deflection.
+Visible shaft deflection in operation.
+Pump bearings appear in acceptable condition.
+Pump made noises - not nough to affect performance.
+Pump shaft has a slight deflection.
+
+
+
+

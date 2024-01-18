@@ -1,0 +1,58 @@
+,cause,cause health status,causal keyword,effect,effect health status,sentence,conjecture
+0,investigation,,revealed,steam dump control relay,failed,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable.
+",False
+1,investigation,,rendering,atmospheric steam dump valves,inoperable,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable.
+",False
+2,steam dump control relay,failed,rendering,atmospheric steam dump valves,inoperable,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable.
+",False
+3,investigation,,revealed,steam dump control relay,failed,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4.
+",False
+4,investigation,,rendering,atmospheric steam dump valves,inoperable,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4.
+",False
+5,steam dump control relay,failed,rendering,atmospheric steam dump valves,inoperable,"investigation revealed that the steam dump control relay had failed, rendering all four atmospheric steam dump valves inoperable, and causing an entry into a 24-hour shutdown action statement limiting condition for operation 3.7.4.
+",False
+6,asdvs,,prevent,steam safety valves,lifting,"the capacity of the asdvs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
+",True
+7,asdvs,,prevent,turbine,,"the capacity of the asdvs is adequate to prevent lifting of the main steam safety valves following a turbine and reactor trip.
+",True
+8,control room,,controlled,asdvs,controlled,"although the steam dump system is arranged for automatic operation, the asdvs may be manually controlled from either control room or engineered safeguards control panels.
+",True
+9,control room,,controlled,steam dump system,automatic operation,"although the steam dump system is arranged for automatic operation, the asdvs may be manually controlled from either control room or engineered safeguards control panels.
+",True
+10,control panels,engineered safeguards,controlled,asdvs,controlled,"although the steam dump system is arranged for automatic operation, the asdvs may be manually controlled from either control room or engineered safeguards control panels.
+",True
+11,control panels,engineered safeguards,controlled,steam dump system,automatic operation,"although the steam dump system is arranged for automatic operation, the asdvs may be manually controlled from either control room or engineered safeguards control panels.
+",True
+12,steam dump control relay coil,failure,due to,failure,,"troubleshooting the circuit identified that the bussmann fuse fuz/im13-1, model number fnm-5, was found opened due to the steam dump control relay coil failure.
+",False
+13,fuse,the opening,resulted in,im13 scheme,loss of power,"the opening of the fuse resulted in loss of power to the im13 scheme, which disabled the automatic fast-open function, as well as the manual operation, of the asdvs.
+",False
+14,relay coil,the age,the cause,sdcr coil,failure,"the cause of the sdcr coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
+",False
+15,relay,normally energized,the cause,sdcr coil,failure,"the cause of the sdcr coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life for a normally energized relay.
+",False
+16,relay,the normally energized state,due to,relay,,"the duty cycle of the relay was set at ""low duty cycle"" when it should have been ""high duty cycle"" due to the normally energized state of the relay.
+",False
+17,electrical coil,an internal failure,due to,sdcr relay,an internal failure,"the fuse opened because the sdcr relay failed due to an internal failure of the electrical coil.
+",False
+18,relay coil,the age,the cause,relay coil,failure,"the cause of the relay coil failure is overheating due to the age of the relay coil being beyond the vendor recommended life.
+",False
+19,relay,the normally energized state,due to,relay,,"the relay coil was beyond the vendor recommended life because the duty cycle of the relay was set at ""low duty cycle"" when it should have been ""high duty cycle"" due to the normally energized state of the relay.
+
+",False
+20,sdcr,the failure,the actual consequence,im13 circuit,overcurrent,"the actual consequence of the failure of the sdcr, which was a short-circuit in the relay coil, was overcurrent in the im13 circuit and opening of fuse fuz/im13-1.
+",False
+21,sdcr,the failure,the actual consequence,im13,opening,"the actual consequence of the failure of the sdcr, which was a short-circuit in the relay coil, was overcurrent in the im13 circuit and opening of fuse fuz/im13-1.
+",False
+22,relay coil,a short-circuit,the actual consequence,im13 circuit,overcurrent,"the actual consequence of the failure of the sdcr, which was a short-circuit in the relay coil, was overcurrent in the im13 circuit and opening of fuse fuz/im13-1.
+",False
+23,relay coil,a short-circuit,the actual consequence,im13,opening,"the actual consequence of the failure of the sdcr, which was a short-circuit in the relay coil, was overcurrent in the im13 circuit and opening of fuse fuz/im13-1.
+",False
+24,this,,resulted in,im13 scheme,loss of power,"this resulted in loss of power to the im13 scheme, which disables the automatic fast-open function of the asdvs and disables manual operation of the asdvs.
+",False
+25,this,,resulted in,asdvs,the automatic fast-open function,"this resulted in loss of power to the im13 scheme, which disables the automatic fast-open function of the asdvs and disables manual operation of the asdvs.
+",False
+26,this,,resulted in,asdvs,manual operation,"this resulted in loss of power to the im13 scheme, which disables the automatic fast-open function of the asdvs and disables manual operation of the asdvs.
+",False
+27,relay,failure,due to,atmospheric steam dump valves,inoperable,"atmospheric steam dump valves inoperable due to relay failure.
+",False
