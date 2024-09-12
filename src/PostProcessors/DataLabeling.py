@@ -190,6 +190,6 @@ class DataLabeling(PostProcessorPluginBase):
               dimsDict[self.label] = dims
             break
         outputDict[self.label].append(np.asarray([label]*historySize))
-    outputDict[self.label] = np.asarray(outputDict[self.label])
+    outputDict[self.label] = np.asarray(outputDict[self.label], dtype=object)
     outputDict = {'data': outputDict, 'dims':targetDict['dims']}
     return outputDict
