@@ -22,7 +22,7 @@ jobs:
       - run: cd .. && rm -Rf raven && git clone https://github.com/idaholab/raven.git
       - run: python3 ../raven/scripts/install_plugins.py -s ${{ github.workspace }}
       - run: conda create -n test_lib python=3.10 pip
-      - run: source activate test_lib
+      - run: conda init zsh && conda activate test_lib
       - run: pip install pyDOE3
       - run: conda deactivate
       - run: WD=`(cd ../../.. && pwd)` && export RAVEN_LIBS_NAME="raven_libs_"`basename $WD` && ../raven/scripts/establish_conda_env.sh --install
