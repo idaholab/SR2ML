@@ -3,7 +3,8 @@ run-name: ${{ github.actor }} is testing out SR2ML
 on: [push, pull_request]
 jobs:
   Test-SR2ML-Linux:
-    runs-on: [self-hosted, ubuntu-latest]
+    # runs-on: [self-hosted, ubuntu-latest]
+    runs-on: ${{ fromJSON('["ubuntu-latest", "self-hosted"]')[github.repository == 'github/docs-internal'] }}
     steps:
       - run: echo " The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo " This job is now running on a ${{ runner.os }} server"
