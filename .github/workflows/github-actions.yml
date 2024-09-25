@@ -1,6 +1,14 @@
 name: GitHub SR2ML test
 run-name: ${{ github.actor }} is testing out SR2ML
 on: [push, pull_request]
+
+concurrency:
+  # Here the group is defined by the head_ref of the PR
+  group: ${{ github.head_ref }}
+  # Here we specify that we'll cancel any "in progress" workflow of the same group. Thus if we push, ammend a commit and push
+  # again the previous workflow will be cancelled, thus saving us github action build minutes and avoid any conflicts
+  cancel-in-progress: true
+
 jobs:
   Test-SR2ML-Linux:
     # runs-on: [self-hosted, ubuntu-latest]
@@ -72,7 +80,7 @@ jobs:
       - run: pwd
       - run: cd ..; if (Test-Path raven) {Remove-Item -Recurse -Force raven}; git clone https://github.com/idaholab/raven.git
       - run: python ../raven/scripts/install_plugins.py -s ${{ github.workspace }}
-      - run: $Env:RAVEN_LIBS_NAME =  "raven_libraries_"+(Get-Location).Path.Split("\")[-4]; bash ../raven/scripts/establish_conda_env.sh --install --conda-defs $HOME/Miniconda3/etc/profile.d/conda.sh
+      - run: $Env:RAVEN_LIBS_NAME =  "raven_libraries_"+(Get-Location).Path.Split("\")[-1]; bash ../raven/scripts/establish_conda_env.sh --install --conda-defs $HOME/Miniconda3/etc/profile.d/conda.sh
       - run: cd ../raven; bash ./build_raven
       - run: bash ../raven/run_tests --library-report
       - run: bash ../raven/run_tests -j4 --plugins --re=SR2ML
