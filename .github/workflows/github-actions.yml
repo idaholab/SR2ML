@@ -39,14 +39,14 @@ jobs:
       - run: ../raven/run_tests -j4 --plugins --re=SR2ML
 
   Test-SR2ML-Macos:
-    # runs-on: macos-latest
-    runs-on: macos-14
+    runs-on: macos-latest
+    # runs-on: macos-14
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           channels: conda-forge, defaults
-          use-only-tar-bz2: true  # IMPORTANT: This needs to be set for caching to work properly!
+          use-only-tar-bz2: False  # IMPORTANT: This needs to be set to True for caching to work properly!
           auto-update-conda: true
           auto-activate-base: true
       - run: echo " The job was automatically triggered by a ${{ github.event_name }} event."
