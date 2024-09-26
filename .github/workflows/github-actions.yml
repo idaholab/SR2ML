@@ -39,7 +39,8 @@ jobs:
       - run: ../raven/run_tests -j4 --plugins --re=SR2ML
 
   Test-SR2ML-Macos:
-    runs-on: macos-latest
+    # runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:
