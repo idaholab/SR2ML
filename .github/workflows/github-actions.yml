@@ -63,7 +63,8 @@ jobs:
 
 
   Test-SR2ML-Windows:
-    runs-on: windows-latest
+    # runs-on: windows-latest
+    runs-on: windows-2022
     continue-on-error: true
     strategy:
       fail-fast: false
