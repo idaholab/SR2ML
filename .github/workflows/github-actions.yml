@@ -65,6 +65,8 @@ jobs:
   Test-SR2ML-Windows:
     runs-on: windows-latest
     continue-on-error: true
+    strategy:
+      fail-fast: false
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:
