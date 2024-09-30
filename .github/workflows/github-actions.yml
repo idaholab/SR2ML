@@ -11,8 +11,7 @@ concurrency:
 
 jobs:
   Test-SR2ML-Linux:
-    # runs-on: [self-hosted, ubuntu-latest]
-    runs-on: ${{ fromJSON('["ubuntu-latest", "self-hosted"]')[github.repository == 'github/docs-internal'] }}
+    runs-on: ubuntu-latest
     steps:
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -29,10 +28,6 @@ jobs:
       - run: pwd
       - run: cd .. && rm -Rf raven && git clone https://github.com/idaholab/raven.git
       - run: python3 ../raven/scripts/install_plugins.py -s ${{ github.workspace }}
-      # test with pip install pyDOE3
-      # - run: conda create -n test_lib python=3.10 pip
-      # - run: conda init bash && source ~/.bashrc && conda activate test_lib
-      # - run: pip install pyDOE3
       - run: WD=`(cd ../../.. && pwd)` && export RAVEN_LIBS_NAME="raven_libs_"`basename $WD` && ../raven/scripts/establish_conda_env.sh --install
       - run: cd ../raven && ./build_raven
       - run: ../raven/run_tests --library-report
