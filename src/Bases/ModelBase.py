@@ -12,8 +12,8 @@ import copy
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
 #Internal Modules End--------------------------------------------------------------------------------
 
 class ModelBase(object):

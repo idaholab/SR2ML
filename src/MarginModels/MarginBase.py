@@ -11,9 +11,9 @@ import abc
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from SR2ML.src.Bases import ModelBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Bases import ModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class MarginBase(ModelBase):
@@ -65,4 +65,3 @@ class MarginBase(ModelBase):
       @ Out, margin, float, value of margin for the considered model
     """
     pass
-

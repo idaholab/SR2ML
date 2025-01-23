@@ -13,8 +13,8 @@ from scipy.integrate import quad
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from Models.PostProcessors.FTStructure import FTStructure
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ravenframework.Models.PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 

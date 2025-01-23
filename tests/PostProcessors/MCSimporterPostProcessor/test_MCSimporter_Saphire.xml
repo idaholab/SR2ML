@@ -1,0 +1,55 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>framework/PostProcessors/MCSimporterPostProcessor.MCSimporter</name>
+    <author>wangc</author>
+    <created>2022-02-09</created>
+    <classesTested>MCSImporter</classesTested>
+    <description>
+      Tests of the MCSImporter post-processor: it reads a list of MCSs generated from Saphire and it imports it as a PointSet.
+    </description>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>MCSimporterSaphire</WorkingDir>
+    <Sequence>import,printOnFile</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile" type="MCSlist">cutset_saphire.txt</Input>
+  </Files>
+
+  <Models>
+    <PostProcessor name="MCSImporter" subType="SR2ML.MCSImporter">
+      <expand>False</expand>
+      <fileFrom>Saphire</fileFrom>
+    </PostProcessor>
+  </Models>
+
+  <Steps>
+    <PostProcess name="import">
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="PostProcessor"   >MCSImporter</Model>
+      <Output  class="DataObjects"  type="PointSet"        >MCS_PS</Output>
+    </PostProcess>
+    <IOStep name="printOnFile">
+      <Input   class="DataObjects"  type="PointSet"        >MCS_PS</Input>
+      <Output  class="OutStreams"   type="Print"           >PrintPS</Output>
+    </IOStep>
+  </Steps>
+
+  <OutStreams>
+    <Print name="PrintPS">
+      <type>csv</type>
+      <source>MCS_PS</source>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="MCS_PS">
+      <Input>S-DGN-FR-B, C-PMP-FS-B, S-DGN-FR-A, S-TNK-FC-T1, C-CKV-CC-B, C-CKV-CF, C-PMP-FR-B, S-DGN-FS-A</Input>
+      <Output> MCS_ID,probability,out </Output>
+    </PointSet>
+  </DataObjects>
+
+</Simulation>

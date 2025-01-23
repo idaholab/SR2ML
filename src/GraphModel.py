@@ -9,14 +9,14 @@ Created on April 30, 2018
 #External Modules---------------------------------------------------------------
 import numpy as np
 import xml.etree.ElementTree as ET
-from utils import utils
-from utils import graphStructure as GS
 import copy
-from utils import xmlUtils as xmlU
 #External Modules End-----------------------------------------------------------
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ravenframework.utils import xmlUtils as xmlU
+from ravenframework.utils import utils
+from ravenframework.utils import graphStructure as GS
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
 #Internal Modules End-----------------------------------------------------------
 
 

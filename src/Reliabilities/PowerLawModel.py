@@ -13,9 +13,9 @@ from scipy.integrate import quad
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .ReliabilityBase import ReliabilityBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Reliabilities.ReliabilityBase import ReliabilityBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class PowerLawModel(ReliabilityBase):

@@ -21,8 +21,8 @@ import xml.etree.ElementTree as ET
 import copy
 import itertools
 
-from .FTGate import FTGate
-from utils import xmlUtils as xmlU
+from ...src.PostProcessors.FTGate import FTGate
+from ravenframework.utils import xmlUtils as xmlU
 
 class FTStructure(object):
   """
@@ -132,5 +132,3 @@ class FTStructure(object):
         outcome[key][index]=float(combinationDict[key])
       outcome[self.topEventID][index] = out[self.topEventID]
     return outcome
-
-

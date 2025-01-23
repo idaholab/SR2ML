@@ -19,8 +19,8 @@ Created on Jan 29, 2018
 
 import numpy as np
 
-from utils import InputData, InputTypes, utils
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ravenframework.utils import InputData, InputTypes, utils
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
 
 class DataLabeling(PostProcessorPluginBase):
   """
@@ -190,6 +190,6 @@ class DataLabeling(PostProcessorPluginBase):
               dimsDict[self.label] = dims
             break
         outputDict[self.label].append(np.asarray([label]*historySize))
-    outputDict[self.label] = np.asarray(outputDict[self.label])
+    outputDict[self.label] = np.asarray(outputDict[self.label], dtype=object)
     outputDict = {'data': outputDict, 'dims':targetDict['dims']}
     return outputDict

@@ -14,8 +14,8 @@ import os
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import InputData, InputTypes
-from .MarginBase import MarginBase
+from ravenframework.utils import InputData, InputTypes
+from ...src.MarginModels.MarginBase import MarginBase
 from sklearn.metrics import pairwise_distances
 #Internal Modules End--------------------------------------------------------------------------------
 
@@ -120,5 +120,3 @@ def customDist(pointSet,refPoint):
   """
   distance = np.linalg.norm(pointSet - refPoint)
   return distance
-
-

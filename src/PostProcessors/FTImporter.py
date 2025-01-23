@@ -17,9 +17,9 @@ Created on Dec 21, 2017
 @author: mandd
 """
 #Internal Modules---------------------------------------------------------------
-from utils import InputData, InputTypes
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
-from .FTStructure import FTStructure
+from ravenframework.utils import InputData, InputTypes
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ...src.PostProcessors.FTStructure import FTStructure
 #Internal Modules End-----------------------------------------------------------
 
 class FTImporter(PostProcessorPluginBase):

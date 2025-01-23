@@ -10,9 +10,9 @@ from scipy.stats import erlang
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .ScipyStatsModelBase import ScipyStatsModelBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.Reliabilities.ScipyStatsModelBase import ScipyStatsModelBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class ErlangianModel(ScipyStatsModelBase):

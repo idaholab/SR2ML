@@ -1,0 +1,9 @@
+, Fault Tree/CS#, Prob./Freq., Total %, Cut Sets
+CCS, 2.532E-2, 100%, Displaying 29 of 29 cut sets
+1, 2.113E-2, 83.45%, S-DGN-FR-B
+4, 2.536E-5, 0.10%, C-PMP-FS-B,  S-DGN-FR-A
+9, 2.400E-6, 0.01%, S-TNK-FC-T1
+10, 2.113E-6, 0.01%, C-CKV-CC-B,  S-DGN-FR-A
+11, 2.050E-6, 0.01%, C-CKV-CF
+12, 2.015E-6, 0.01%, C-PMP-FR-B,  S-DGN-FS-A
+, , , ,

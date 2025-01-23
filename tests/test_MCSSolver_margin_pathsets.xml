@@ -1,0 +1,85 @@
+<Simulation verbosity="debug">
+  <TestInfo>
+    <name>SR2ML/tests.MCSSolver_margin_pathsets</name>
+    <author>mandd</author>
+    <created>2021-04-27</created>
+    <classesTested>SR2ML.MCSSolver</classesTested>
+    <description>
+      This model is designed to read from file a list of Minimal Path Sets (MPSs) and
+      to import such Boolean logic structure as a RAVEN model. Provided the sampled
+      margin values of all Basic Events (BEs), the MCSSolver determines the
+      margin of Top Event (TE) using the Euclidean metrics and it calculates the 
+      derivative based importance measures for each basic event
+    </description>
+  </TestInfo>
+
+  <RunInfo>
+    <WorkingDir>MCSSolverMargin</WorkingDir>
+    <Sequence>simRun</Sequence>
+    <batchSize>1</batchSize>
+  </RunInfo>
+
+  <Files>
+    <Input name="MCSlistFile" type="MCSlist">MCSlist.csv</Input>
+  </Files>
+
+  <Models>
+    <ExternalModel name="MCSmodel" subType="SR2ML.MCSSolver">
+      <inputs>statusA,statusB,statusC,statusD,statusE</inputs>
+      <outputs>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</outputs>
+      <solver type='margin'>
+        <metric>2</metric>
+        <setType>path</setType>
+      </solver>
+      <topEventID>TOP</topEventID>
+      <map var='statusA'>A</map>
+      <map var='statusB'>B</map>
+      <map var='statusC'>C</map>
+      <map var='statusD'>D</map>
+      <map var='statusE'>E</map>
+    </ExternalModel>
+  </Models>
+
+  <Samplers>
+    <MonteCarlo name="MC_external">
+      <samplerInit>
+        <limit>1</limit>
+      </samplerInit>
+      <constant name="statusA">0.35</constant>
+      <constant name="statusB">0.2</constant>
+      <constant name="statusC">0.1</constant>
+      <constant name="statusD">0.3</constant>
+      <constant name="statusE">0.4</constant>
+    </MonteCarlo>
+  </Samplers>
+
+  <Steps>
+    <MultiRun name="simRun">
+      <Input   class="Files"        type="MCSlist"         >MCSlistFile</Input>
+      <Model   class="Models"       type="ExternalModel"   >MCSmodel</Model>
+      <Sampler class="Samplers"     type="MonteCarlo"      >MC_external</Sampler>
+      <Output  class="DataObjects"  type="PointSet"        >sim_PS</Output>
+      <Output  class="OutStreams"   type="Print"           >Print_sim_PS_path</Output>
+    </MultiRun>
+  </Steps>
+
+  <OutStreams>
+    <Print name="Print_sim_PS_path">
+      <type>csv</type>
+      <source>sim_PS</source>
+      <what>input,output</what>
+    </Print>
+  </OutStreams>
+
+  <DataObjects>
+    <PointSet name="inputPlaceHolder">
+      <Input>statusA,statusB,statusC,statusD,statusE</Input>
+      <Output>OutputPlaceHolder</Output>
+    </PointSet>
+    <PointSet name="sim_PS">
+      <Input>statusA,statusB,statusC,statusD,statusE</Input>
+      <Output>TOP,sens_statusA,sens_statusB,sens_statusC,sens_statusD,sens_statusE</Output>
+    </PointSet>
+  </DataObjects>
+
+</Simulation>

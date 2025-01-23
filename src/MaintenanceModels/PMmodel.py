@@ -12,9 +12,9 @@ import numpy.ma as ma
 #External Modules End--------------------------------------------------------------------------------
 
 #Internal Modules------------------------------------------------------------------------------------
-from utils import mathUtils as utils
-from utils import InputData, InputTypes
-from .MaintenanceBase import MaintenanceBase
+from ravenframework.utils import mathUtils as utils
+from ravenframework.utils import InputData, InputTypes
+from ...src.MaintenanceModels.MaintenanceBase import MaintenanceBase
 #Internal Modules End--------------------------------------------------------------------------------
 
 class PMModel(MaintenanceBase):

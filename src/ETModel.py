@@ -7,8 +7,8 @@ Created on April 30, 2018
 """
 
 #Internal Modules---------------------------------------------------------------
-from PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
-from .PostProcessors.ETStructure import ETStructure
+from ravenframework.PluginBaseClasses.ExternalModelPluginBase import ExternalModelPluginBase
+from ..src.PostProcessors.ETStructure import ETStructure
 #Internal Modules End-----------------------------------------------------------
 
 

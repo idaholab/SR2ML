@@ -17,10 +17,8 @@ Created on April 30, 2018
 @author: mandd
 """
 #Internal Modules---------------------------------------------------------------
-import MessageHandler
-from utils import utils
-from utils import xmlUtils as xmlU
-import MessageHandler
+from ravenframework.utils import utils
+from ravenframework.utils import xmlUtils as xmlU
 #Internal Modules End-----------------------------------------------------------
 
 #External Modules---------------------------------------------------------------
@@ -305,7 +303,7 @@ class ETStructure(object):
     seqID        = []
 
     for node in root.findall('define-sequence'):
-      for child in node.getiterator():
+      for child in node.iter():
         if 'event-tree' in child.tag:
           dependencies.append(child.get('name'))
           seqID.append(node.get('name'))
@@ -460,7 +458,7 @@ class ETStructure(object):
         ## fill in the details under this branch, later iterations will
         ## correct lower rows if a path does change
         X[rowCounter, col] = val
-        for fork in path.getchildren():
+        for fork in iter(path):
           newCounter = self.constructPointDFS(fork, inputMap, stateMap, outputMap, X, rowCounter)
           for i in range(newCounter-rowCounter):
             X[rowCounter+i, col] = val

@@ -17,9 +17,9 @@ Created on Nov 1, 2017
 @author: dan maljovec, mandd
 """
 #Internal Modules---------------------------------------------------------------
-from utils import InputData, InputTypes
-from PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
-from .ETStructure import ETStructure
+from ravenframework.utils import InputData, InputTypes
+from ravenframework.PluginBaseClasses.PostProcessorPluginBase import PostProcessorPluginBase
+from ...src.PostProcessors.ETStructure import ETStructure
 #Internal Modules End-----------------------------------------------------------
 
 class ETImporter(PostProcessorPluginBase):
